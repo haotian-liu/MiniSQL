@@ -3,5 +3,5 @@ project(MiniSQL)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp src/RecordManager/RecordManager.cpp src/RecordManager/RecordManager.h src/CatelogManager/CatelogManager.cpp src/CatelogManager/CatelogManager.h src/IndexManager/IndexManager.cpp src/IndexManager/IndexManager.h lib/BPTree/BPTree.cpp lib/BPTree/BPTree.h)
 add_executable(MiniSQL ${SOURCE_FILES})
