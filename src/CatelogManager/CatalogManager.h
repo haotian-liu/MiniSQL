@@ -6,7 +6,7 @@
 #define MINISQL_CATELOGMANAGER_H
 
 
-class CatelogManager {
+class CatalogManager {
 
 };
 
