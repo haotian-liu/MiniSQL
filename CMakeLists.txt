@@ -3,5 +3,6 @@ project(MiniSQL)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp src/RecordManager/RecordManager.cpp src/RecordManager/RecordManager.h src/CatelogManager/CatalogManager.cpp src/CatelogManager/CatalogManager.h src/IndexManager/IndexManager.cpp src/IndexManager/IndexManager.h lib/BPTree/BPTree.cpp lib/BPTree/BPTree.h)
+set(SOURCE_FILES main.cpp src/RecordManager/RecordManager.cpp src/RecordManager/RecordManager.h src/CatalogManager/CatalogManager.cpp src/CatalogManager/CatalogManager.h src/IndexManager/IndexManager.cpp src/IndexManager/IndexManager.h lib/BPTree/BPTree.cpp lib/BPTree/BPTree.h include/DataStructure.h)
+
 add_executable(MiniSQL ${SOURCE_FILES})
