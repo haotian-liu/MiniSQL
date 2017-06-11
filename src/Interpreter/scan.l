@@ -23,7 +23,9 @@ num                  {digit}+
 s_num                [+\-]?{num}
 %x comment
 %x shell_cmd
+
 %%
+
 "/*"                 {BEGIN(comment);}
 <comment>[^*]        {/* ignore the text of the comment */}
 <comment>"*/"        {BEGIN(INITIAL);}
@@ -52,5 +54,7 @@ s_num                [+\-]?{num}
 [*/+\-=<>':;,.|&()]  {return yytext[0];}
 <<EOF>>              {return T_EOF;}
 .                    {printf("illegal character [%c]\n", yytext[0]);}
+
 %%
+
 #include "scanhelp.c"
