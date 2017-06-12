@@ -12,7 +12,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "redbase.h"
-#include "parser_internal.h"
+#include "parser_internal.rb.h"
 #include "y.tab.h"
 
 /*
