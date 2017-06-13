@@ -4,19 +4,22 @@
 
 #include <string>
 #include <iostream>
+#include <cstring>
 
 #include "Interpreter.h"
 
-#define INPUT_LENGTH 2000
+#include "parser_public.h"
+
+char input_s[INPUT_LENGTH];
+size_t input_len;
 
 void main_repl_loop()
 {
     while (true)
     {
         std::cout << "\n>>> ";
-        char input_s[INPUT_LENGTH];
         std::cin.getline(input_s, INPUT_LENGTH);
-        std::string input{input_s};
+        input_len = std::strlen(input_s);
 
         break;
     }
