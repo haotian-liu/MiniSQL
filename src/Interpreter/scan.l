@@ -29,7 +29,21 @@ s_num       [+\-]?{num}
 {s_num}\.{num}				{ sscanf(yytext, "%f", yylval.r); return T_REAL; }
 {s_num}\.{num}[Ee]{s_num}	{ sscanf(yytext, "%f", yylval.r); return T_REAL; }
 \"([^\"\n]|(\"\"))*\"       { yylval.str = std::string(yytext); return T_STRING; }
+	/* why QSTRING? ignored yyleng for the string length. */
 \"([^\"\n]|(\"\"))*\n       { std::cerr << "newline in string literal\n"; }
+
+"<"                  {return T_LT;}
+"<="                 {return T_LE;}
+">"                  {return T_GT;}
+">="                 {return T_GE;}
+"="                  {return T_EQ;}
+"!="                 {return T_NE;}
+"<>"                 {return T_NE;}
+
+[*/+\-=<>':;,.|&()]  {return yytext[0];}
+<<EOF>>              {return T_EOF;}
+
+.                    { std::cerr << "illegal character [" << yytext[0] << "]\n"; }
 
 %%
 

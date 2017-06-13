@@ -24,6 +24,8 @@
     T_EQ
     T_NE
 
+    T_EOF
+
 %token <i> T_INT
 %token <r> T_REAL
 %token <str> T_STRING
