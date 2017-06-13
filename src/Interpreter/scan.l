@@ -33,6 +33,7 @@ s_num       [+\-]?{num}
 \"([^\"\n]|(\"\"))*\"       { yylval.str = std::string(yytext + 1, yyleng - 2); return T_STRING; }
 	/* why QSTRING? ignored yyleng for the string length. */
 \"([^\"\n]|(\"\"))*\n       { std::cerr << "newline in string literal\n"; }
+{letter}({letter}|{digit}|_)*   {return get_id(yylval.str = std::string(yytext));}
 
 "<"                  {return T_LT;}
 "<="                 {return T_LE;}
