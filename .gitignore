@@ -69,3 +69,7 @@ cmake-build-*
 # Debug files
 *.dSYM/
 
+# vim temp file
+*.un~
+*~
+*.swp
