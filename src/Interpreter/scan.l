@@ -1,4 +1,4 @@
-%{
+%{ /* -*- C++ -*- */
 /*
  * scan.l
  * flex scanner file for SQL interpreter
@@ -8,6 +8,7 @@
  */
 
 #include "y.tab.h"
+#include "parser_public.h"
 
 #include <cstring>
 #include <string>

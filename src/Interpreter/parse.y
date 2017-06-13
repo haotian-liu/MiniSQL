@@ -1,4 +1,6 @@
-%{
+%require "3.0.4"
+
+%{ /* -*- C++ -*- */
 
 /*
  *
@@ -6,6 +8,8 @@
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <memory>
 
 %}
 
@@ -50,6 +54,8 @@
 %token <str> T_STRING
 
 %%
+
+exit: RW_EXIT { /************/ }
 
 %%
 

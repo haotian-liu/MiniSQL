@@ -73,3 +73,8 @@ cmake-build-*
 *.un~
 *~
 *.swp
+
+# generatoed file
+scan.c
+parse.c
+y.tab.h

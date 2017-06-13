@@ -3,13 +3,13 @@
 YACC=bison -dy
 LEX=flex
 
-all: scan.cpp parse.cpp
+all: scan.c parse.c
 
-parse.cpp: parse.y
-	$(YACC) parse.y; mv y.tab.c parse.cpp
+parse.c: parse.y
+	$(YACC) parse.y; mv y.tab.c parse.c
 
-scan.cpp: scan.l
-	$(LEX) scan.l; mv lex.yy.c scan.cpp
+scan.c: scan.l
+	$(LEX) scan.l; mv lex.yy.c scan.c
 
 clean:
-	rm parse.cpp scan.cpp
+	rm parse.c scan.c
