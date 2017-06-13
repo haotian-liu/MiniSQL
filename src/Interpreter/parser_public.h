@@ -7,6 +7,7 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 int yylex();
 int yyparse();
@@ -20,6 +21,8 @@ typedef struct yystype
     int i;
     double r;
     std::string str;
+    void *dummy;    //for non-final nodes dummy part in AST.
+    std::vector<std::string> str_list;
 } YYSTYPE;
 
 extern "C" inline int yyerror(const char *s)

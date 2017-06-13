@@ -30,7 +30,7 @@ s_num       [+\-]?{num}
 {s_num}						{ sscanf(yytext, "%d", yylval.i); return T_INT; }
 {s_num}\.{num}				{ sscanf(yytext, "%f", yylval.r); return T_REAL; }
 {s_num}\.{num}[Ee]{s_num}	{ sscanf(yytext, "%f", yylval.r); return T_REAL; }
-\"([^\"\n]|(\"\"))*\"       { yylval.str = std::string(yytext); return T_STRING; }
+\"([^\"\n]|(\"\"))*\"       { yylval.str = std::string(yytext + 1, yyleng - 2); return T_STRING; }
 	/* why QSTRING? ignored yyleng for the string length. */
 \"([^\"\n]|(\"\"))*\n       { std::cerr << "newline in string literal\n"; }
 

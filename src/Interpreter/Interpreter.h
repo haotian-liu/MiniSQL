@@ -11,5 +11,6 @@ class Interpreter
 
 };
 
+void main_repl_loop();
 
 #endif //MINISQL_INTERPRETER_H

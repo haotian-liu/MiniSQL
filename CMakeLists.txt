@@ -3,6 +3,8 @@ project(MiniSQL)
 
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
 set(SOURCE_FILES main.cpp
         src/RecordManager/RecordManager.cpp
         src/RecordManager/RecordManager.h
