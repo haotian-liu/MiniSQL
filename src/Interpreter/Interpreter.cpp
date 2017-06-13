@@ -13,6 +13,8 @@
 char input_s[INPUT_LENGTH];
 size_t input_len;
 
+bool isExit = false;
+
 void main_repl_loop()
 {
     while (true)
@@ -20,7 +22,10 @@ void main_repl_loop()
         std::cout << "\n>>> ";
         std::cin.getline(input_s, INPUT_LENGTH);
         input_len = std::strlen(input_s);
-
-        break;
+        yyparse();
+        if (isExit)
+        {
+            break;
+        }
     }
 }

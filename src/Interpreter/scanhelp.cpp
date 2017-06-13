@@ -3,8 +3,9 @@
 //
 
 #include <string>
+#include <iostream>
 
-int get_id(std::string &s)
+int get_id(const std::string &s)
 {
     std::string tok{s};
     int r;
@@ -22,6 +23,10 @@ int get_id(std::string &s)
     if (tok == "and")r = RW_AND;
     if (tok == "into")r = RW_INTO;
     if (tok == "values")r = RW_VALUES;
+
+    if (tok == "naive")r = RW_TEST;
+
+    if(tok == "exit")r = RW_EXIT;
 
     return yylval.i = r;
 }

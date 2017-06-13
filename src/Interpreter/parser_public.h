@@ -8,14 +8,20 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cassert>
+#include <cstring>
 
 #define INPUT_LENGTH 2000
 
+// generated functions
 int yylex();
+
 int yyparse();
 
 extern char input_s[INPUT_LENGTH];
 extern size_t input_len;
+
+extern bool isExit;
 
 #ifdef YYSTYPE
 #undef YYSTYPE
@@ -25,10 +31,10 @@ extern size_t input_len;
 #error YY_INPUT defined
 #endif
 
-#define YY_INPUT(input_s, input_len, INPUT_LENGTH)
+#define YY_INPUT(i_s, i_len, I_LEN) do { std::strcpy(i_s, input_s); i_len = input_len; } while(0);
 // let us assume the buffer should be read-only.
 
-int get_id(std::string &s);
+int get_id(const std::string &s);
 
 typedef struct yystype
 {
@@ -41,12 +47,15 @@ typedef struct yystype
 
 extern "C" inline int yyerror(const char *s)
 {
+    std::cerr << "error: ";
     std::cerr << s << std::endl;
 }
 
+/*
 extern "C" inline int yywrap()
 {
     return 1;
 }
+ */
 
 #endif //MINISQL_PARSER_PUBLIC_H

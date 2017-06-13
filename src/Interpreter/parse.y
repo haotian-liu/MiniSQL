@@ -34,6 +34,8 @@
     RW_SET
     RW_EXIT
 
+    RW_TEST
+
     T_LT
     T_GT
     T_GE
@@ -51,7 +53,14 @@
 
 %%
 
-exit: RW_EXIT { /************/ }
+top_input: top_stmt ';' { YYACCEPT; }
+
+top_stmt: exit
+    | test
+
+exit: RW_EXIT { isExit = true; }
+
+test: RW_TEST { std::cerr << "RW_TEST is input\n"; }
 
 %%
 
