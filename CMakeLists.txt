@@ -20,6 +20,7 @@ set(SOURCE_FILES main.cpp
         src/Interpreter/QueryRequest.h
         src/Interpreter/scan.cpp
         src/Interpreter/parse.cpp
+        src/Interpreter/parser_public.h
         )
 
 add_executable(MiniSQL ${SOURCE_FILES})

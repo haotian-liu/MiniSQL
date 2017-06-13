@@ -11,14 +11,10 @@
 #include <cstdlib>
 #include <memory>
 
-%}
+#include "parser_public.h"
+#include "y.tab.h"
 
-%union
-{
-    int i;
-    double r;
-    std::string str;
-}
+%}
 
 %token
     RW_CREATE
@@ -59,12 +55,5 @@ exit: RW_EXIT { /************/ }
 
 %%
 
-int yyerror(const char *s)
-{
-    std::cerr << s << std::endl;
-}
+bool bFlag; /* no meanings. */
 
-int yywrap()
-{
-    return 1;
-}

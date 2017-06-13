@@ -7,9 +7,10 @@
  * Author: yzy
  */
 
-#include "y.tab.h"
 #include "parser_public.h"
+#include "y.tab.h"
 
+#include <iostream>
 #include <cstring>
 #include <string>
 #include <cstdio>
