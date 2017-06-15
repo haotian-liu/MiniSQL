@@ -58,6 +58,8 @@
 
 %type <val> value
 
+%type <cond> condition
+
 %type <dummy> top_stmt
     test
     exit
@@ -87,9 +89,17 @@ dml:
      insert
     ;
 
-insert: RW_INSERT RW_INTO T_ASTRING RW_VALUES '(' T_ASTRING ')'
+insert: RW_INSERT RW_INTO T_STRING RW_VALUES '(' T_ASTRING ')'
     {
         std::cout << $6 << std::endl;
+    }
+    ;
+
+condition: T_STRING operator value
+    {
+        $$.name = $1;
+        $$.op = $2;
+        $$.val = $3;
     }
     ;
 

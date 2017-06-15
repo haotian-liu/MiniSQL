@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include "operator.h"
+
 enum class SqlValueType
 {
     Integer,
@@ -23,6 +25,13 @@ struct SqlValue
         float r;
         std::string str;
     };
+};
+
+struct Condition
+{
+    std::string name;
+    Operator op;
+    SqlValue val;
 };
 
 enum class QueryType

@@ -442,7 +442,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  11
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   11
+#define YYLAST   12
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  42
@@ -501,8 +501,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    79,    79,    81,    82,    83,    87,    90,   111,   111,
-     113,   115
+       0,    81,    81,    83,    84,    85,    89,    92,   121,   121,
+     123,   125
 };
 #endif
 
@@ -550,7 +550,7 @@ static const yytype_uint16 yytoknum[] =
 static const yytype_int8 yypact[] =
 {
      -10,   -11,   -35,   -35,     4,   -34,   -35,   -35,   -35,   -35,
-     -28,   -35,   -35,   -35,   -35,    -9,   -31,   -28,   -30,   -35
+     -23,   -35,   -35,    -6,   -30,   -28,   -35,   -35,   -29,   -35
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -559,19 +559,19 @@ static const yytype_int8 yypact[] =
 static const yytype_uint8 yydefact[] =
 {
        0,     0,    10,    11,     0,     0,     5,     6,     3,     4,
-       0,     1,     2,     9,     8,     0,     0,     0,     0,     7
+       0,     1,     2,     0,     0,     0,     9,     8,     0,     7
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -35,   -35,   -35,   -35,   -35,    -7,   -35,   -35
+     -35,   -35,   -35,   -35,   -35,   -35,   -35,   -35
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5,     6,     7,    15,     8,     9
+      -1,     4,     5,     6,     7,    18,     8,     9
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -579,14 +579,14 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,    13,    14,    10,    11,    12,    16,     2,     3,    17,
-      18,    19
+       1,    16,    17,    10,    11,    12,    13,     2,     3,    14,
+      15,     0,    19
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-      10,    29,    30,    14,     0,    39,    15,    17,    18,    40,
-      17,    41
+      10,    29,    30,    14,     0,    39,    29,    17,    18,    15,
+      40,    -1,    41
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -594,7 +594,7 @@ static const yytype_uint8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,    10,    17,    18,    43,    44,    45,    46,    48,    49,
-      14,     0,    39,    29,    30,    47,    15,    40,    47,    41
+      14,     0,    39,    29,    15,    40,    29,    30,    47,    41
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -1285,13 +1285,13 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 79 "parse.y" /* yacc.c:1646  */
+#line 81 "parse.y" /* yacc.c:1646  */
     { YYACCEPT; }
 #line 1291 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 91 "parse.y" /* yacc.c:1646  */
+#line 93 "parse.y" /* yacc.c:1646  */
     {
         std::cout << (yyvsp[-1].str) << std::endl;
     }
@@ -1299,13 +1299,13 @@ yyreduce:
     break;
 
   case 10:
-#line 113 "parse.y" /* yacc.c:1646  */
+#line 123 "parse.y" /* yacc.c:1646  */
     { isExit = true; }
 #line 1305 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 115 "parse.y" /* yacc.c:1646  */
+#line 125 "parse.y" /* yacc.c:1646  */
     { std::cerr << "RW_TEST is input\n"; }
 #line 1311 "y.tab.c" /* yacc.c:1646  */
     break;
@@ -1539,7 +1539,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 117 "parse.y" /* yacc.c:1906  */
+#line 127 "parse.y" /* yacc.c:1906  */
 
 
 bool bFlag; /* no meanings. */

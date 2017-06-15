@@ -47,6 +47,7 @@ typedef struct yystype
     void *dummy;    //for non-final nodes dummy part in AST.
     Operator op;
     SqlValue val;
+    Condition cond;
     std::vector<std::string> str_list;
 } YYSTYPE;
 
