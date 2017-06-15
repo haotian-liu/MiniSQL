@@ -50,17 +50,47 @@
 %token <i> T_INT
 %token <r> T_REAL
 %token <str> T_STRING
+%token <str> T_QSTRING
+%token <str> T_ASTRING
+
+%type <dummy> top_stmt
+    test
+    exit
+    dml
+    insert
+
+%token
+    ddl
+    query
+    delete_op
+    update
+    create_table
+    create_index
+    drop_table
+    drop_index
 
 %%
 
-top_input: top_stmt ';' { YYACCEPT; }
+top_input: top_stmt ';' { YYACCEPT; };
 
 top_stmt: exit
     | test
+    | dml
+    ;
 
-exit: RW_EXIT { isExit = true; }
+dml:
+     insert
+    ;
 
-test: RW_TEST { std::cerr << "RW_TEST is input\n"; }
+insert: RW_INSERT RW_INTO T_STRING RW_VALUES '(' T_STRING ')'
+    {
+        std::cout << $6 << std::endl;
+    }
+    ;
+
+exit: RW_EXIT { isExit = true; };
+
+test: RW_TEST { std::cerr << "RW_TEST is input\n"; };
 
 %%
 

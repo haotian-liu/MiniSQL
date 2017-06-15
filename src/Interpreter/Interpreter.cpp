@@ -5,6 +5,15 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
+
+#ifdef NO_GNU_READLINE
+#error GNU readline needed
+#else
+
+#include <readline/readline.h>
+
+#endif
 
 #include "Interpreter.h"
 
@@ -19,8 +28,16 @@ void main_repl_loop()
 {
     while (true)
     {
+#ifdef NO_GNU_READLINE
         std::cout << "\n>>> ";
         std::cin.getline(input_s, INPUT_LENGTH);
+#else
+        char *rl = readline("MiniSQL>");
+        if (!rl)
+            continue;
+        std::strcpy(input_s, rl);
+        std::free(rl);
+#endif
         input_len = std::strlen(input_s);
         yyparse();
         if (isExit)

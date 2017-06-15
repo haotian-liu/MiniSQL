@@ -4,11 +4,21 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
+#include <cctype>
+#include <cstdint>
+#include <climits>
 
+///
+/// \param s
+/// \return INT_MAX for error
 int get_id(const std::string &s)
 {
     std::string tok{s};
-    int r;
+    int r = INT_MAX;
+
+    std::transform(tok.begin(), tok.end(), tok.begin(), [](unsigned char c)
+    { return std::tolower(c); });
 
     if (tok == "select")r = RW_SELECT;
     if (tok == "create")r = RW_CREATE;
@@ -26,7 +36,7 @@ int get_id(const std::string &s)
 
     if (tok == "naive")r = RW_TEST;
 
-    if(tok == "exit")r = RW_EXIT;
+    if (tok == "exit")r = RW_EXIT;
 
     return yylval.i = r;
 }

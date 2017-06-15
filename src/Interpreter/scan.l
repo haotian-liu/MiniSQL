@@ -34,7 +34,7 @@ s_num       [+\-]?{num}
 {s_num}\.{num}				{ sscanf(yytext, "%f", yylval.r); return T_REAL; }
 {s_num}\.{num}[Ee]{s_num}	{ sscanf(yytext, "%f", yylval.r); return T_REAL; }
 \"([^\"\n]|(\"\"))*\"       { yylval.str = std::string(yytext + 1, yyleng - 2); return T_STRING; }
-\"([^\"\n]|(\"\"))*\n       { std::cerr << "newline in string literal\n"; }
+
 {letter}({letter}|{digit}|_)*   { return get_id(yylval.str = std::string(yytext)); }
 
 "<"                  {return T_LT;}
