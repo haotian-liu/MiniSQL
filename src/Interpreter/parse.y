@@ -33,10 +33,9 @@
     RW_AND
     RW_INTO
     RW_VALUES
-
     RW_SET
-    RW_EXIT
 
+    RW_EXIT
     RW_TEST
 
     T_LT
@@ -78,11 +77,11 @@
     dml
     insert
     query
+    delete_op
+    update
 
 %token
     ddl
-    delete_op
-    update
     create_table
     create_index
     drop_table
@@ -99,6 +98,30 @@ top_stmt: exit
 
 dml: insert
     | query
+    | delete_op
+    | update
+    ;
+
+update: RW_UPDATE T_NSTRING RW_SET T_NSTRING '=' value op_where
+    {
+        auto update_query = new UpdateQuery();
+        update_query->table_name = $2;
+        update_query->condition_list = $7;
+        update_query->attr = $4;
+        update_query->value = $6;
+
+        query = update_query;
+    }
+    ;
+
+delete_op: RW_DELETE RW_FROM T_NSTRING op_where
+    {
+        auto delete_query = new DeleteQuery();
+        delete_query->table_name = $3;
+        delete_query->condition_list = $4;
+
+        query = delete_query;
+    }
     ;
 
 query: RW_SELECT attr_list RW_FROM T_NSTRING op_where
@@ -110,9 +133,7 @@ query: RW_SELECT attr_list RW_FROM T_NSTRING op_where
 
         query = select_query;
     }
-    ;
-
-query: RW_SELECT '*' RW_FROM T_NSTRING op_where
+    | RW_SELECT '*' RW_FROM T_NSTRING op_where
     {
         auto select_query = new SelectQuery();
         select_query->table_name = $4;
@@ -123,6 +144,7 @@ query: RW_SELECT '*' RW_FROM T_NSTRING op_where
         query = select_query;
     }
     ;
+
 insert: RW_INSERT RW_INTO T_NSTRING RW_VALUES '(' value_list ')'
     {
         auto insert_query = new InsertQuery();
@@ -167,7 +189,7 @@ condition_list: condition_list RW_AND condition
     }
     ;
 
-condition: T_STRING operator value
+condition: T_NSTRING operator value
     {
         $$.name = $1;
         $$.op = $2;

@@ -7,3 +7,8 @@ select sdaasf from `sdfs` where a >= 0 and b = 1;
 select sdaasf from `awdfcwds`;
 select sdasadf from ewqfwef;
 select * from asd;
+
+update adfsd set sada = 1221 where asdfsd <> 123.1231;
+update adfsd set sada = 1221;
+
+delete from sgfs;

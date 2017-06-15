@@ -87,4 +87,28 @@ public:
     std::vector<SqlValue> value_list;
 };
 
+class UpdateQuery final : public QueryRequest
+{
+public:
+    UpdateQuery()
+    {
+        type = QueryType::UPDATE;
+    }
+    std::string table_name;
+    std::string attr;
+    SqlValue value;
+    std::vector<Condition> condition_list;
+};
+
+class DeleteQuery final : public QueryRequest
+{
+public:
+    DeleteQuery()
+    {
+        type = QueryType::DELETE;
+    }
+    std::string table_name;
+    std::vector<Condition> condition_list;
+};
+
 #endif //MINISQL_QUERYREQUEST_H

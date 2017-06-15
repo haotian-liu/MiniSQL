@@ -75,12 +75,10 @@ extern int yydebug;
     T_QSTRING = 285,
     T_RQSTRING = 286,
     ddl = 287,
-    delete_op = 288,
-    update = 289,
-    create_table = 290,
-    create_index = 291,
-    drop_table = 292,
-    drop_index = 293
+    create_table = 288,
+    create_index = 289,
+    drop_table = 290,
+    drop_index = 291
   };
 #endif
 /* Tokens.  */
@@ -114,12 +112,10 @@ extern int yydebug;
 #define T_QSTRING 285
 #define T_RQSTRING 286
 #define ddl 287
-#define delete_op 288
-#define update 289
-#define create_table 290
-#define create_index 291
-#define drop_table 292
-#define drop_index 293
+#define create_table 288
+#define create_index 289
+#define drop_table 290
+#define drop_index 291
 
 /* Value type.  */
 
