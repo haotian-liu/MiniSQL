@@ -49,6 +49,8 @@ typedef struct yystype
     SqlValue val;
     Condition cond;
     std::vector<std::string> str_list;
+    std::vector<Condition> cond_list;
+    std::vector<SqlValue> val_list;
 } YYSTYPE;
 
 extern "C" inline int yyerror(const char *s)

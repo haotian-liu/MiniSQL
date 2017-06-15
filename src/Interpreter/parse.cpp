@@ -501,8 +501,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    81,    81,    83,    84,    85,    89,    92,   121,   121,
-     123,   125
+       0,    87,    87,    89,    90,    91,    95,    98,   127,   127,
+     129,   131
 };
 #endif
 
@@ -1285,13 +1285,13 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 81 "parse.y" /* yacc.c:1646  */
+#line 87 "parse.y" /* yacc.c:1646  */
     { YYACCEPT; }
 #line 1291 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 93 "parse.y" /* yacc.c:1646  */
+#line 99 "parse.y" /* yacc.c:1646  */
     {
         std::cout << (yyvsp[-1].str) << std::endl;
     }
@@ -1299,13 +1299,13 @@ yyreduce:
     break;
 
   case 10:
-#line 123 "parse.y" /* yacc.c:1646  */
+#line 129 "parse.y" /* yacc.c:1646  */
     { isExit = true; }
 #line 1305 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 125 "parse.y" /* yacc.c:1646  */
+#line 131 "parse.y" /* yacc.c:1646  */
     { std::cerr << "RW_TEST is input\n"; }
 #line 1311 "y.tab.c" /* yacc.c:1646  */
     break;
@@ -1539,7 +1539,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 127 "parse.y" /* yacc.c:1906  */
+#line 133 "parse.y" /* yacc.c:1906  */
 
 
 bool bFlag; /* no meanings. */

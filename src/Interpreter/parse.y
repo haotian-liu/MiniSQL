@@ -60,6 +60,12 @@
 
 %type <cond> condition
 
+%type <str_list> attr_list;
+
+%type <cond_list> condition_list;
+
+%type <val_list> value_list;
+
 %type <dummy> top_stmt
     test
     exit

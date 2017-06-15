@@ -19,12 +19,9 @@ enum class SqlValueType
 struct SqlValue
 {
     SqlValueType type;
-    union
-    {
-        int i;
-        float r;
-        std::string str;
-    };
+    int i;
+    float r;
+    std::string str;
 };
 
 struct Condition
