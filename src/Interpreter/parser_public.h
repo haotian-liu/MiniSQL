@@ -11,6 +11,9 @@
 #include <cassert>
 #include <cstring>
 
+#include "operator.h"
+#include "QueryRequest.h"
+
 #define INPUT_LENGTH 2000
 
 // generated functions
@@ -42,6 +45,8 @@ typedef struct yystype
     double r;
     std::string str;
     void *dummy;    //for non-final nodes dummy part in AST.
+    Operator op;
+    SqlValue val;
     std::vector<std::string> str_list;
 } YYSTYPE;
 

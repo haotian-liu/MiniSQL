@@ -7,6 +7,24 @@
 
 #include <string>
 
+enum class SqlValueType
+{
+    Integer,
+    String,
+    Float
+};
+
+struct SqlValue
+{
+    SqlValueType type;
+    union
+    {
+        int i;
+        float r;
+        std::string str;
+    };
+};
+
 enum class QueryType
 {
     INSERT,

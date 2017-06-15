@@ -54,6 +54,10 @@
 
 %type <str> T_ASTRING
 
+%type <op> operator
+
+%type <val> value
+
 %type <dummy> top_stmt
     test
     exit
@@ -89,11 +93,26 @@ insert: RW_INSERT RW_INTO T_ASTRING RW_VALUES '(' T_ASTRING ')'
     }
     ;
 
+value:
+    T_INT { $$.type = SqlValueType.Integer; $$.i = $1; }
+    | T_REAL { $$.type = SqlValueType.Float; $$.r = $1; }
+    | T_INT { $$.type = SqlValueType.String; $$.str = $1; }
+    ;
+
+operator:
+    T_LT { $$ = Operator.LT_OP; }
+    | T_LE { $$ = Operator.LE_OP; }
+    | T_GT { $$ = Operator.GT_OP; }
+    | T_GE { $$ = Operator.GE_OP; }
+    | T_EQ { $$ = Operator.EQ_OP; }
+    | T_NE { $$ = Operator.NE_OP; }
+    ;
+
+T_ASTRING: T_QSTRING | T_STRING;
+
 exit: RW_EXIT { isExit = true; };
 
 test: RW_TEST { std::cerr << "RW_TEST is input\n"; };
-
-T_ASTRING: T_QSTRING | T_STRING;
 
 %%
 

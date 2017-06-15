@@ -501,8 +501,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    75,    75,    77,    78,    79,    83,    86,    92,    94,
-      96,    96
+       0,    79,    79,    81,    82,    83,    87,    90,   111,   111,
+     113,   115
 };
 #endif
 
@@ -518,7 +518,7 @@ static const char *const yytname[] =
   "NO_TOKEN", "T_INT", "T_REAL", "T_STRING", "T_QSTRING", "ddl", "query",
   "delete_op", "update", "create_table", "create_index", "drop_table",
   "drop_index", "';'", "'('", "')'", "$accept", "top_input", "top_stmt",
-  "dml", "insert", "exit", "test", "T_ASTRING", YY_NULLPTR
+  "dml", "insert", "T_ASTRING", "exit", "test", YY_NULLPTR
 };
 #endif
 
@@ -558,20 +558,20 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     8,     9,     0,     0,     5,     6,     3,     4,
-       0,     1,     2,    11,    10,     0,     0,     0,     0,     7
+       0,     0,    10,    11,     0,     0,     5,     6,     3,     4,
+       0,     1,     2,     9,     8,     0,     0,     0,     0,     7
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -35,   -35,   -35,   -35,   -35,   -35,   -35,    -7
+     -35,   -35,   -35,   -35,   -35,    -7,   -35,   -35
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5,     6,     7,     8,     9,    15
+      -1,     4,     5,     6,     7,    15,     8,     9
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -593,15 +593,15 @@ static const yytype_uint8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    10,    17,    18,    43,    44,    45,    46,    47,    48,
-      14,     0,    39,    29,    30,    49,    15,    40,    49,    41
+       0,    10,    17,    18,    43,    44,    45,    46,    48,    49,
+      14,     0,    39,    29,    30,    47,    15,    40,    47,    41
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    42,    43,    44,    44,    44,    45,    46,    47,    48,
-      49,    49
+       0,    42,    43,    44,    44,    44,    45,    46,    47,    47,
+      48,    49
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1285,27 +1285,27 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 75 "parse.y" /* yacc.c:1646  */
+#line 79 "parse.y" /* yacc.c:1646  */
     { YYACCEPT; }
 #line 1291 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 87 "parse.y" /* yacc.c:1646  */
+#line 91 "parse.y" /* yacc.c:1646  */
     {
         std::cout << (yyvsp[-1].str) << std::endl;
     }
 #line 1299 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 8:
-#line 92 "parse.y" /* yacc.c:1646  */
+  case 10:
+#line 113 "parse.y" /* yacc.c:1646  */
     { isExit = true; }
 #line 1305 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 94 "parse.y" /* yacc.c:1646  */
+  case 11:
+#line 115 "parse.y" /* yacc.c:1646  */
     { std::cerr << "RW_TEST is input\n"; }
 #line 1311 "y.tab.c" /* yacc.c:1646  */
     break;
@@ -1539,7 +1539,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 98 "parse.y" /* yacc.c:1906  */
+#line 117 "parse.y" /* yacc.c:1906  */
 
 
 bool bFlag; /* no meanings. */
