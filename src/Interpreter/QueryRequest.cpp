@@ -3,3 +3,6 @@
 //
 
 #include "QueryRequest.h"
+
+QueryRequest::~QueryRequest()
+{}

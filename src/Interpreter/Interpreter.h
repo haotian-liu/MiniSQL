@@ -5,6 +5,9 @@
 #ifndef MINISQL_INTERPRETER_H
 #define MINISQL_INTERPRETER_H
 
+#include "QueryRequest.h"
+
+extern QueryRequest *query;
 
 class Interpreter
 {

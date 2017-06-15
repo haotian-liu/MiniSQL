@@ -11,7 +11,10 @@
 #include <cstdlib>
 #include <memory>
 
+#include "QueryRequest.h"
+#include "Interpreter.h"
 #include "parser_public.h"
+
 #include "y.tab.h"
 
 %}
@@ -65,6 +68,7 @@
 %type <str_list> attr_list;
 
 %type <cond_list> condition_list;
+%type <cond_list> op_where;
 
 %type <val_list> value_list;
 
@@ -73,10 +77,10 @@
     exit
     dml
     insert
+    query
 
 %token
     ddl
-    query
     delete_op
     update
     create_table
@@ -93,13 +97,73 @@ top_stmt: exit
     | dml
     ;
 
-dml:
-     insert
+dml: insert
+    | query
     ;
 
+query: RW_SELECT attr_list RW_FROM T_NSTRING op_where
+    {
+        auto select_query = new SelectQuery();
+        select_query->table_name = $4;
+        select_query->attr_list = $2;
+        select_query->condition_list = $5;
+
+        query = select_query;
+    }
+    ;
+
+query: RW_SELECT '*' RW_FROM T_NSTRING op_where
+    {
+        auto select_query = new SelectQuery();
+        select_query->table_name = $4;
+        select_query->condition_list = $5;
+
+        select_query->isSelectAll = true;
+
+        query = select_query;
+    }
+    ;
 insert: RW_INSERT RW_INTO T_NSTRING RW_VALUES '(' value_list ')'
     {
-        std::cout << $6.size() << std::endl;
+        auto insert_query = new InsertQuery();
+        insert_query->table_name = $3;
+        insert_query->value_list = $6;
+
+        query = insert_query;
+    }
+    ;
+
+op_where: RW_WHERE condition_list
+    {
+        $$ = $2;
+    }
+    | nothing
+    {
+        $$ = std::vector<Condition>();
+    }
+    ;
+
+attr_list: attr_list ',' T_NSTRING
+    {
+        $1.push_back($3);
+        $$ = $1;
+    }
+    | T_NSTRING
+    {
+        $$ = std::vector<std::string>();
+        $$.push_back($1);
+    }
+    ;
+
+condition_list: condition_list RW_AND condition
+    {
+        $1.push_back($3);
+        $$ = $1;
+    }
+    | condition
+    {
+        $$ = std::vector<Condition>();
+        $$.push_back($1);
     }
     ;
 
@@ -130,18 +194,21 @@ value:
     ;
 
 operator:
-    T_LT { $$ = Operator.LT_OP; }
-    | T_LE { $$ = Operator.LE_OP; }
-    | T_GT { $$ = Operator.GT_OP; }
-    | T_GE { $$ = Operator.GE_OP; }
-    | T_EQ { $$ = Operator.EQ_OP; }
-    | T_NE { $$ = Operator.NE_OP; }
+    T_LT { $$ = Operator::LT_OP; }
+    | T_LE { $$ = Operator::LE_OP; }
+    | T_GT { $$ = Operator::GT_OP; }
+    | T_GE { $$ = Operator::GE_OP; }
+    | T_EQ { $$ = Operator::EQ_OP; }
+    | T_NE { $$ = Operator::NE_OP; }
     ;
 
 T_ASTRING: T_QSTRING | T_STRING;
 T_NSTRING: T_RQSTRING | T_STRING;
 
 exit: RW_EXIT { isExit = true; };
+
+nothing:
+    ;
 
 test: RW_TEST { std::cout << "YOUR INPUT IS TOOOOOO SIMPLE, SOMETIMES NAIVE!\n"; };
 

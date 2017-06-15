@@ -16,8 +16,11 @@
 #endif
 
 #include "Interpreter.h"
+#include "QueryRequest.h"
 
 #include "parser_public.h"
+
+QueryRequest *query = nullptr;
 
 char input_s[INPUT_LENGTH];
 size_t input_len;
@@ -44,6 +47,27 @@ void main_repl_loop()
         {
             std::cout << "Bye!\n";
             break;
+        }
+        if (query == nullptr)
+        {
+            continue;
+        } else
+        {
+            auto insert_query = dynamic_cast<InsertQuery *>(query);
+            if (insert_query)
+            {
+                delete insert_query;
+                query = nullptr;
+                continue;
+            }
+
+            auto select_query = dynamic_cast<SelectQuery *>(query);
+            if (select_query)
+            {
+                delete select_query;
+                query = nullptr;
+                continue;
+            }
         }
     }
 }

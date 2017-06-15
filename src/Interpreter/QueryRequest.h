@@ -6,6 +6,7 @@
 #define MINISQL_QUERYREQUEST_H
 
 #include <string>
+#include <vector>
 
 #include "operator.h"
 
@@ -41,10 +42,49 @@ enum class QueryType
 
 class QueryRequest
 {
-public:
+protected:
     QueryType type;
 
-    virtual ~QueryRequest() = 0;
+public:
+    QueryType getQueryType() const
+    {
+        return this->type;
+    }
+
+    virtual ~QueryRequest();
+};
+
+class SelectQuery final : public QueryRequest
+{
+public:
+    SelectQuery()
+            : isSelectAll(false)
+    {
+        type = QueryType::SELECT;
+    }
+
+    ~SelectQuery() override
+    {}
+
+    bool isSelectAll;
+    std::string table_name;
+    std::vector<std::string> attr_list;
+    std::vector<Condition> condition_list;
+};
+
+class InsertQuery final : public QueryRequest
+{
+public:
+    InsertQuery()
+    {
+        type = QueryType::INSERT;
+    }
+
+    ~InsertQuery() override
+    {}
+
+    std::string table_name;
+    std::vector<SqlValue> value_list;
 };
 
 #endif //MINISQL_QUERYREQUEST_H
