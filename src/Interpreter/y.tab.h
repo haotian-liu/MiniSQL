@@ -73,14 +73,15 @@ extern int yydebug;
     T_REAL = 283,
     T_STRING = 284,
     T_QSTRING = 285,
-    ddl = 286,
-    query = 287,
-    delete_op = 288,
-    update = 289,
-    create_table = 290,
-    create_index = 291,
-    drop_table = 292,
-    drop_index = 293
+    T_RQSTRING = 286,
+    ddl = 287,
+    query = 288,
+    delete_op = 289,
+    update = 290,
+    create_table = 291,
+    create_index = 292,
+    drop_table = 293,
+    drop_index = 294
   };
 #endif
 /* Tokens.  */
@@ -112,14 +113,15 @@ extern int yydebug;
 #define T_REAL 283
 #define T_STRING 284
 #define T_QSTRING 285
-#define ddl 286
-#define query 287
-#define delete_op 288
-#define update 289
-#define create_table 290
-#define create_index 291
-#define drop_table 292
-#define drop_index 293
+#define T_RQSTRING 286
+#define ddl 287
+#define query 288
+#define delete_op 289
+#define update 290
+#define create_table 291
+#define create_index 292
+#define drop_table 293
+#define drop_index 294
 
 /* Value type.  */
 

@@ -51,8 +51,10 @@
 %token <r> T_REAL
 %token <str> T_STRING
 %token <str> T_QSTRING
+%token <str> T_RQSTRING
 
 %type <str> T_ASTRING
+%type <str> T_NSTRING
 
 %type <op> operator
 
@@ -95,9 +97,9 @@ dml:
      insert
     ;
 
-insert: RW_INSERT RW_INTO T_STRING RW_VALUES '(' T_ASTRING ')'
+insert: RW_INSERT RW_INTO T_NSTRING RW_VALUES '(' value_list ')'
     {
-        std::cout << $6 << std::endl;
+        std::cout << $6.size() << std::endl;
     }
     ;
 
@@ -109,10 +111,22 @@ condition: T_STRING operator value
     }
     ;
 
+value_list: value_list ',' value
+    {
+        $1.push_back($3);
+        $$ = $1;
+    }
+    | value
+    {
+        $$ = std::vector<SqlValue>();
+        $$.push_back($1);
+    }
+    ;
+
 value:
-    T_INT { $$.type = SqlValueType.Integer; $$.i = $1; }
-    | T_REAL { $$.type = SqlValueType.Float; $$.r = $1; }
-    | T_INT { $$.type = SqlValueType.String; $$.str = $1; }
+    T_INT { $$.type = SqlValueType::Integer; $$.i = $1; }
+    | T_REAL { $$.type = SqlValueType::Float; $$.r = $1; }
+    | T_ASTRING { $$.type = SqlValueType::String; $$.str = $1; }
     ;
 
 operator:
@@ -125,10 +139,11 @@ operator:
     ;
 
 T_ASTRING: T_QSTRING | T_STRING;
+T_NSTRING: T_RQSTRING | T_STRING;
 
 exit: RW_EXIT { isExit = true; };
 
-test: RW_TEST { std::cerr << "RW_TEST is input\n"; };
+test: RW_TEST { std::cout << "YOUR INPUT IS TOOOOOO SIMPLE, SOMETIMES NAIVE!\n"; };
 
 %%
 

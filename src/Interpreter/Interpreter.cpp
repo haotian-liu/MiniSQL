@@ -42,6 +42,7 @@ void main_repl_loop()
         yyparse();
         if (isExit)
         {
+            std::cout << "Bye!\n";
             break;
         }
     }
