@@ -51,7 +51,8 @@
 %token <r> T_REAL
 %token <str> T_STRING
 %token <str> T_QSTRING
-%token <str> T_ASTRING
+
+%type <str> T_ASTRING
 
 %type <dummy> top_stmt
     test
@@ -82,7 +83,7 @@ dml:
      insert
     ;
 
-insert: RW_INSERT RW_INTO T_STRING RW_VALUES '(' T_STRING ')'
+insert: RW_INSERT RW_INTO T_ASTRING RW_VALUES '(' T_ASTRING ')'
     {
         std::cout << $6 << std::endl;
     }
@@ -91,6 +92,8 @@ insert: RW_INSERT RW_INTO T_STRING RW_VALUES '(' T_STRING ')'
 exit: RW_EXIT { isExit = true; };
 
 test: RW_TEST { std::cerr << "RW_TEST is input\n"; };
+
+T_ASTRING: T_QSTRING | T_STRING;
 
 %%
 

@@ -11,11 +11,11 @@
 
 ///
 /// \param s
-/// \return INT_MAX for error
+/// \return T_STRING as default.
 int get_id(const std::string &s)
 {
     std::string tok{s};
-    int r = INT_MAX;
+    int r = T_STRING;
 
     std::transform(tok.begin(), tok.end(), tok.begin(), [](unsigned char c)
     { return std::tolower(c); });

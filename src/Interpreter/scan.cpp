@@ -777,7 +777,7 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 36 "scan.l"
-{ yylval.str = std::string(yytext + 1, yyleng - 2); return T_STRING; }
+{ yylval.str = std::string(yytext + 1, yyleng - 2); return T_QSTRING; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
