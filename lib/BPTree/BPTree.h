@@ -344,11 +344,75 @@ bool BPTree::cascadeDelete(BPTree::TreeNode node) {
     TreeNode currentParent = node->parent, sibling;
 
     if (node->isLeaf) {
+        // merge if it is leaf node
         int index;
         currentParent->search(node->keys[0], index);
-        if (currentParent->children[0] != node && currentParent->cnt == index + 1) {
-            // sibling
+        if (currentParent->children[0] != node && currentParent->cnt == index + 1) { // rightest, also not first, merge with left sibling
+            sibling = currentParent->children[index];
+            if (sibling->cnt > minimal) { // transfer rightest of left to the leftest to meet the requirement
+                for (int i=node->cnt; i>0; i--) {
+                    node->keys[i] = node->keys[i-1];
+                    node->keyOffset[i] = node->keyOffset[i-1];
+                }
+                node->keys[0] = sibling->keys[sibling->cnt - 1];
+                node->keyOffset[0] = sibling->keyOffset[sibling->cnt - 1];
+                sibling->removeAt(sibling->cnt - 1);
+
+                node->cnt++;
+                currentParent->keys[index] = node->keys[0];
+
+                return true;
+            } else {
+                // have to merge and cascadingly merge
+                currentParent->removeAt(index);
+                for (int i=0; i<node->cnt; i++) {
+                    sibling->keys[i + sibling->cnt] = node->keys[i];
+                    sibling->keyOffset[i + sibling->cnt] = node->keyOffset[i];
+                }
+                sibling->cnt += node->cnt;
+                sibling->sibling = node->sibling;
+
+                delete node;
+                nodeCount--;
+
+                return cascadeDelete(currentParent);
+            }
+        } else { // can merge with right brother
+            if (currentParent->children[0] == node) {
+                sibling = currentParent->children[1]; // on the leftest
+            } else {
+                sibling = currentParent->children[index + 2]; // normally
+            }
+            if (sibling->cnt > minimal) { // add the leftest of sibling to the right
+                node->keys[node->cnt] = sibling->keys[0];
+                node->keyOffset[node->cnt] = sibling->keyOffset[0];
+                node->cnt++;
+                sibling->removeAt(0);
+                if (currentParent->children[0] == node) {
+                    currentParent->keys[0] = sibling->keys[0]; // if it is leftest, change key at index zero
+                } else {
+                    currentParent->keys[index + 1] = sibling->keys[0]; // or next sibling should be updated
+                }
+                return true;
+            } else { // merge and cascadingly delete
+                for (int i=0; i<sibling->cnt; i++) {
+                    node->keys[node->cnt + i] = sibling->keys[i];
+                    node->keyOffset[node->cnt + i] = sibling->keyOffset[i];
+                }
+                if (node == currentParent->children[0]) {
+                    currentParent->removeAt(0); // if leftest, merge with first sibling
+                } else {
+                    currentParent->removeAt(index + 1); // or merge with next
+                }
+                node->cnt += sibling->cnt;
+                node->sibling = sibling->sibling;
+                delete sibling;
+                nodeCount--;
+                return cascadeDelete(currentParent);
+            }
         }
+    } else {
+        // merge if it is branch node
     }
 
     return false;
