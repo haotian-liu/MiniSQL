@@ -26,6 +26,7 @@ int main() {
         if (!t[i]) continue;
         cout << i << " " << bpTree.find(i) << endl;
         bpTree.remove(i);
+        if (i == 4) break;
     }
     return 0;
 }

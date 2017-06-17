@@ -33,6 +33,14 @@ public:
     vector<int> keyOffset;
     vector<BPTreeNode<T>*> children;
 
+    void debug(int id) {
+        cout << "Keys [" << id << "]: ";
+        for (int i=0; i<this->cnt; i++) {
+            cout << keys[i] << " ";
+        }
+        cout << endl;
+    }
+
 private:
     bool binarySearch(const T &key, int &index) const;
 };
@@ -153,10 +161,13 @@ void BPTreeNode<T>::removeAt(int index) {
         for (int i=index; i<cnt-1; i++) {
             keyOffset[i] = keyOffset[i+1];
         }
+        keys[cnt - 1] = keyOffset[cnt - 1] = 0;
     } else {
         for (int i=index + 1; i<cnt; i++) {
             children[i] = children[i+1];
         }
+        keys[cnt - 1] = 0;
+        children[cnt] = nullptr;
     }
     cnt--;
 }
@@ -185,6 +196,25 @@ private:
     bool findKeyFromNode(TreeNode node, const T &key, NodeSearchParse &res);
     void cascadeInsert(TreeNode node);
     bool cascadeDelete(TreeNode node);
+
+    bool deleteBranchLL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+    bool deleteBranchLR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+    bool deleteBranchRL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+    bool deleteBranchRR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
+    bool deleteLeafLL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+    bool deleteLeafLR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+    bool deleteLeafRL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+    bool deleteLeafRR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
+    void debug(TreeNode node, int id) {
+        node->debug(id);
+        if (!node->isLeaf) {
+            for (int i=0; i<=node->cnt; i++) {
+                debug(node->children[i], i);
+            }
+        }
+    }
 };
 
 template<typename T>
@@ -286,6 +316,7 @@ void BPTree<T>::cascadeInsert(BPTree::TreeNode node) {
 template<typename T>
 bool BPTree<T>::remove(const T &key) {
     NodeSearchParse res;
+    debug(root, -1);
     if (!root) {
         cerr << "Dequeuing empty BPTree!" << endl;
         return false;
@@ -323,16 +354,16 @@ bool BPTree<T>::remove(const T &key) {
 
 template<typename T>
 bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
-    int minimal = (degree - 1) / 2, minimalBranch = (degree + 1) / 2;
+    int minimal = (degree - 1) / 2;
     if ((node->isLeaf && node->cnt >= minimal) // leaf node
         || (node->isRoot() && node->cnt) // root node
-        || (!node->isLeaf && !node->isRoot() && node->cnt >= minimalBranch) // branch node
+        || (!node->isLeaf && !node->isRoot() && node->cnt >= minimal) // branch node
             ) {
         return true; // no need to update
     }
 
     if (node->isRoot()) {
-        if (node->isLeaf) {
+        if (root->isLeaf) {
             // tree completely removed
             root = nullptr;
             head = nullptr;
@@ -346,6 +377,8 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
         level--;
         return true;
     }
+
+
     TreeNode currentParent = node->parent, sibling;
     int index;
 
@@ -354,152 +387,206 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
         currentParent->search(node->keys[0], index);
         if (currentParent->children[0] != node && currentParent->cnt == index + 1) { // rightest, also not first, merge with left sibling
             sibling = currentParent->children[index];
-            if (sibling->cnt > minimal) { // transfer rightest of left to the leftest to meet the requirement
-                for (int i=node->cnt; i>0; i--) {
-                    node->keys[i] = node->keys[i-1];
-                    node->keyOffset[i] = node->keyOffset[i-1];
-                }
-                node->keys[0] = sibling->keys[sibling->cnt - 1];
-                node->keyOffset[0] = sibling->keyOffset[sibling->cnt - 1];
-                sibling->removeAt(sibling->cnt - 1);
-
-                node->cnt++;
-                currentParent->keys[index] = node->keys[0];
-
-                return true;
+            if (sibling->cnt > minimal) {
+                // transfer rightest of left to the leftest to meet the requirement
+                return deleteLeafLL(node, currentParent, sibling, index);
             } else {
                 // have to merge and cascadingly merge
-                currentParent->removeAt(index);
-                for (int i=0; i<node->cnt; i++) {
-                    sibling->keys[i + sibling->cnt] = node->keys[i];
-                    sibling->keyOffset[i + sibling->cnt] = node->keyOffset[i];
-                }
-                sibling->cnt += node->cnt;
-                sibling->sibling = node->sibling;
-
-                delete node;
-                nodeCount--;
-
-                return cascadeDelete(currentParent);
+                return deleteLeafLR(node, currentParent, sibling, index);
             }
         } else { // can merge with right brother
             if (currentParent->children[0] == node) {
-                sibling = currentParent->children[1]; // on the leftest
+                // on the leftest
+                sibling = currentParent->children[1];
             } else {
-                sibling = currentParent->children[index + 2]; // normally
+                // normally
+                sibling = currentParent->children[index + 2];
             }
-            if (sibling->cnt > minimal) { // add the leftest of sibling to the right
-                node->keys[node->cnt] = sibling->keys[0];
-                node->keyOffset[node->cnt] = sibling->keyOffset[0];
-                node->cnt++;
-                sibling->removeAt(0);
-                if (currentParent->children[0] == node) {
-                    currentParent->keys[0] = sibling->keys[0]; // if it is leftest, change key at index zero
-                } else {
-                    currentParent->keys[index + 1] = sibling->keys[0]; // or next sibling should be updated
-                }
-                return true;
-            } else { // merge and cascadingly delete
-                for (int i=0; i<sibling->cnt; i++) {
-                    node->keys[node->cnt + i] = sibling->keys[i];
-                    node->keyOffset[node->cnt + i] = sibling->keyOffset[i];
-                }
-                if (node == currentParent->children[0]) {
-                    currentParent->removeAt(0); // if leftest, merge with first sibling
-                } else {
-                    currentParent->removeAt(index + 1); // or merge with next
-                }
-                node->cnt += sibling->cnt;
-                node->sibling = sibling->sibling;
-                delete sibling;
-                nodeCount--;
-                return cascadeDelete(currentParent);
+            if (sibling->cnt > minimal) {
+                // add the leftest of sibling to the right
+                return deleteLeafRL(node, currentParent, sibling, index);
+            } else {
+                // merge and cascadingly delete
+                return deleteLeafRR(node, currentParent, sibling, index);
             }
         }
     } else {
         // merge if it is branch node
         currentParent->search(node->children[0]->keys[0], index);
-        if (currentParent->children[0] != node && currentParent->cnt == index + 1) { // can only be updated with left sibling
+        if (currentParent->children[0] != node && currentParent->cnt == index + 1) {
+            // can only be updated with left sibling
             sibling = currentParent->children[index];
-            if (sibling->cnt > minimalBranch) { // add rightest key to the first node to avoid cascade operation
-                node->children[node->cnt + 1] = node->children[node->cnt];
-                for (int i=node->cnt; i>0; i--) {
-                    node->children[i] = node->children[i-1];
-                    node->keys[i] = node->keys[i-1];
-                }
-                node->children[0] = sibling->children[sibling->cnt];
-                node->keys[0] = currentParent->keys[index];
-                currentParent->keys[index] = sibling->keys[sibling->cnt - 1];
-                node->cnt++;
-                sibling->children[sibling->cnt]->parent = node;
-                sibling->removeAt(sibling->cnt - 1);
-                return true;
-            } else { // delete this and merge
-                sibling->keys[sibling->cnt] = currentParent->keys[index]; // add one node
-                currentParent->removeAt(index);
-                sibling->cnt++;
-                for (int i=0; i<node->cnt; i++) {
-                    node->children[i]->parent = sibling;
-                    sibling->children[sibling->cnt + i] = node->children[i];
-                    sibling->keys[sibling->cnt + i] = node->keys[i];
-                }
-                // rightest children
-                sibling->children[sibling->cnt + node->cnt] = node->children[node->cnt];
-                sibling->children[sibling->cnt + node->cnt]->parent = sibling;
-                sibling->cnt += node->cnt;
-
-                delete node;
-                nodeCount--;
-
-                return cascadeDelete(currentParent);
+            if (sibling->cnt > minimal - 1) {
+                // add rightest key to the first node to avoid cascade operation
+                return deleteBranchLL(node, currentParent, sibling, index);
+            } else {
+                // delete this and merge
+                return deleteBranchLR(node, currentParent, sibling, index);
             }
-        } else { // update with right sibling
+        } else {
+            // update with right sibling
             if (currentParent->children[0] == node) {
                 sibling = currentParent->children[1];
             } else {
                 sibling = currentParent->children[index + 2];
             }
 
-            if (sibling->cnt > minimalBranch) { // add first key of sibling to the right
-                sibling->children[0]->parent = node;
-                node->children[node->cnt + 1] = sibling->children[0];
-                node->keys[node->cnt] = sibling->keys[0];
-                node->cnt++;
-
-                if (node == currentParent->children[0]) {
-                    currentParent->keys[0] = sibling->keys[0];
-                } else {
-                    currentParent->keys[index + 1] = sibling->keys[0];
-                }
-
-                sibling->children[0] = sibling->children[1];
-                sibling->removeAt(0);
-                return true;
-            } else { // merge the sibling to current node
-                node->keys[node->cnt] = currentParent->keys[index];
-                if (node == currentParent->children[0]) {
-                    currentParent->removeAt(0);
-                } else {
-                    currentParent->removeAt(index + 1);
-                }
-                node->cnt++;
-                for (int i=0; i<sibling->cnt; i++) {
-                    sibling->children[i]->parent = node;
-                    node->children[node->cnt + i] = sibling->children[i];
-                    node->keys[node->cnt + i] = sibling->keys[i];
-                }
-                // rightest child
-                sibling->children[sibling->cnt] = node;
-                node->children[node->cnt + sibling->cnt] = sibling->children[sibling->cnt];
-                node->cnt += sibling->cnt;
-
-                delete sibling;
-                nodeCount--;
-
-                return cascadeDelete(currentParent);
+            if (sibling->cnt > minimal - 1) {
+                // add first key of sibling to the right
+                return deleteBranchRL(node, currentParent, sibling, index);
+            } else {
+                // merge the sibling to current node
+                return deleteBranchRR(node, currentParent, sibling, index);
             }
         }
     }
+}
+
+template<typename T>
+bool BPTree<T>::deleteBranchLL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    node->children[node->cnt + 1] = node->children[node->cnt];
+    for (int i=node->cnt; i>0; i--) {
+        node->children[i] = node->children[i-1];
+        node->keys[i] = node->keys[i-1];
+    }
+    node->children[0] = sibling->children[sibling->cnt];
+    node->keys[0] = parent->keys[index];
+    parent->keys[index] = sibling->keys[sibling->cnt - 1];
+    node->cnt++;
+//                !!!! fix this
+//                if(sibling->children[sibling->cnt])
+    sibling->children[sibling->cnt]->parent = node;
+    sibling->removeAt(sibling->cnt - 1);
+    return true;
+}
+
+template<typename T>
+bool BPTree<T>::deleteBranchLR(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    sibling->keys[sibling->cnt] = parent->keys[index]; // add one node
+    parent->removeAt(index);
+    sibling->cnt++;
+    for (int i=0; i<node->cnt; i++) {
+        node->children[i]->parent = sibling;
+        sibling->children[sibling->cnt + i] = node->children[i];
+        sibling->keys[sibling->cnt + i] = node->keys[i];
+    }
+    // rightest children
+    sibling->children[sibling->cnt + node->cnt] = node->children[node->cnt];
+    sibling->children[sibling->cnt + node->cnt]->parent = sibling;
+    sibling->cnt += node->cnt;
+
+    delete node;
+    nodeCount--;
+
+    return cascadeDelete(parent);
+}
+
+template<typename T>
+bool BPTree<T>::deleteBranchRL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    sibling->children[0]->parent = node;
+    node->children[node->cnt + 1] = sibling->children[0];
+    node->keys[node->cnt] = sibling->keys[0];
+    node->cnt++;
+
+    if (node == parent->children[0]) {
+        parent->keys[0] = sibling->keys[0];
+    } else {
+        parent->keys[index + 1] = sibling->keys[0];
+    }
+
+    sibling->children[0] = sibling->children[1];
+    sibling->removeAt(0);
+    return true;
+}
+
+template<typename T>
+bool BPTree<T>::deleteBranchRR(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+
+    node->keys[node->cnt] = parent->keys[index];
+    if (node == parent->children[0]) {
+        parent->removeAt(0);
+    } else {
+        parent->removeAt(index + 1);
+    }
+    node->cnt++;
+    for (int i=0; i<sibling->cnt; i++) {
+        sibling->children[i]->parent = node;
+        node->children[node->cnt + i] = sibling->children[i];
+        node->keys[node->cnt + i] = sibling->keys[i];
+    }
+    // rightest child
+    sibling->children[sibling->cnt] = node;
+    node->children[node->cnt + sibling->cnt] = sibling->children[sibling->cnt];
+    node->cnt += sibling->cnt;
+
+    delete sibling;
+    nodeCount--;
+
+    return cascadeDelete(parent);
+}
+
+template<typename T>
+bool BPTree<T>::deleteLeafLL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    for (int i=node->cnt; i>0; i--) {
+        node->keys[i] = node->keys[i-1];
+        node->keyOffset[i] = node->keyOffset[i-1];
+    }
+    node->keys[0] = sibling->keys[sibling->cnt - 1];
+    node->keyOffset[0] = sibling->keyOffset[sibling->cnt - 1];
+    sibling->removeAt(sibling->cnt - 1);
+
+    node->cnt++;
+    parent->keys[index] = node->keys[0];
+
+    return true;
+}
+
+template<typename T>
+bool BPTree<T>::deleteLeafLR(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    parent->removeAt(index);
+    for (int i=0; i<node->cnt; i++) {
+        sibling->keys[i + sibling->cnt] = node->keys[i];
+        sibling->keyOffset[i + sibling->cnt] = node->keyOffset[i];
+    }
+    sibling->cnt += node->cnt;
+    sibling->sibling = node->sibling;
+
+    delete node;
+    nodeCount--;
+
+    return cascadeDelete(parent);
+}
+
+template<typename T>
+bool BPTree<T>::deleteLeafRL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    node->keys[node->cnt] = sibling->keys[0];
+    node->keyOffset[node->cnt] = sibling->keyOffset[0];
+    node->cnt++;
+    sibling->removeAt(0);
+    if (parent->children[0] == node) {
+        parent->keys[0] = sibling->keys[0]; // if it is leftest, change key at index zero
+    } else {
+        parent->keys[index + 1] = sibling->keys[0]; // or next sibling should be updated
+    }
+    return true;
+}
+
+template<typename T>
+bool BPTree<T>::deleteLeafRR(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
+    for (int i=0; i<sibling->cnt; i++) {
+        node->keys[node->cnt + i] = sibling->keys[i];
+        node->keyOffset[node->cnt + i] = sibling->keyOffset[i];
+    }
+    if (node == parent->children[0]) {
+        parent->removeAt(0); // if leftest, merge with first sibling
+    } else {
+        parent->removeAt(index + 1); // or merge with next
+    }
+    node->cnt += sibling->cnt;
+    node->sibling = sibling->sibling;
+    delete sibling;
+    nodeCount--;
+    return cascadeDelete(parent);
 }
 
 #endif //MINISQL_BPTREE_H
