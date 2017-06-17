@@ -316,7 +316,7 @@ void BPTree<T>::cascadeInsert(BPTree::TreeNode node) {
 template<typename T>
 bool BPTree<T>::remove(const T &key) {
     NodeSearchParse res;
-    debug(root, -1);
+    //debug(root, -1);
     if (!root) {
         cerr << "Dequeuing empty BPTree!" << endl;
         return false;
@@ -354,7 +354,7 @@ bool BPTree<T>::remove(const T &key) {
 
 template<typename T>
 bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
-    int minimal = (degree - 1) / 2;
+    int minimal = degree / 2, minimalBranch = (degree - 1) / 2;
     if ((node->isLeaf && node->cnt >= minimal) // leaf node
         || (node->isRoot() && node->cnt) // root node
         || (!node->isLeaf && !node->isRoot() && node->cnt >= minimal) // branch node
@@ -385,7 +385,8 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
     if (node->isLeaf) {
         // merge if it is leaf node
         currentParent->search(node->keys[0], index);
-        if (currentParent->children[0] != node && currentParent->cnt == index + 1) { // rightest, also not first, merge with left sibling
+        if (currentParent->children[0] != node && currentParent->cnt == index + 1) {
+            // rightest, also not first, merge with left sibling
             sibling = currentParent->children[index];
             if (sibling->cnt > minimal) {
                 // transfer rightest of left to the leftest to meet the requirement
@@ -394,7 +395,8 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
                 // have to merge and cascadingly merge
                 return deleteLeafLR(node, currentParent, sibling, index);
             }
-        } else { // can merge with right brother
+        } else {
+            // can merge with right brother
             if (currentParent->children[0] == node) {
                 // on the leftest
                 sibling = currentParent->children[1];
@@ -416,7 +418,7 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
         if (currentParent->children[0] != node && currentParent->cnt == index + 1) {
             // can only be updated with left sibling
             sibling = currentParent->children[index];
-            if (sibling->cnt > minimal - 1) {
+            if (sibling->cnt > minimalBranch) {
                 // add rightest key to the first node to avoid cascade operation
                 return deleteBranchLL(node, currentParent, sibling, index);
             } else {
@@ -431,7 +433,7 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
                 sibling = currentParent->children[index + 2];
             }
 
-            if (sibling->cnt > minimal - 1) {
+            if (sibling->cnt > minimalBranch) {
                 // add first key of sibling to the right
                 return deleteBranchRL(node, currentParent, sibling, index);
             } else {
@@ -485,7 +487,7 @@ template<typename T>
 bool BPTree<T>::deleteBranchRL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
     sibling->children[0]->parent = node;
     node->children[node->cnt + 1] = sibling->children[0];
-    node->keys[node->cnt] = sibling->keys[0];
+    node->keys[node->cnt] = sibling->children[0]->keys[0];
     node->cnt++;
 
     if (node == parent->children[0]) {
@@ -515,7 +517,7 @@ bool BPTree<T>::deleteBranchRR(BPTree::TreeNode node, BPTree::TreeNode parent, B
         node->keys[node->cnt + i] = sibling->keys[i];
     }
     // rightest child
-    sibling->children[sibling->cnt] = node;
+    sibling->children[sibling->cnt]->parent = node;
     node->children[node->cnt + sibling->cnt] = sibling->children[sibling->cnt];
     node->cnt += sibling->cnt;
 

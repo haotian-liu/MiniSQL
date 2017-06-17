@@ -9,13 +9,13 @@ using namespace std;
 
 int main() {
     BPTree<int> bpTree("test.file", 4, 4);
-    const int testCnt = 10;
+    const int testCnt = 10000;
     bool t[testCnt] = {false};
     srand(time(NULL));
     for (int i=0; i<testCnt; i++) {
         int random;
-//        random = rand() % testCnt;
-        random = i;
+        random = rand() % testCnt;
+//        random = i;
         if (t[random]) continue;
         t[random] = true;
         bpTree.insert(random, testCnt - random);
@@ -26,7 +26,8 @@ int main() {
         if (!t[i]) continue;
         cout << i << " " << bpTree.find(i) << endl;
         bpTree.remove(i);
-        if (i == 4) break;
+        cout << i << " " << bpTree.find(i) << endl;
+        //if (i == 3) break;
     }
     return 0;
 }
