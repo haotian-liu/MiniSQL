@@ -14,6 +14,7 @@ using namespace std;
 template<typename T>
 class BPTreeNode {
 public:
+    BPTreeNode() = default;
     BPTreeNode(int degree, bool isLeaf);
 
     ~BPTreeNode() {}
@@ -30,7 +31,7 @@ public:
     BPTreeNode *parent, *sibling;
     vector<T> keys;
     vector<int> keyOffset;
-    vector<BPTreeNode> children;
+    vector<BPTreeNode<T>> children;
 
 private:
     bool binarySearch(const T &key, int &index) const;
