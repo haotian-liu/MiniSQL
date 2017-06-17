@@ -342,10 +342,10 @@ bool BPTree::cascadeDelete(BPTree::TreeNode node) {
         return true;
     }
     TreeNode currentParent = node->parent, sibling;
+    int index;
 
     if (node->isLeaf) {
         // merge if it is leaf node
-        int index;
         currentParent->search(node->keys[0], index);
         if (currentParent->children[0] != node && currentParent->cnt == index + 1) { // rightest, also not first, merge with left sibling
             sibling = currentParent->children[index];
@@ -413,9 +413,88 @@ bool BPTree::cascadeDelete(BPTree::TreeNode node) {
         }
     } else {
         // merge if it is branch node
-    }
+        currentParent->search(node->children[0]->keys[0], index);
+        if (currentParent->children[0] != node && currentParent->cnt == index + 1) { // can only be updated with left sibling
+            sibling = currentParent->children[index];
+            if (sibling->cnt > minimalBranch) { // add rightest key to the first node to avoid cascade operation
+                node->children[node->cnt + 1] = node->children[node->cnt];
+                for (int i=node->cnt; i>0; i--) {
+                    node->children[i] = node->children[i-1];
+                    node->keys[i] = node->keys[i-1];
+                }
+                node->children[0] = sibling->children[sibling->cnt];
+                node->keys[0] = currentParent->keys[index];
+                currentParent->keys[index] = sibling->keys[sibling->cnt - 1];
+                node->cnt++;
+                sibling->children[sibling->cnt]->parent = node;
+                sibling->removeAt(sibling->cnt - 1);
+                return true;
+            } else { // delete this and merge
+                sibling->keys[sibling->cnt] = currentParent->keys[index]; // add one node
+                currentParent->removeAt(index);
+                sibling->cnt++;
+                for (int i=0; i<node->cnt; i++) {
+                    node->children[i]->parent = sibling;
+                    sibling->children[sibling->cnt + i] = node->children[i];
+                    sibling->keys[sibling->cnt + i] = node->keys[i];
+                }
+                // rightest children
+                sibling->children[sibling->cnt + node->cnt] = node->children[node->cnt];
+                sibling->children[sibling->cnt + node->cnt]->parent = sibling;
+                sibling->cnt += node->cnt;
 
-    return false;
+                delete node;
+                nodeCount--;
+
+                return cascadeDelete(currentParent);
+            }
+        } else { // update with right sibling
+            if (currentParent->children[0] == node) {
+                sibling = currentParent->children[1];
+            } else {
+                sibling = currentParent->children[index + 2];
+            }
+
+            if (sibling->cnt > minimalBranch) { // add first key of sibling to the right
+                sibling->children[0]->parent = node;
+                node->children[node->cnt + 1] = sibling->children[0];
+                node->keys[node->cnt] = sibling->keys[0];
+                node->cnt++;
+
+                if (node == currentParent->children[0]) {
+                    currentParent->keys[0] = sibling->keys[0];
+                } else {
+                    currentParent->keys[index + 1] = sibling->keys[0];
+                }
+
+                sibling->children[0] = sibling->children[1];
+                sibling->removeAt(0);
+                return true;
+            } else { // merge the sibling to current node
+                node->keys[node->cnt] = currentParent->keys[index];
+                if (node == currentParent->children[0]) {
+                    currentParent->removeAt(0);
+                } else {
+                    currentParent->removeAt(index + 1);
+                }
+                node->cnt++;
+                for (int i=0; i<sibling->cnt; i++) {
+                    sibling->children[i]->parent = node;
+                    node->children[node->cnt + i] = sibling->children[i];
+                    node->keys[node->cnt + i] = sibling->keys[i];
+                }
+                // rightest child
+                sibling->children[sibling->cnt] = node;
+                node->children[node->cnt + sibling->cnt] = sibling->children[sibling->cnt];
+                node->cnt += sibling->cnt;
+
+                delete sibling;
+                nodeCount--;
+
+                return cascadeDelete(currentParent);
+            }
+        }
+    }
 }
 
 #endif //MINISQL_BPTREE_H
