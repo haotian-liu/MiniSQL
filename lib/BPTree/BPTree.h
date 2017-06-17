@@ -36,7 +36,8 @@ private:
     bool binarySearch(const T &key, int &index) const;
 };
 
-BPTreeNode::BPTreeNode(int degree, bool isLeaf) : degree(degree), isLeaf(isLeaf), cnt(0), parent(nullptr),
+template<typename T>
+BPTreeNode<T>::BPTreeNode(int degree, bool isLeaf) : degree(degree), isLeaf(isLeaf), cnt(0), parent(nullptr),
                                                   sibling(nullptr) {
     children.resize(degree + 1);
     keys.resize(degree);
@@ -44,7 +45,7 @@ BPTreeNode::BPTreeNode(int degree, bool isLeaf) : degree(degree), isLeaf(isLeaf)
 }
 
 template<typename T>
-bool BPTreeNode::search(const T &key, int &index) const {
+bool BPTreeNode<T>::search(const T &key, int &index) const {
     if (cnt == 0) {
         index = 0;
         return false;
@@ -61,7 +62,7 @@ bool BPTreeNode::search(const T &key, int &index) const {
 }
 
 template<typename T>
-bool BPTreeNode::binarySearch(const T &key, int &index) const {
+bool BPTreeNode<T>::binarySearch(const T &key, int &index) const {
     int left = 0, right = cnt - 1, pos;
     while (left <= right) {
         pos = left + (right - left) / 2;
@@ -76,8 +77,8 @@ bool BPTreeNode::binarySearch(const T &key, int &index) const {
 }
 
 template<typename T>
-BPTreeNode *BPTreeNode::split(T &key) {
-    BPTreeNode* newNode = new BPTreeNode(degree, isLeaf);
+BPTreeNode<T> *BPTreeNode<T>::split(T &key) {
+    BPTreeNode<T>* newNode = new BPTreeNode<T>(degree, isLeaf);
     int minimal;
 
     if (isLeaf) {
@@ -106,7 +107,7 @@ BPTreeNode *BPTreeNode::split(T &key) {
 }
 
 template<typename T>
-int BPTreeNode::add(const T &key) {
+int BPTreeNode<T>::add(const T &key) {
     int index;
     bool keyExists = search(key, index);
     if (keyExists) {
@@ -124,7 +125,7 @@ int BPTreeNode::add(const T &key) {
 }
 
 template<typename T>
-int BPTreeNode::add(const T &key, int offset) {
+int BPTreeNode<T>::add(const T &key, int offset) {
     int index;
     bool keyExists = search(key, index);
     if (keyExists) {
@@ -141,7 +142,8 @@ int BPTreeNode::add(const T &key, int offset) {
     return index;
 }
 
-void BPTreeNode::removeAt(int index) {
+template<typename T>
+void BPTreeNode<T>::removeAt(int index) {
     for (int i=index; i<cnt-1; i++) {
         keys[i] = keys[i+1];
     }
@@ -184,17 +186,18 @@ private:
 };
 
 template<typename T>
-BPTree::BPTree(string fileName, int sizeofKey, int degree) : fileName(fileName), sizeofKey(sizeofKey), degree(degree), keyCount(0), nodeCount(0), level(0), root(
+BPTree<T>::BPTree(string fileName, int sizeofKey, int degree) : fileName(fileName), sizeofKey(sizeofKey), degree(degree), keyCount(0), nodeCount(0), level(0), root(
         nullptr), head(nullptr) {
     initBPTree();
 }
 
-BPTree::~BPTree() {
+template<typename T>
+BPTree<T>::~BPTree() {
 
 }
 
 template<typename T>
-void BPTree::initBPTree() {
+void BPTree<T>::initBPTree() {
     root = new BPTreeNode<T>(degree, true);
     keyCount = 0;
     level = 1;
@@ -203,7 +206,7 @@ void BPTree::initBPTree() {
 }
 
 template<typename T>
-bool BPTree::findKeyFromNode(BPTree::TreeNode node, const T &key, NodeSearchParse &res) {
+bool BPTree<T>::findKeyFromNode(BPTree::TreeNode node, const T &key, NodeSearchParse &res) {
     int index;
     if (node->search(key, index)) {
         if (node->isLeaf) {
@@ -227,7 +230,7 @@ bool BPTree::findKeyFromNode(BPTree::TreeNode node, const T &key, NodeSearchPars
 }
 
 template<typename T>
-int BPTree::find(const T &key) {
+int BPTree<T>::find(const T &key) {
     NodeSearchParse res;
     if (!root) { return -1; }
     if (findKeyFromNode(root, key, res)) { return res.node->keyOffset[res.index]; }
@@ -235,7 +238,7 @@ int BPTree::find(const T &key) {
 }
 
 template<typename T>
-bool BPTree::insert(const T &key, int offset) {
+bool BPTree<T>::insert(const T &key, int offset) {
     NodeSearchParse res;
     if (!root) { initBPTree(); }
     if (findKeyFromNode(root, key, res)) {
@@ -251,7 +254,7 @@ bool BPTree::insert(const T &key, int offset) {
 }
 
 template<typename T>
-void BPTree::cascadeInsert(BPTree::TreeNode node) {
+void BPTree<T>::cascadeInsert(BPTree::TreeNode node) {
     T key;
     TreeNode sibling = node->split(key);
     nodeCount++;
@@ -279,7 +282,7 @@ void BPTree::cascadeInsert(BPTree::TreeNode node) {
 }
 
 template<typename T>
-bool BPTree::remove(const T &key) {
+bool BPTree<T>::remove(const T &key) {
     NodeSearchParse res;
     if (!root) {
         cerr << "Dequeuing empty BPTree!" << endl;
@@ -317,7 +320,7 @@ bool BPTree::remove(const T &key) {
 }
 
 template<typename T>
-bool BPTree::cascadeDelete(BPTree::TreeNode node) {
+bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
     int minimal = degree / 2, minimalBranch = (degree + 1) / 2;
     if ((node->isLeaf && node->cnt >= minimal) // leaf node
         || (node->isRoot() && node->cnt) // root node
