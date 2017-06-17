@@ -28,6 +28,14 @@ private:
     intMap intIndexMap;
     floatMap floatIndexMap;
     charMap charIndexMap;
+
+    BPTree<int> *intBPTree;
+    BPTree<float> *floatBPTree;
+    BPTree<string> *charBPTree;
+
+    intMap::iterator intBPIterator;
+    floatMap::iterator floatBPIterator;
+    charMap::iterator charBPIterator;
 };
 
 

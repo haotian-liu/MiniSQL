@@ -6,6 +6,7 @@
 #define MINISQL_DATASTRUCTURE_H
 
 #include <string>
+#include <iostream>
 #include <vector>
 
 // define basic types we support
@@ -14,6 +15,28 @@
 #define MINISQL_TYPE_DATES 2
 #define MINISQL_TYPE_FLOAT 3
 #define MINISQL_TYPE_NULL 4
+
+namespace MINISQL_BASE {
+    inline int getSize(int type, int size=0) {
+        switch (type) {
+            case MINISQL_TYPE_INT:
+                return sizeof(int);
+            case MINISQL_TYPE_FLOAT:
+                return sizeof(float);
+            case MINISQL_TYPE_CHAR:
+                return size;
+            default:
+                std::cerr << "Undefined type!!!" << std::endl;
+        }
+    }
+    inline int getDegree(int type) {
+        int blockSize = 24; // fixme !!!!! add BM Controller!!!
+        int keySize = getSize(type);
+        int degree = blockSize / (keySize + sizeof(int));
+
+        return degree;
+    }
+}
 
 struct Element {
     std::string attrName, val;
