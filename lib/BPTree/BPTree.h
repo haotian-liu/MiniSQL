@@ -31,7 +31,7 @@ public:
     BPTreeNode *parent, *sibling;
     vector<T> keys;
     vector<int> keyOffset;
-    vector<BPTreeNode<T>> children;
+    vector<BPTreeNode<T>*> children;
 
 private:
     bool binarySearch(const T &key, int &index) const;
@@ -80,30 +80,31 @@ bool BPTreeNode<T>::binarySearch(const T &key, int &index) const {
 template<typename T>
 BPTreeNode<T> *BPTreeNode<T>::split(T &key) {
     BPTreeNode<T>* newNode = new BPTreeNode<T>(degree, isLeaf);
-    int minimal;
+    int minimal = (degree - 1) / 2;
 
     if (isLeaf) {
-        minimal = degree / 2;
-        key = keys[minimal];
-        for (int i=minimal; i<degree; i++) {
-            newNode->keys[i - minimal] = keys[i];
-            newNode->keyOffset[i - minimal] = keyOffset[i];
+        key = keys[minimal + 1];
+        for (int i=minimal + 1; i<degree; i++) {
+            newNode->keys[i - minimal - 1] = keys[i];
+            newNode->keyOffset[i - minimal - 1] = keyOffset[i];
         }
         newNode->sibling = this->sibling;
         this->sibling = newNode;
+        this->cnt = minimal + 1;
     } else {
-        minimal = (degree + 1) / 2;
         key = keys[minimal];
-        for (int i=minimal; i<=degree; i++) {
-            newNode->keys[i - minimal] = keys[i];
-            newNode->children[i - minimal] = this->children[i];
-            newNode->children[i - minimal]->parent = newNode;
+        for (int i=minimal + 1; i<=degree; i++) {
+            newNode->children[i - minimal - 1] = this->children[i];
+            this->children[i]->parent = newNode;
             this->children[i] = nullptr;
         }
+        for (int i=minimal + 1; i<degree; i++) {
+            newNode->keys[i - minimal - 1] = keys[i];
+        }
+        this->cnt = minimal;
     }
     newNode->parent = this->parent;
-    this->cnt = minimal;
-    newNode->cnt = degree - minimal;
+    newNode->cnt = degree - minimal - 1;
     return newNode;
 }
 
@@ -117,7 +118,7 @@ int BPTreeNode<T>::add(const T &key) {
     }
     for (int i=cnt; i>index; i--) {
         keys[i] = keys[i-1];
-        children[i+1] = keyOffset[i];
+        children[i+1] = children[i];
     }
     keys[index] = key;
     children[index + 1] = nullptr;
@@ -207,7 +208,7 @@ void BPTree<T>::initBPTree() {
 }
 
 template<typename T>
-bool BPTree<T>::findKeyFromNode(BPTree::TreeNode node, const T &key, NodeSearchParse &res) {
+bool BPTree<T>::findKeyFromNode(TreeNode node, const T &key, NodeSearchParse &res) {
     int index;
     if (node->search(key, index)) {
         if (node->isLeaf) {
