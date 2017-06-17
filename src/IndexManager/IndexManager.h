@@ -22,8 +22,12 @@ public:
     bool removeKey(string filename, string key, int type);
 private:
     typedef map<string, BPTree<int>*> intMap;
+    typedef map<string, BPTree<float>*> floatMap;
     typedef map<string, BPTree<string>*> charMap;
-    typedef map<string, BPTree<string>*> charMap;
+
+    intMap intIndexMap;
+    floatMap floatIndexMap;
+    charMap charIndexMap;
 };
 
 
