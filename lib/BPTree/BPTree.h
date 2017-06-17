@@ -323,7 +323,7 @@ bool BPTree<T>::remove(const T &key) {
 
 template<typename T>
 bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
-    int minimal = degree / 2, minimalBranch = (degree + 1) / 2;
+    int minimal = (degree - 1) / 2, minimalBranch = (degree + 1) / 2;
     if ((node->isLeaf && node->cnt >= minimal) // leaf node
         || (node->isRoot() && node->cnt) // root node
         || (!node->isLeaf && !node->isRoot() && node->cnt >= minimalBranch) // branch node
