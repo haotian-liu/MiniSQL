@@ -100,6 +100,22 @@ void main_repl_loop()
                 query = nullptr;
                 continue;
             }
+
+            auto drop_table_query = dynamic_cast<DropTableQuery *>(query);
+            if (drop_table_query)
+            {
+                delete drop_table_query;
+                query = nullptr;
+                continue;
+            }
+
+            auto drop_index_query = dynamic_cast<DropIndexQuery *>(query);
+            if (drop_index_query)
+            {
+                delete drop_index_query;
+                query = nullptr;
+                continue;
+            }
         }
     }
 }
