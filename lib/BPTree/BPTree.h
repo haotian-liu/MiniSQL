@@ -161,12 +161,13 @@ void BPTreeNode<T>::removeAt(int index) {
         for (int i=index; i<cnt-1; i++) {
             keyOffset[i] = keyOffset[i+1];
         }
-        keys[cnt - 1] = keyOffset[cnt - 1] = 0;
+        keyOffset[cnt - 1] = 0;
+        keys[cnt - 1] = T();
     } else {
         for (int i=index + 1; i<cnt; i++) {
             children[i] = children[i+1];
         }
-        keys[cnt - 1] = 0;
+        keys[cnt - 1] = T();
         children[cnt] = nullptr;
     }
     cnt--;
