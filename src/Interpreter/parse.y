@@ -85,8 +85,6 @@
     ddl
     create_table
     create_index
-
-%token
     drop_table
     drop_index
 
@@ -132,6 +130,24 @@ create_index: RW_CREATE RW_INDEX T_STRING '(' T_STRING ')'
     }
     ;
 
+drop_table: RW_DROP RW_TABLE T_STRING
+    {
+        auto drop_table_query = new DropTableQuery();
+        drop_table_query->table_name = $3;
+
+        query = drop_table_query;
+    }
+    ;
+
+drop_index: RW_DROP RW_INDEX T_STRING '(' T_STRING ')'
+    {
+        auto drop_index_query = new DropIndexQuery();
+        drop_index_query->table_name = $3;
+        drop_index_query->attr_name = $5;
+
+        query = drop_index_query;
+    }
+    ;
 update: RW_UPDATE T_NSTRING RW_SET T_NSTRING T_EQ value op_where
     {
         auto update_query = new UpdateQuery();

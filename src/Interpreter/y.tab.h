@@ -73,9 +73,7 @@ extern int yydebug;
     T_REAL = 283,
     T_STRING = 284,
     T_QSTRING = 285,
-    T_RQSTRING = 286,
-    drop_table = 287,
-    drop_index = 288
+    T_RQSTRING = 286
   };
 #endif
 /* Tokens.  */
@@ -108,8 +106,6 @@ extern int yydebug;
 #define T_STRING 284
 #define T_QSTRING 285
 #define T_RQSTRING 286
-#define drop_table 287
-#define drop_index 288
 
 /* Value type.  */
 
