@@ -71,6 +71,9 @@
 
 %type <val_list> value_list;
 
+%type <schema> schema_item;
+%type <schema_list> table_schema_definition;
+
 %type <dummy> top_stmt
     test
     exit
@@ -80,10 +83,10 @@
     delete_op
     update
     ddl
-
-%token
     create_table
     create_index
+
+%token
     drop_table
     drop_index
 
@@ -107,6 +110,26 @@ ddl: create_table
     | create_index
     | drop_table
     | drop_index
+    ;
+
+create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition ')'
+    {
+        auto create_table_query = new CreateTableQuery();
+        create_table_query->table_name = $3;
+        create_table_query->table_schema_list = $5;
+
+        query = create_table_query;
+    }
+    ;
+
+create_index: RW_CREATE RW_INDEX T_STRING '(' T_STRING ')'
+    {
+        auto create_index_query = new CreateIndexQuery();
+        create_index_query->table_name = $3;
+        create_index_query->attr_name = $5;
+
+        query = create_index_query;
+    }
     ;
 
 update: RW_UPDATE T_NSTRING RW_SET T_NSTRING T_EQ value op_where
@@ -169,6 +192,24 @@ op_where: RW_WHERE condition_list
     | nothing
     {
         $$ = std::vector<Condition>();
+    }
+    ;
+
+table_schema_definition: table_schema_definition ',' schema_item
+    {
+        $$ = $1;
+        $$.push_back($3);
+    }
+    | schema_item
+    {
+        $$ = std::vector<std::pair<std::string, std::string>>();
+        $$.push_back($1);
+    }
+    ;
+
+schema_item: T_STRING T_STRING
+    {
+        $$ = std::make_pair($1, $2);
     }
     ;
 

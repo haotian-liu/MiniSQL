@@ -37,7 +37,11 @@ enum class QueryType
     INSERT,
     DELETE,
     SELECT,
-    UPDATE
+    UPDATE,
+    CREATE_TABLE,
+    CREATE_INDEX,
+    DROP_TABLE,
+    DROP_INDEX
 };
 
 class QueryRequest
@@ -109,6 +113,28 @@ public:
     }
     std::string table_name;
     std::vector<Condition> condition_list;
+};
+
+class CreateTableQuery final : public QueryRequest
+{
+public:
+    CreateTableQuery()
+    {
+        type = QueryType::CREATE_TABLE;
+    }
+    std::string table_name;
+    std::vector<std::pair<std::string, std::string>> table_schema_list;
+};
+
+class CreateIndexQuery final : public QueryRequest
+{
+public:
+    CreateIndexQuery()
+    {
+        type = QueryType::CREATE_INDEX;
+    }
+    std::string table_name;
+    std::string attr_name;
 };
 
 #endif //MINISQL_QUERYREQUEST_H

@@ -10,6 +10,7 @@
 #include <vector>
 #include <cassert>
 #include <cstring>
+#include <utility>
 
 #include "operator.h"
 #include "QueryRequest.h"
@@ -48,9 +49,11 @@ typedef struct yystype
     Operator op;
     SqlValue val;
     Condition cond;
+    std::pair<std::string, std::string> schema;
     std::vector<std::string> str_list;
     std::vector<Condition> cond_list;
     std::vector<SqlValue> val_list;
+    std::vector<std::pair<std::string, std::string>> schema_list;
 } YYSTYPE;
 
 extern "C" inline int yyerror(const char *s)

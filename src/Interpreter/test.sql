@@ -12,3 +12,5 @@ update adfsd set sada = 1221 where asdfsd <> 123.1231;
 update adfsd set sada = 1221;
 
 delete from sgfs;
+create table asdfg(sfgs char, fsf char, afsdf int);
+create index asfd(sdgsdc);

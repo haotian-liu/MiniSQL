@@ -84,6 +84,22 @@ void main_repl_loop()
                 query = nullptr;
                 continue;
             }
+
+            auto create_table_query = dynamic_cast<CreateTableQuery *>(query);
+            if (create_table_query)
+            {
+                delete create_table_query;
+                query = nullptr;
+                continue;
+            }
+
+            auto create_index_query = dynamic_cast<CreateIndexQuery *>(query);
+            if (create_index_query)
+            {
+                delete create_index_query;
+                query = nullptr;
+                continue;
+            }
         }
     }
 }
