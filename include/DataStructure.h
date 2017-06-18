@@ -16,7 +16,22 @@
 #define MINISQL_TYPE_FLOAT 3
 #define MINISQL_TYPE_NULL 4
 
+// define basic cond we support
+
+#define MINISQL_COND_EQUAL 0
+#define MINISQL_COND_UEQUAL 1
+#define MINISQL_COND_LEQUAL 2
+#define MINISQL_COND_GEQUAL 3
+#define MINISQL_COND_LESS 4
+#define MINISQL_COND_MORE 5
+
 namespace MINISQL_BASE {
+    struct Cond {
+        Cond() = default;
+        Cond(std::string attr, std::string value, int cond) : attr(attr), value(value), cond(cond) {}
+        int cond;
+        std::string attr, value;
+    };
     inline int getSize(int type, int size=0) {
         switch (type) {
             case MINISQL_TYPE_INT:
@@ -36,30 +51,29 @@ namespace MINISQL_BASE {
 
         return degree;
     }
+
+    struct Element {
+        std::string attrName, val;
+    };
+
+    struct Tuple {
+        std::vector<Element> element;
+    };
+
+    struct Table {
+        Table() {};
+        Table(const Table& T) : DbName(T.DbName), Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength), recordCnt(T.recordCnt), size(T.size) {};
+
+        std::string DbName, Name;
+        int attrCnt, recordLength, recordCnt, size;
+    };
+
+    struct Row {
+        std::vector<std::string> col;
+    };
+
+    struct Result {
+        std::vector<Row> row;
+    };
 }
-
-struct Element {
-    std::string attrName, val;
-};
-
-struct Tuple {
-    std::vector<Element> element;
-};
-
-struct Table {
-    Table() {};
-    Table(const Table& T) : DbName(T.DbName), Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength), recordCnt(T.recordCnt), size(T.size) {};
-
-    std::string DbName, Name;
-    int attrCnt, recordLength, recordCnt, size;
-};
-
-struct Row {
-    std::vector<std::string> col;
-};
-
-struct Result {
-    std::vector<Row> row;
-};
-
 #endif //MINISQL_DATASTRUCTURE_H
