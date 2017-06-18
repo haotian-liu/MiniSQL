@@ -33,6 +33,7 @@ int get_id(const std::string &s)
     if (tok == "and")r = RW_AND;
     if (tok == "into")r = RW_INTO;
     if (tok == "values")r = RW_VALUES;
+    if (tok == "set")r = RW_SET;
 
     if (tok == "naive")r = RW_TEST;
 

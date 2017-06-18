@@ -68,6 +68,22 @@ void main_repl_loop()
                 query = nullptr;
                 continue;
             }
+
+            auto delete_query = dynamic_cast<DeleteQuery *>(query);
+            if (delete_query)
+            {
+                delete delete_query;
+                query = nullptr;
+                continue;
+            }
+
+            auto update_query = dynamic_cast<UpdateQuery *>(query);
+            if (update_query)
+            {
+                delete update_query;
+                query = nullptr;
+                continue;
+            }
         }
     }
 }

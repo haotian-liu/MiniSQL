@@ -79,9 +79,9 @@
     query
     delete_op
     update
+    ddl
 
 %token
-    ddl
     create_table
     create_index
     drop_table
@@ -94,6 +94,7 @@ top_input: top_stmt ';' { YYACCEPT; };
 top_stmt: exit
     | test
     | dml
+    | ddl
     ;
 
 dml: insert
@@ -102,7 +103,13 @@ dml: insert
     | update
     ;
 
-update: RW_UPDATE T_NSTRING RW_SET T_NSTRING '=' value op_where
+ddl: create_table
+    | create_index
+    | drop_table
+    | drop_index
+    ;
+
+update: RW_UPDATE T_NSTRING RW_SET T_NSTRING T_EQ value op_where
     {
         auto update_query = new UpdateQuery();
         update_query->table_name = $2;
