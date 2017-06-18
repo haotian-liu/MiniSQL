@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "operator.h"
 
@@ -16,6 +17,25 @@ enum class SqlValueType
     String,
     Float
 };
+
+inline std::ostream &operator<<(std::ostream &os, SqlValueType &tp)
+{
+    switch (tp)
+    {
+        case SqlValueType::Integer:
+            os << "Integer";
+            break;
+        case SqlValueType::String:
+            os << "String";
+            break;
+        case SqlValueType::Float:
+            os << "Float";
+            break;
+/*        default:
+            throw std::runtime_error("Invalid SqlValueType");*/
+    }
+    return os;
+}
 
 struct SqlValue
 {

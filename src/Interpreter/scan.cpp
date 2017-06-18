@@ -772,12 +772,12 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 34 "scan.l"
-{ /* std::cout << "T_REAL\n"; */ sscanf(yytext, "%f", &yylval.r); return T_REAL; }
+{ /* std::cout << "T_REAL\n"; */ sscanf(yytext, "%lf", &yylval.r); return T_REAL; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 35 "scan.l"
-{ sscanf(yytext, "%f", &yylval.r); return T_REAL; }
+{ sscanf(yytext, "%lf", &yylval.r); return T_REAL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP

@@ -56,6 +56,16 @@ void main_repl_loop()
             auto insert_query = dynamic_cast<InsertQuery *>(query);
             if (insert_query)
             {
+                std::cout << "table name: " << insert_query->table_name << std::endl;
+                std::cout << "value count: " << insert_query->value_list.size() << std::endl;
+                for (auto &v: insert_query->value_list)
+                {
+                    std::cout << v.type << std::endl;
+                    std::cout << v.i << std::endl;
+                    std::cout << v.str << std::endl;
+                    std::cout << v.r << std::endl;
+                    std::cout << std::endl;
+                }
                 delete insert_query;
                 query = nullptr;
                 continue;
