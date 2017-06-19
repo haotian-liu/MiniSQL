@@ -8,8 +8,11 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <type_traits>
+#include <stdexcept>
 
 #include "operator.h"
+#include "../../include/DataStructure.h"
 
 enum class SqlValueType
 {
@@ -17,6 +20,21 @@ enum class SqlValueType
     String,
     Float
 };
+
+inline int M(SqlValueType& tp)
+{
+    switch (tp)
+    {
+        case SqlValueType::Integer:
+            return MINISQL_TYPE_INT;
+        case SqlValueType::Float:
+            return MINISQL_TYPE_FLOAT;
+        case SqlValueType::String:
+            return MINISQL_TYPE_CHAR;
+        default:
+            throw std::runtime_error("");
+    }
+}
 
 inline std::ostream &operator<<(std::ostream &os, SqlValueType &tp)
 {
@@ -44,6 +62,8 @@ struct SqlValue
     float r;
     std::string str;
 };
+
+static_assert(!std::is_pod<SqlValue>::value);
 
 struct Condition
 {
@@ -75,7 +95,7 @@ public:
         return this->type;
     }
 
-    virtual ~QueryRequest();
+    virtual ~QueryRequest() = 0;
 };
 
 class SelectQuery final : public QueryRequest

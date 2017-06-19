@@ -78,11 +78,13 @@
     test
     exit
     dml
+    ddl
+
+%type <dummy>
     insert
     query
     delete_op
     update
-    ddl
     create_table
     create_index
     drop_table

@@ -7,7 +7,6 @@
 #include "lib/BPTree/BPTree.h"
 using namespace std;
 
-
 #include "src/Interpreter/Interpreter.h"
 
 int main(int argc, char *argv[])
