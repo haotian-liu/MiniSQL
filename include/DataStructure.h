@@ -26,6 +26,10 @@
 #define MINISQL_COND_MORE 5
 
 namespace MINISQL_BASE {
+    const int BlockSize = 4096;
+    const char UnUsed = 0;
+    const char Used = 1;
+
     struct Cond {
         Cond() = default;
         Cond(std::string attr, std::string value, int cond) : attr(attr), value(value), cond(cond) {}
@@ -78,6 +82,7 @@ namespace MINISQL_BASE {
         SqlValueType type;
         int i;
         float r;
+        int strLength;
         std::string str;
     };
 
