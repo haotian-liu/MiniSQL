@@ -44,6 +44,11 @@ namespace MINISQL_BASE {
                 std::cerr << "Undefined type!!!" << std::endl;
         }
     }
+
+    inline std::string dbFile(std::string db) { return db + ".db"; }
+    inline std::string tableFile(std::string table) { return table + ".tb"; }
+    inline std::string indexFile(std::string table, std::string index) { return table + "_" + index + ".ind"; }
+
     inline int getDegree(int type) {
         int blockSize = 24; // fixme !!!!! add BM Controller!!!
         int keySize = getSize(type);
@@ -52,9 +57,31 @@ namespace MINISQL_BASE {
         return degree;
     }
 
-    struct Element {
-        std::string attrName, val;
+    enum class SqlValueType {
+        Integer,
+        String,
+        Float
     };
+
+    inline int M(SqlValueType& tp) {
+        switch (tp) {
+            case SqlValueType::Integer:
+                return MINISQL_TYPE_INT;
+            case SqlValueType::Float:
+                return MINISQL_TYPE_FLOAT;
+            case SqlValueType::String:
+                return MINISQL_TYPE_CHAR;
+        }
+    }
+
+    struct SqlValue {
+        SqlValueType type;
+        int i;
+        float r;
+        std::string str;
+    };
+
+    typedef struct SqlValue Element;
 
     struct Tuple {
         std::vector<Element> element;
