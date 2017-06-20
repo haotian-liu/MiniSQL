@@ -12,8 +12,6 @@
 
 using namespace std;
 
-struct
-
 class RecordManager {
 public:
     RecordManager();

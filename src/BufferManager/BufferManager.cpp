@@ -15,3 +15,7 @@ char *BufferManager::getFileBlock(string filename) {
 void BufferManager::setDirty(const char *dest) {
 
 }
+
+void BufferManager::removeFile(string filename) {
+
+}

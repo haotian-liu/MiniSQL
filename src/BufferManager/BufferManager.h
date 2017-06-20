@@ -13,6 +13,7 @@ public:
     BufferManager() = default;
     ~BufferManager() = default;
     void removeFileNode(string filename);
+    void removeFile(string filename);
     char *getFileBlock(string filename);
     void setDirty(const char *dest);
 };

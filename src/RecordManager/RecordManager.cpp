@@ -14,35 +14,27 @@ RecordManager::~RecordManager() {
 
 bool RecordManager::createTable(string table) {
     string tableFile = MINISQL_BASE::tableFile(table);
-    FILE *fp = fopen(tableFile, "w+");
-    if (fp == NULL) {
-        return false;
-    }
-    fclose(fp);
+    bm->getFileBlock(tableFile);
     return true;
 }
 
 bool RecordManager::dropTable(string table) {
     string tableFile = MINISQL_BASE::tableFile(table);
     bm->removeFileNode(tableFile);
-    remove(tableFile);
+    bm->removeFile(tableFile);
     return true;
 }
 
 bool RecordManager::createIndex(string table, string index) {
     string indexFile = MINISQL_BASE::indexFile(table, index);
-    FILE *fp = fopen(indexFile, "w+");
-    if (fp == NULL) {
-        return false;
-    }
-    fclose(fp);
+    bm->getFileBlock(indexFile);
     return true;
 }
 
 bool RecordManager::dropIndex(string table, string index) {
     string indexFile = MINISQL_BASE::indexFile(table, index);
     bm->removeFileNode(indexFile);
-    remove(indexFile);
+    bm->removeFile(indexFile);
     return true;
 }
 
