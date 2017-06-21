@@ -10,16 +10,19 @@
 #include "../../include/DataStructure.h"
 #include "../../lib/BPTree/BPTree.h"
 using namespace std;
+using namespace MINISQL_BASE;
 
 class IndexManager {
 public:
-    IndexManager();
+    IndexManager() = default;
+
+    // fixme!!! destructor needs to be implemented to release memory of B+Tree instances
     ~IndexManager();
-    bool create(string filename, int type);
-    bool drop(string filename, int type);
-    int search(string filename, string key, int type);
-    bool insert(string filename, string key, int offset, int type);
-    bool removeKey(string filename, string key, int type);
+    bool create(string filename, SqlValueType type);
+    bool drop(string filename, SqlValueType type);
+    int search(string filename, Element &e);
+    bool insert(string filename, Element &e, int offset);
+    bool removeKey(string filename, Element &e);
 private:
     typedef map<string, BPTree<int>*> intMap;
     typedef map<string, BPTree<float>*> floatMap;

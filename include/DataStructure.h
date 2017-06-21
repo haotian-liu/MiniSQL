@@ -32,30 +32,9 @@ namespace MINISQL_BASE {
     const char UnUsed = 0;
     const char Used = 1;
 
-    inline int getSize(int type, int size=0) {
-        switch (type) {
-            case MINISQL_TYPE_INT:
-                return sizeof(int);
-            case MINISQL_TYPE_FLOAT:
-                return sizeof(float);
-            case MINISQL_TYPE_CHAR:
-                return size;
-            default:
-                std::cerr << "Undefined type!!!" << std::endl;
-        }
-    }
-
     inline std::string dbFile(std::string db) { return db + ".db"; }
     inline std::string tableFile(std::string table) { return table + ".tb"; }
     inline std::string indexFile(std::string table, std::string index) { return table + "_" + index + ".ind"; }
-
-    inline int getDegree(int type) {
-        int blockSize = 24; // fixme !!!!! add BM Controller!!!
-        int keySize = getSize(type);
-        int degree = blockSize / (keySize + sizeof(int));
-
-        return degree;
-    }
 
     enum class SqlValueTypeBase {
         Integer,
@@ -65,7 +44,7 @@ namespace MINISQL_BASE {
 
     struct SqlValueType {
         SqlValueTypeBase type;
-        int charSize;
+        int charSize; // charSize does not include the terminating zero of string!
 
         inline int M() const {
             switch (type) {
@@ -76,6 +55,24 @@ namespace MINISQL_BASE {
                 case SqlValueTypeBase::String:
                     return MINISQL_TYPE_CHAR;
             }
+        }
+
+        inline int getSize() const {
+            switch (M()) {
+                case MINISQL_TYPE_INT:
+                    return sizeof(int);
+                case MINISQL_TYPE_FLOAT:
+                    return sizeof(float);
+                case MINISQL_TYPE_CHAR:
+                    return charSize + 1;
+            }
+        }
+
+        inline int getDegree() const {
+            int keySize = getSize();
+            int degree = BlockSize / (keySize + sizeof(int));
+
+            return degree;
         }
     };
 

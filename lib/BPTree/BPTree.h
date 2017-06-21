@@ -317,7 +317,6 @@ void BPTree<T>::cascadeInsert(BPTree::TreeNode node) {
 template<typename T>
 bool BPTree<T>::remove(const T &key) {
     NodeSearchParse res;
-    //debug(root, -1);
     if (!root) {
         cerr << "Dequeuing empty BPTree!" << endl;
         return false;
