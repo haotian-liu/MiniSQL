@@ -208,7 +208,7 @@ namespace MINISQL_BASE {
         }
     };
 
-    bool condsTest(std::vector<Cond> &conds, Tuple &tup, std::vector<std::string> &attr) {
+    inline bool condsTest(std::vector<Cond> &conds, Tuple &tup, std::vector<std::string> &attr) {
         int condPos;
         for (Cond cond : conds) {
             condPos = -1;
@@ -228,7 +228,7 @@ namespace MINISQL_BASE {
         return true;
     }
 
-    void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
+    inline void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
         tup.element.clear();
