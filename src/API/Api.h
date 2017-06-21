@@ -32,13 +32,15 @@ namespace Api
                   const std::vector<Condition> &condition_list
     );
 
-    bool create_table(const std::string &table_name);   //TODO: fixme on table schema parsing.
+    bool create_table(const std::string &table_name,
+                      const std::vector<std::pair<std::string, SqlValueType>> &schema_list
+    );
 
-    bool create_index(const CreateIndexQuery &);
+    bool create_index(const std::string &table_name, const std::string &attribute_name);
 
-    bool drop_table(const DropTableQuery &);
+    bool drop_table(const std::string &table_name);
 
-    bool drop_index(const DropIndexQuery &);
+    bool drop_index(const std::string &table_name, const std::string &attribute_name);
 
     extern std::string database_name;
     extern bool is_database_assigned;
