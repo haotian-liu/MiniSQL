@@ -55,19 +55,24 @@ namespace MINISQL_BASE {
         return degree;
     }
 
-    enum class SqlValueType {
+    enum class SqlValueTypeBase {
         Integer,
         String,
         Float
     };
 
+    struct SqlValueType {
+        SqlValueTypeBase type;
+        int charSize;
+    };
+
     inline int M(SqlValueType& tp) {
-        switch (tp) {
-            case SqlValueType::Integer:
+        switch (tp.type) {
+            case SqlValueTypeBase::Integer:
                 return MINISQL_TYPE_INT;
-            case SqlValueType::Float:
+            case SqlValueTypeBase::Float:
                 return MINISQL_TYPE_FLOAT;
-            case SqlValueType::String:
+            case SqlValueTypeBase::String:
                 return MINISQL_TYPE_CHAR;
         }
     }
@@ -80,23 +85,23 @@ namespace MINISQL_BASE {
         std::string str;
 
         bool operator<(SqlValue& e) {
-            switch (type) {
-                case SqlValueType::Integer:
+            switch (M(type)) {
+                case MINISQL_TYPE_INT:
                     return i < e.i;
-                case SqlValueType::Float:
+                case MINISQL_TYPE_FLOAT:
                     return r < e.r;
-                case SqlValueType::String:
+                case MINISQL_TYPE_CHAR:
                     return str < e.str;
             }
         }
 
         bool operator==(SqlValue& e) {
-            switch (type) {
-                case SqlValueType::Integer:
+            switch (M(type)) {
+                case MINISQL_TYPE_INT:
                     return i == e.i;
-                case SqlValueType::Float:
+                case MINISQL_TYPE_FLOAT:
                     return r == e.r;
-                case SqlValueType::String:
+                case MINISQL_TYPE_CHAR:
                     return str == e.str;
             }
         }
@@ -104,6 +109,12 @@ namespace MINISQL_BASE {
         bool operator>(SqlValue &e) { return !operator<(e); }
         bool operator<=(SqlValue &e) { return operator<(e) && operator==(e); }
         bool operator>=(SqlValue &e) { return !operator<(e) && operator<(e); }
+
+        void reset() {
+            str.clear();
+            i = 0;
+            r = 0;
+        }
     };
 
     typedef struct SqlValue Element;
@@ -118,6 +129,7 @@ namespace MINISQL_BASE {
 
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
+        std::vector<SqlValueType> attrType;
     };
 
     struct Cond {
@@ -144,6 +156,30 @@ namespace MINISQL_BASE {
             }
         }
     };
+
+    void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
+        const char *block = blockBuffer + offset + 1; // 1 for meta bit
+        Element e;
+        for (int i=0; i<attrType.size(); i++) {
+            e.reset();
+            e.type = attrType[i];
+            switch (M(attrType[i])) {
+                case MINISQL_TYPE_INT:
+                    memcpy(&e.i, block, sizeof(int));
+                    block += sizeof(int);
+                    break;
+                case MINISQL_TYPE_FLOAT:
+                    memcpy(&e.r, block, sizeof(float));
+                    block += sizeof(float);
+                    break;
+                case MINISQL_TYPE_CHAR:
+                    e.str = block;
+                    block += attrType[i].charSize + 1;
+                    break;
+            }
+            tup.element.push_back(e);
+        }
+    }
 
     struct Row {
         std::vector<std::string> col;
