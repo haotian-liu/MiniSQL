@@ -98,10 +98,10 @@ bool RecordManager::selectRecord(Table table, vector<string> &attr, vector<Cond>
             if (block[i * length] != Used) { continue; }
             convertToTuple(block, i * length, table.attrType, tup);
             if (condsTest(cond, tup, table.attrNames)) {
-                row = tup.fetchRow(table.attrNames, attr);
-                res.row.push_back(row);
+                block[i * length] = UnUsed;
             }
         }
+        bm->setDirty(block);
         block = bm->getFileBlock(tableFile(table.Name));
     }
 
@@ -109,7 +109,24 @@ bool RecordManager::selectRecord(Table table, vector<string> &attr, vector<Cond>
 }
 
 bool RecordManager::deleteRecord(string table, vector<Cond> &cond) {
-    return false;
+    char *block = bm->getFileBlock(tableFile(table.Name));
+    int length = table.recordLength + 1;
+    int blocks = BlockSize / length;
+    Tuple tup;
+    Row row;
+    Result res;
+
+    while (block) {
+        for (int i=0; i<blocks; i++) {
+            if (block[i * length] != Used) { continue; }
+            convertToTuple(block, i * length, table.attrType, tup);
+            if (condsTest(cond, tup, table.attrNames)) {
+                row = tup.fetchRow(table.attrNames, attr);
+                res.row.push_back(row);
+            }
+        }
+        block = bm->getFileBlock(tableFile(table.Name));
+    }
 }
 
 void RecordManager::dumpResult(Result &res) const {
