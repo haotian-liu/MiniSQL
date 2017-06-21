@@ -69,3 +69,12 @@ cmake-build-*
 # Debug files
 *.dSYM/
 
+# vim temp file
+*.un~
+*~
+*.swp
+
+# generated file
+#scan.c
+#parse.c
+#y.tab.h

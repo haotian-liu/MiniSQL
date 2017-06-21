@@ -8,6 +8,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cstring>
+#include <stdexcept>
 
 // define basic types we support
 #define MINISQL_TYPE_INT 0
@@ -103,6 +105,8 @@ namespace MINISQL_BASE {
                     return r < e.r;
                 case MINISQL_TYPE_CHAR:
                     return str < e.str;
+                default:
+                    throw std::runtime_error("Undefined Type!");
             }
         }
 
@@ -114,6 +118,8 @@ namespace MINISQL_BASE {
                     return r == e.r;
                 case MINISQL_TYPE_CHAR:
                     return str == e.str;
+                default:
+                    throw std::runtime_error("Undefined Type!");
             }
         }
 

@@ -1,3 +1,4 @@
+#include <string>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -6,28 +7,22 @@
 #include "lib/BPTree/BPTree.h"
 using namespace std;
 
+#include "src/Interpreter/Interpreter.h"
 
-int main() {
-    BPTree<int> bpTree("test.file", 4, 4);
-    const int testCnt = 10000;
-    bool t[testCnt] = {false};
-    srand(time(NULL));
-    for (int i=0; i<testCnt; i++) {
-        int random;
-        random = rand() % testCnt;
-//        random = i;
-        if (t[random]) continue;
-        t[random] = true;
-        bpTree.insert(random, testCnt - random);
-    }
-
-
-    for (int i=0; i<testCnt; i++) {
-        if (!t[i]) continue;
-        cout << i << " " << bpTree.find(i) << endl;
-        bpTree.remove(i);
-        cout << i << " " << bpTree.find(i) << endl;
-        //if (i == 3) break;
+int main(int argc, char *argv[])
+{
+    std::string file_name;
+    switch (argc)
+    {
+        case 1:
+            main_repl_loop();
+            break;
+        case 2:
+            file_name = argv[1];
+            break;
+        default:
+            return 1;
     }
     return 0;
 }
+
