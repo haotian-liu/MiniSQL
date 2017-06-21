@@ -7,8 +7,16 @@
 
 namespace Api
 {
-
     std::string database_name;
     bool is_database_assigned = false;
 
+    RecordManager *ApiHelper::getRecordManager()
+    {
+        return (rm == nullptr) ? rm = new RecordManager() : rm;
+    }
+
+    IndexManager *ApiHelper::getIndexManager()
+    {
+        return (im == nullptr) ? im = new IndexManager() : im;
+    }
 }

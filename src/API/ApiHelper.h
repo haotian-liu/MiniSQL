@@ -6,6 +6,8 @@
 #define MINISQL_APIHELPER_H
 
 #include <string>
+#include "../RecordManager/RecordManager.h"
+#include "../IndexManager/IndexManager.h"
 
 namespace Api
 {
@@ -14,7 +16,14 @@ namespace Api
 
     class ApiHelper
     {
+    public:
+        RecordManager *getRecordManager();
 
+        IndexManager *getIndexManager();
+
+    private:
+        RecordManager *rm;
+        IndexManager *im;
     };
 }
 
