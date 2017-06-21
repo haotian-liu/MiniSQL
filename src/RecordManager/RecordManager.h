@@ -26,7 +26,7 @@ public:
     bool insertRecord(Table table, Tuple record);
     bool selectRecord(Table table, vector<string> &attr, vector<Cond> &cond);
 
-    bool deleteRecord(string table, vector<Cond> &cond);
+    bool deleteRecord(Table table, vector<Cond> &cond);
 
 private:
     BufferManager *bm;
