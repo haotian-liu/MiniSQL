@@ -8,6 +8,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cstring>
+#include <stdexcept>
 
 // define basic types we support
 #define MINISQL_TYPE_INT 0
@@ -92,6 +94,8 @@ namespace MINISQL_BASE {
                     return r < e.r;
                 case MINISQL_TYPE_CHAR:
                     return str < e.str;
+                default:
+                    throw std::runtime_error("Undefined Type!"):
             }
         }
 
@@ -103,6 +107,8 @@ namespace MINISQL_BASE {
                     return r == e.r;
                 case MINISQL_TYPE_CHAR:
                     return str == e.str;
+                default:
+                    throw std::runtime_error("Undefined Type!"):
             }
         }
 
@@ -157,7 +163,7 @@ namespace MINISQL_BASE {
         }
     };
 
-    void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
+    inline void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
         for (int i=0; i<attrType.size(); i++) {
