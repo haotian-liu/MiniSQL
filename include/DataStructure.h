@@ -66,18 +66,18 @@ namespace MINISQL_BASE {
     struct SqlValueType {
         SqlValueTypeBase type;
         int charSize;
-    };
 
-    inline int M(SqlValueType& tp) {
-        switch (tp.type) {
-            case SqlValueTypeBase::Integer:
-                return MINISQL_TYPE_INT;
-            case SqlValueTypeBase::Float:
-                return MINISQL_TYPE_FLOAT;
-            case SqlValueTypeBase::String:
-                return MINISQL_TYPE_CHAR;
+        inline int M() const {
+            switch (type) {
+                case SqlValueTypeBase::Integer:
+                    return MINISQL_TYPE_INT;
+                case SqlValueTypeBase::Float:
+                    return MINISQL_TYPE_FLOAT;
+                case SqlValueTypeBase::String:
+                    return MINISQL_TYPE_CHAR;
+            }
         }
-    }
+    };
 
     struct SqlValue {
         SqlValueType type;
@@ -86,8 +86,19 @@ namespace MINISQL_BASE {
         int strLength;
         std::string str;
 
+        inline int M() const {
+            switch (type.type) {
+                case SqlValueTypeBase::Integer:
+                    return MINISQL_TYPE_INT;
+                case SqlValueTypeBase::Float:
+                    return MINISQL_TYPE_FLOAT;
+                case SqlValueTypeBase::String:
+                    return MINISQL_TYPE_CHAR;
+            }
+        }
+
         bool operator<(SqlValue& e) {
-            switch (M(type)) {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i < e.i;
                 case MINISQL_TYPE_FLOAT:
@@ -100,7 +111,7 @@ namespace MINISQL_BASE {
         }
 
         bool operator==(SqlValue& e) {
-            switch (M(type)) {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i == e.i;
                 case MINISQL_TYPE_FLOAT:
@@ -121,12 +132,51 @@ namespace MINISQL_BASE {
             i = 0;
             r = 0;
         }
+
+        std::string toStr() const {
+            switch (M()) {
+                case MINISQL_TYPE_INT:
+                    return std::to_string(i);
+                case MINISQL_TYPE_FLOAT:
+                    return std::to_string(r);
+                case MINISQL_TYPE_CHAR:
+                    return this->str;
+            }
+        }
     };
 
     typedef struct SqlValue Element;
 
+    struct Row {
+        std::vector<std::string> col;
+    };
+
+    struct Result {
+        std::vector<Row> row;
+    };
+
     struct Tuple {
         std::vector<Element> element;
+
+        Row fetchRow(std::vector<std::string> &attrTable, std::vector<std::string> &attrFetch) const {
+            Row row;
+            bool attrFound;
+            row.col.reserve(attrFetch.size());
+            for (auto fetch : attrFetch) {
+                attrFound = false;
+                for (int i=0; i<attrTable.size(); i++) {
+                    if (fetch == attrTable[i]) {
+                        row.col.push_back(element[i].toStr());
+                        attrFound = true;
+                        break;
+                    }
+                }
+                if (!attrFound) {
+                    std::cerr << "Undefined attr in row fetching!!" << std::endl;
+                }
+            }
+            return row;
+        }
     };
 
     struct Table {
@@ -136,6 +186,7 @@ namespace MINISQL_BASE {
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
         std::vector<SqlValueType> attrType;
+        std::vector<std::string> attrNames;
     };
 
     struct Cond {
@@ -145,31 +196,52 @@ namespace MINISQL_BASE {
         std::string attr;
         Element value;
 
-        bool test(Element &a, Element &b) {
+        bool test(Element &e) {
             switch (cond) {
                 case MINISQL_COND_EQUAL:
-                    return a == b;
+                    return e == value;
                 case MINISQL_COND_LEQUAL:
-                    return a <= b;
+                    return e <= value;
                 case MINISQL_COND_GEQUAL:
-                    return a >= b;
+                    return e >= value;
                 case MINISQL_COND_LESS:
-                    return a < b;
+                    return e < value;
                 case MINISQL_COND_MORE:
-                    return a > b;
+                    return e > value;
                 default:
                     std::cerr << "Undefined condition!" << std::endl;
             }
         }
     };
 
+    inline bool condsTest(std::vector<Cond> &conds, Tuple &tup, std::vector<std::string> &attr) {
+        int condPos;
+        for (Cond cond : conds) {
+            condPos = -1;
+            for (int i=0; i<attr.size(); i++) {
+                if (attr[i] == cond.attr) {
+                    condPos = i;
+                    break;
+                }
+            }
+            if (condPos == -1) {
+                std::cerr << "Attr not found in cond test!" << std::endl;
+            }
+            if (!cond.test(tup.element[condPos])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     inline void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
+        tup.element.clear();
         for (int i=0; i<attrType.size(); i++) {
             e.reset();
             e.type = attrType[i];
-            switch (M(attrType[i])) {
+            switch (attrType[i].M()) {
                 case MINISQL_TYPE_INT:
                     memcpy(&e.i, block, sizeof(int));
                     block += sizeof(int);
@@ -187,12 +259,5 @@ namespace MINISQL_BASE {
         }
     }
 
-    struct Row {
-        std::vector<std::string> col;
-    };
-
-    struct Result {
-        std::vector<Row> row;
-    };
 }
 #endif //MINISQL_DATASTRUCTURE_H
