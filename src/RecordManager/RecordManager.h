@@ -11,6 +11,7 @@
 #include "../BufferManager/BufferManager.h"
 
 using namespace std;
+using namespace MINISQL_BASE;
 
 class RecordManager {
 public:
@@ -22,13 +23,15 @@ public:
     bool createIndex(string table, string index);
     bool dropIndex(string table, string index);
 
-    bool insertRecord(MINISQL_BASE::Table table, MINISQL_BASE::Tuple record);
-    bool selectRecord(string table, vector<string> &attr, vector<MINISQL_BASE::Cond> &cond);
+    bool insertRecord(Table table, Tuple record);
+    bool selectRecord(Table table, vector<string> &attr, vector<Cond> &cond);
 
-    bool deleteRecord(string table, vector<MINISQL_BASE::Cond> &cond);
+    bool deleteRecord(string table, vector<Cond> &cond);
 
 private:
     BufferManager *bm;
+
+    void dumpResult(Result &res) const;
 };
 
 

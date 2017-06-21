@@ -3,6 +3,7 @@
 //
 
 #include "RecordManager.h"
+#include "../../include/DataStructure.h"
 
 RecordManager::RecordManager() {
 
@@ -13,44 +14,44 @@ RecordManager::~RecordManager() {
 }
 
 bool RecordManager::createTable(string table) {
-    string tableFile = MINISQL_BASE::tableFile(table);
+    string tableFile = tableFile(table);
     bm->getFileBlock(tableFile);
     return true;
 }
 
 bool RecordManager::dropTable(string table) {
-    string tableFile = MINISQL_BASE::tableFile(table);
+    string tableFile = tableFile(table);
     bm->removeFileNode(tableFile);
     bm->removeFile(tableFile);
     return true;
 }
 
 bool RecordManager::createIndex(string table, string index) {
-    string indexFile = MINISQL_BASE::indexFile(table, index);
+    string indexFile = indexFile(table, index);
     bm->getFileBlock(indexFile);
     return true;
 }
 
 bool RecordManager::dropIndex(string table, string index) {
-    string indexFile = MINISQL_BASE::indexFile(table, index);
+    string indexFile = indexFile(table, index);
     bm->removeFileNode(indexFile);
     bm->removeFile(indexFile);
     return true;
 }
 
-bool RecordManager::insertRecord(MINISQL_BASE::Table table, MINISQL_BASE::Tuple record) {
-    char *block = bm->getFileBlock(MINISQL_BASE::tableFile(table.Name));
+bool RecordManager::insertRecord(Table table, Tuple record) {
+    char *block = bm->getFileBlock(tableFile(table.Name));
     int length = table.recordLength + 1;
-    int blocks = MINISQL_BASE::BlockSize / length;
+    int blocks = BlockSize / length;
     int offset = 1;
     string strFixed;
     int lengthOffset;
 
     while (true) {
         for (int i=0; i<blocks; i++) {
-            if (block[i * length] != MINISQL_BASE::UnUsed) { continue; }
+            if (block[i * length] != UnUsed) { continue; }
             for (auto attr = record.element.begin(); attr < record.element.end(); attr++) {
-                switch (MINISQL_BASE::M(attr->type)) {
+                switch (M(attr->type)) {
                     case MINISQL_TYPE_CHAR:
                         strFixed = attr->str;
                         lengthOffset = attr->strLength - strFixed.length();
@@ -73,7 +74,7 @@ bool RecordManager::insertRecord(MINISQL_BASE::Table table, MINISQL_BASE::Tuple 
                         break;
                 }
             }
-            block[i * length] = MINISQL_BASE::Used;
+            block[i * length] = Used;
             bm->setDirty(block);
             return true;
         }
@@ -82,10 +83,39 @@ bool RecordManager::insertRecord(MINISQL_BASE::Table table, MINISQL_BASE::Tuple 
     }
 }
 
-bool RecordManager::selectRecord(string table, vector<string> &attr, vector<MINISQL_BASE::Cond> &cond) {
+bool RecordManager::selectRecord(Table table, vector<string> &attr, vector<Cond> &cond) {
+    char *block = bm->getFileBlock(tableFile(table.Name));
+    int length = table.recordLength + 1;
+    int blocks = BlockSize / length;
+    Tuple tup;
+    Row row;
+    Result res;
+
+    while (block) {
+        for (int i=0; i<blocks; i++) {
+            if (block[i * length] != Used) { continue; }
+            convertToTuple(block, i * length, table.attrType, tup);
+            if (condsTest(cond, tup, table.attrNames)) {
+                row = tup.fetchRow(table.attrNames, attr);
+                res.row.push_back(row);
+            }
+        }
+        block = bm->getFileBlock(tableFile(table.Name));
+    }
+
+    dumpResult(res);
+}
+
+bool RecordManager::deleteRecord(string table, vector<Cond> &cond) {
     return false;
 }
 
-bool RecordManager::deleteRecord(string table, vector<MINISQL_BASE::Cond> &cond) {
-    return false;
+void RecordManager::dumpResult(Result &res) const {
+    for (auto row : res.row) {
+        cout << " | ";
+        for (auto col : row.col) {
+            cout << col << " | ";
+        }
+        cout << endl;
+    }
 }
