@@ -64,18 +64,18 @@ namespace MINISQL_BASE {
     struct SqlValueType {
         SqlValueTypeBase type;
         int charSize;
-    };
 
-    inline int M(SqlValueType& tp) {
-        switch (tp.type) {
-            case SqlValueTypeBase::Integer:
-                return MINISQL_TYPE_INT;
-            case SqlValueTypeBase::Float:
-                return MINISQL_TYPE_FLOAT;
-            case SqlValueTypeBase::String:
-                return MINISQL_TYPE_CHAR;
+        inline int M() const {
+            switch (type) {
+                case SqlValueTypeBase::Integer:
+                    return MINISQL_TYPE_INT;
+                case SqlValueTypeBase::Float:
+                    return MINISQL_TYPE_FLOAT;
+                case SqlValueTypeBase::String:
+                    return MINISQL_TYPE_CHAR;
+            }
         }
-    }
+    };
 
     struct SqlValue {
         SqlValueType type;
@@ -84,8 +84,19 @@ namespace MINISQL_BASE {
         int strLength;
         std::string str;
 
+        inline int M() const {
+            switch (type.type) {
+                case SqlValueTypeBase::Integer:
+                    return MINISQL_TYPE_INT;
+                case SqlValueTypeBase::Float:
+                    return MINISQL_TYPE_FLOAT;
+                case SqlValueTypeBase::String:
+                    return MINISQL_TYPE_CHAR;
+            }
+        }
+
         bool operator<(SqlValue& e) {
-            switch (M(type)) {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i < e.i;
                 case MINISQL_TYPE_FLOAT:
@@ -96,7 +107,7 @@ namespace MINISQL_BASE {
         }
 
         bool operator==(SqlValue& e) {
-            switch (M(type)) {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i == e.i;
                 case MINISQL_TYPE_FLOAT:
@@ -117,7 +128,7 @@ namespace MINISQL_BASE {
         }
 
         std::string toStr() const {
-            switch (M(type)) {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return std::to_string(i);
                 case MINISQL_TYPE_FLOAT:
@@ -129,6 +140,14 @@ namespace MINISQL_BASE {
     };
 
     typedef struct SqlValue Element;
+
+    struct Row {
+        std::vector<std::string> col;
+    };
+
+    struct Result {
+        std::vector<Row> row;
+    };
 
     struct Tuple {
         std::vector<Element> element;
@@ -216,7 +235,7 @@ namespace MINISQL_BASE {
         for (int i=0; i<attrType.size(); i++) {
             e.reset();
             e.type = attrType[i];
-            switch (M(attrType[i])) {
+            switch (attrType[i].M()) {
                 case MINISQL_TYPE_INT:
                     memcpy(&e.i, block, sizeof(int));
                     block += sizeof(int);
@@ -234,12 +253,5 @@ namespace MINISQL_BASE {
         }
     }
 
-    struct Row {
-        std::vector<std::string> col;
-    };
-
-    struct Result {
-        std::vector<Row> row;
-    };
 }
 #endif //MINISQL_DATASTRUCTURE_H

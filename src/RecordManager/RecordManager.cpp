@@ -14,28 +14,28 @@ RecordManager::~RecordManager() {
 }
 
 bool RecordManager::createTable(string table) {
-    string tableFile = tableFile(table);
-    bm->getFileBlock(tableFile);
+    string tableFileStr = tableFile(table);
+    bm->getFileBlock(tableFileStr);
     return true;
 }
 
 bool RecordManager::dropTable(string table) {
-    string tableFile = tableFile(table);
-    bm->removeFileNode(tableFile);
-    bm->removeFile(tableFile);
+    string tableFileStr = tableFile(table);
+    bm->removeFileNode(tableFileStr);
+    bm->removeFile(tableFileStr);
     return true;
 }
 
 bool RecordManager::createIndex(string table, string index) {
-    string indexFile = indexFile(table, index);
-    bm->getFileBlock(indexFile);
+    string indexFileStr = indexFile(table, index);
+    bm->getFileBlock(indexFileStr);
     return true;
 }
 
 bool RecordManager::dropIndex(string table, string index) {
-    string indexFile = indexFile(table, index);
-    bm->removeFileNode(indexFile);
-    bm->removeFile(indexFile);
+    string indexFileStr = indexFile(table, index);
+    bm->removeFileNode(indexFileStr);
+    bm->removeFile(indexFileStr);
     return true;
 }
 
@@ -51,7 +51,7 @@ bool RecordManager::insertRecord(Table table, Tuple record) {
         for (int i=0; i<blocks; i++) {
             if (block[i * length] != UnUsed) { continue; }
             for (auto attr = record.element.begin(); attr < record.element.end(); attr++) {
-                switch (M(attr->type)) {
+                switch (attr->type.M()) {
                     case MINISQL_TYPE_CHAR:
                         strFixed = attr->str;
                         lengthOffset = attr->strLength - strFixed.length();
