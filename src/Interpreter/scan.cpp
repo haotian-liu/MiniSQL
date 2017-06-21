@@ -322,9 +322,6 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
-
-#define yywrap() (/*CONSTCOND*/1)
-#define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -480,8 +477,8 @@ char *yytext;
 #include <cstdio>
 #include <cassert>
 
-#line 483 "lex.yy.c"
-#line 484 "lex.yy.c"
+#line 480 "lex.yy.c"
+#line 481 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -698,10 +695,10 @@ YY_DECL
 		}
 
 	{
-#line 29 "scan.l"
+#line 27 "scan.l"
 
 
-#line 704 "lex.yy.c"
+#line 701 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -761,94 +758,94 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 31 "scan.l"
+#line 29 "scan.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 33 "scan.l"
+#line 31 "scan.l"
 { /* std::cout << "T_INT\n"; */ sscanf(yytext, "%d", &yylval.i); return T_INT; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 34 "scan.l"
+#line 32 "scan.l"
 { /* std::cout << "T_REAL\n"; */ sscanf(yytext, "%lf", &yylval.r); return T_REAL; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 35 "scan.l"
+#line 33 "scan.l"
 { sscanf(yytext, "%lf", &yylval.r); return T_REAL; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 36 "scan.l"
+#line 34 "scan.l"
 { yylval.str = std::string(yytext + 1, yyleng - 2); return T_QSTRING; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 37 "scan.l"
+#line 35 "scan.l"
 { yylval.str = std::string(yytext + 1, yyleng - 2); return T_RQSTRING; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 39 "scan.l"
+#line 37 "scan.l"
 { return get_id(yylval.str = std::string(yytext)); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 41 "scan.l"
+#line 39 "scan.l"
 {return T_LT;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 42 "scan.l"
+#line 40 "scan.l"
 {return T_LE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 43 "scan.l"
+#line 41 "scan.l"
 {return T_GT;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 44 "scan.l"
+#line 42 "scan.l"
 {return T_GE;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 45 "scan.l"
+#line 43 "scan.l"
 {return T_EQ;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 46 "scan.l"
+#line 44 "scan.l"
 {return T_NE;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 47 "scan.l"
+#line 45 "scan.l"
 {return T_NE;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 49 "scan.l"
+#line 47 "scan.l"
 {return yytext[0];}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 50 "scan.l"
+#line 48 "scan.l"
 {return T_EOF;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 52 "scan.l"
+#line 50 "scan.l"
 { std::cerr << "illegal character [" << yytext[0] << "]\n"; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 54 "scan.l"
+#line 52 "scan.l"
 ECHO;
 	YY_BREAK
-#line 851 "lex.yy.c"
+#line 848 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1851,8 +1848,16 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 54 "scan.l"
+#line 52 "scan.l"
 
 
 #include "scanhelp.cpp"
+
+inline int yywrap()
+{
+    yy_flush_buffer(YY_CURRENT_BUFFER);
+    { BEGIN INITIAL; }
+    return 1;
+}
+
 

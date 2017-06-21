@@ -19,6 +19,11 @@
 
 %}
 
+%define parse.error verbose
+%define parse.lac full
+
+//%define api.pure full
+
 %token
     RW_CREATE
     RW_DROP
@@ -328,4 +333,13 @@ test: RW_TEST { std::cout << "YOUR INPUT IS TOOOOOO SIMPLE, SOMETIMES NAIVE!\n";
 %%
 
 bool bFlag; /* no meanings. */
+
+inline int yyerror(const char *s)
+{
+    //std::cerr << "error: ";
+    std::cerr << s << std::endl;
+    //std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
+    yywrap();
+    return 1;
+}
 

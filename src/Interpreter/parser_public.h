@@ -57,17 +57,8 @@ typedef struct yystype
     SqlValueType val_type;
 } YYSTYPE;
 
-extern "C" inline int yyerror(const char *s)
-{
-    std::cerr << "error: ";
-    std::cerr << s << std::endl;
-}
+int yyerror(const char *s);
 
-/*
-extern "C" inline int yywrap()
-{
-    return 1;
-}
- */
+extern "C" int yywrap();
 
 #endif //MINISQL_PARSER_PUBLIC_H
