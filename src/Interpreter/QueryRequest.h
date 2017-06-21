@@ -61,6 +61,7 @@ struct SqlValue
     int i;
     float r;
     std::string str;
+    //uint16_t char_length;
 };
 
 static_assert(!std::is_pod<SqlValue>::value);

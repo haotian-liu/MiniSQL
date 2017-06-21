@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include "../../include/DataStructure.h"
+#include "../BufferManager/BufferManager.h"
 
 using namespace std;
 
@@ -21,10 +22,13 @@ public:
     bool createIndex(string table, string index);
     bool dropIndex(string table, string index);
 
-    bool insertRecord(string table, const char *record, int length);
+    bool insertRecord(MINISQL_BASE::Table table, MINISQL_BASE::Tuple record);
     bool selectRecord(string table, vector<string> &attr, vector<MINISQL_BASE::Cond> &cond);
 
     bool deleteRecord(string table, vector<MINISQL_BASE::Cond> &cond);
+
+private:
+    BufferManager *bm;
 };
 
 

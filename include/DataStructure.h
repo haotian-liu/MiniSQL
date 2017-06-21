@@ -26,12 +26,10 @@
 #define MINISQL_COND_MORE 5
 
 namespace MINISQL_BASE {
-    struct Cond {
-        Cond() = default;
-        Cond(std::string attr, std::string value, int cond) : attr(attr), value(value), cond(cond) {}
-        int cond;
-        std::string attr, value;
-    };
+    const int BlockSize = 4096;
+    const char UnUsed = 0;
+    const char Used = 1;
+
     inline int getSize(int type, int size=0) {
         switch (type) {
             case MINISQL_TYPE_INT:
@@ -44,6 +42,11 @@ namespace MINISQL_BASE {
                 std::cerr << "Undefined type!!!" << std::endl;
         }
     }
+
+    inline std::string dbFile(std::string db) { return db + ".db"; }
+    inline std::string tableFile(std::string table) { return table + ".tb"; }
+    inline std::string indexFile(std::string table, std::string index) { return table + "_" + index + ".ind"; }
+
     inline int getDegree(int type) {
         int blockSize = 24; // fixme !!!!! add BM Controller!!!
         int keySize = getSize(type);
@@ -52,9 +55,58 @@ namespace MINISQL_BASE {
         return degree;
     }
 
-    struct Element {
-        std::string attrName, val;
+    enum class SqlValueType {
+        Integer,
+        String,
+        Float
     };
+
+    inline int M(SqlValueType& tp) {
+        switch (tp) {
+            case SqlValueType::Integer:
+                return MINISQL_TYPE_INT;
+            case SqlValueType::Float:
+                return MINISQL_TYPE_FLOAT;
+            case SqlValueType::String:
+                return MINISQL_TYPE_CHAR;
+        }
+    }
+
+    struct SqlValue {
+        SqlValueType type;
+        int i;
+        float r;
+        int strLength;
+        std::string str;
+
+        bool operator<(SqlValue& e) {
+            switch (type) {
+                case SqlValueType::Integer:
+                    return i < e.i;
+                case SqlValueType::Float:
+                    return r < e.r;
+                case SqlValueType::String:
+                    return str < e.str;
+            }
+        }
+
+        bool operator==(SqlValue& e) {
+            switch (type) {
+                case SqlValueType::Integer:
+                    return i == e.i;
+                case SqlValueType::Float:
+                    return r == e.r;
+                case SqlValueType::String:
+                    return str == e.str;
+            }
+        }
+
+        bool operator>(SqlValue &e) { return !operator<(e); }
+        bool operator<=(SqlValue &e) { return operator<(e) && operator==(e); }
+        bool operator>=(SqlValue &e) { return !operator<(e) && operator<(e); }
+    };
+
+    typedef struct SqlValue Element;
 
     struct Tuple {
         std::vector<Element> element;
@@ -66,6 +118,31 @@ namespace MINISQL_BASE {
 
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
+    };
+
+    struct Cond {
+        Cond() = default;
+        Cond(std::string attr, Element value, int cond) : attr(attr), value(value), cond(cond) {}
+        int cond;
+        std::string attr;
+        Element value;
+
+        bool test(Element &a, Element &b) {
+            switch (cond) {
+                case MINISQL_COND_EQUAL:
+                    return a == b;
+                case MINISQL_COND_LEQUAL:
+                    return a <= b;
+                case MINISQL_COND_GEQUAL:
+                    return a >= b;
+                case MINISQL_COND_LESS:
+                    return a < b;
+                case MINISQL_COND_MORE:
+                    return a > b;
+                default:
+                    std::cerr << "Undefined condition!" << std::endl;
+            }
+        }
     };
 
     struct Row {
