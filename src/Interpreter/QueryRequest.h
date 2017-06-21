@@ -82,7 +82,8 @@ enum class QueryType
     CREATE_TABLE,
     CREATE_INDEX,
     DROP_TABLE,
-    DROP_INDEX
+    DROP_INDEX,
+    USE_DATABASE
 };
 
 class QueryRequest
@@ -115,6 +116,17 @@ public:
     std::string table_name;
     std::vector<std::string> attr_list;
     std::vector<Condition> condition_list;
+};
+
+class UseDatabaseQuery final : public QueryRequest
+{
+public:
+    UseDatabaseQuery()
+    {
+        type = QueryType::USE_DATABASE;
+    }
+
+    std::string database_name;
 };
 
 class InsertQuery final : public QueryRequest

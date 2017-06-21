@@ -95,7 +95,7 @@ namespace MINISQL_BASE {
                 case MINISQL_TYPE_CHAR:
                     return str < e.str;
                 default:
-                    throw std::runtime_error("Undefined Type!"):
+                    throw std::runtime_error("Undefined Type!");
             }
         }
 
@@ -108,7 +108,7 @@ namespace MINISQL_BASE {
                 case MINISQL_TYPE_CHAR:
                     return str == e.str;
                 default:
-                    throw std::runtime_error("Undefined Type!"):
+                    throw std::runtime_error("Undefined Type!");
             }
         }
 

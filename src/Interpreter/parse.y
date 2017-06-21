@@ -34,6 +34,8 @@
     RW_INTO
     RW_VALUES
     RW_SET
+    RW_USE
+    RW_DATABASE
 
     RW_EXIT
     RW_TEST
@@ -79,6 +81,7 @@
     exit
     dml
     ddl
+    use_database
 
 %type <dummy>
     insert
@@ -98,6 +101,7 @@ top_stmt: exit
     | test
     | dml
     | ddl
+    | use_database
     ;
 
 dml: insert
@@ -110,6 +114,15 @@ ddl: create_table
     | create_index
     | drop_table
     | drop_index
+    ;
+
+use_database: RW_USE RW_DATABASE T_NSTRING
+    {
+        auto use_db_query = new UseDatabaseQuery();
+        use_db_query->database_name = $3;
+
+        query = use_db_query;
+    }
     ;
 
 create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition ')'

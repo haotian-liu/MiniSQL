@@ -53,6 +53,13 @@ void main_repl_loop()
             continue;
         } else
         {
+            auto use_db_query = dynamic_cast<UseDatabaseQuery *>(query);
+            if (use_db_query)
+            {
+                delete use_db_query;
+                query = nullptr;
+                continue;
+            }
             auto insert_query = dynamic_cast<InsertQuery *>(query);
             if (insert_query)
             {
