@@ -42,9 +42,6 @@ namespace Api
 
     bool drop_index(const std::string &table_name, const std::string &attribute_name);
 
-    extern std::string database_name;
-    extern bool is_database_assigned;
-
     std::string get_db_name_prefix();
 }
 
