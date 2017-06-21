@@ -115,6 +115,17 @@ namespace MINISQL_BASE {
             i = 0;
             r = 0;
         }
+
+        std::string toStr() const {
+            switch (M(type)) {
+                case MINISQL_TYPE_INT:
+                    return std::to_string(i);
+                case MINISQL_TYPE_FLOAT:
+                    return std::to_string(r);
+                case MINISQL_TYPE_CHAR:
+                    return this->str;
+            }
+        }
     };
 
     typedef struct SqlValue Element;
@@ -160,6 +171,7 @@ namespace MINISQL_BASE {
     void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
+        tup.element.clear();
         for (int i=0; i<attrType.size(); i++) {
             e.reset();
             e.type = attrType[i];
