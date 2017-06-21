@@ -16,4 +16,6 @@ class Interpreter
 
 void main_repl_loop();
 
+void dispatch();
+
 #endif //MINISQL_INTERPRETER_H

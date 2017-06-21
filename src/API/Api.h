@@ -6,12 +6,16 @@
 #define MINISQL_API_H
 
 #include <cstddef>
+#include <string>
+#include <stdexcept>
 
 #include "../Interpreter/QueryRequest.h"
 
 namespace Api
 {
-    size_t insert(const InsertQuery &);
+    bool use_database(const std::string &db_name);
+
+    size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list);
 
     size_t delete_op(const DeleteQuery &);
 
@@ -26,6 +30,11 @@ namespace Api
     bool drop_table(const DropTableQuery &);
 
     bool drop_index(const DropIndexQuery &);
+
+    extern std::string database_name;
+    extern bool is_database_assigned;
+
+    std::string get_db_name_prefix();
 }
 
 
