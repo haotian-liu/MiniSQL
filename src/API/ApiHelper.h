@@ -26,6 +26,8 @@ namespace Api
 
         IndexManager *getIndexManager();
 
+        BufferManager *getBufferManager();
+
     private:
         ApiHelper() = default;
 
@@ -33,6 +35,7 @@ namespace Api
 
         RecordManager *rm = nullptr;
         IndexManager *im = nullptr;
+        BufferManager *bm = nullptr;
     };
 }
 

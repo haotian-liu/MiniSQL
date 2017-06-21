@@ -20,5 +20,10 @@ namespace Api
         return (im == nullptr) ? im = new IndexManager() : im;
     }
 
+    BufferManager *ApiHelper::getBufferManager()
+    {
+        return (bm == nullptr) ? bm = new BufferManager() : bm;
+    }
+
     ApiHelper *ApiHelper::helper = nullptr;
 }
