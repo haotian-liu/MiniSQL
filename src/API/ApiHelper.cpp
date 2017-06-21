@@ -19,4 +19,6 @@ namespace Api
     {
         return (im == nullptr) ? im = new IndexManager() : im;
     }
+
+    ApiHelper *ApiHelper::helper = nullptr;
 }

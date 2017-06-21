@@ -29,7 +29,7 @@ namespace Api
     private:
         ApiHelper() = default;
 
-        static ApiHelper *helper = nullptr;
+        static ApiHelper *helper;
 
         RecordManager *rm = nullptr;
         IndexManager *im = nullptr;
