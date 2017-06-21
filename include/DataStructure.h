@@ -132,6 +132,26 @@ namespace MINISQL_BASE {
 
     struct Tuple {
         std::vector<Element> element;
+
+        Row fetchRow(std::vector<std::string> &attrTable, std::vector<std::string> &attrFetch) const {
+            Row row;
+            bool attrFound;
+            row.col.reserve(attrFetch.size());
+            for (auto fetch : attrFetch) {
+                attrFound = false;
+                for (int i=0; i<attrTable.size(); i++) {
+                    if (fetch == attrTable[i]) {
+                        row.col.push_back(element[i].toStr());
+                        attrFound = true;
+                        break;
+                    }
+                }
+                if (!attrFound) {
+                    std::cerr << "Undefined attr in row fetching!!" << std::endl;
+                }
+            }
+            return row;
+        }
     };
 
     struct Table {
@@ -141,6 +161,7 @@ namespace MINISQL_BASE {
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
         std::vector<SqlValueType> attrType;
+        std::vector<std::string> attrNames;
     };
 
     struct Cond {
@@ -167,6 +188,26 @@ namespace MINISQL_BASE {
             }
         }
     };
+
+    bool condsTest(std::vector<Cond> &conds, Tuple &tup, std::vector<std::string> &attr) {
+        int condPos;
+        for (Cond cond : conds) {
+            condPos = -1;
+            for (int i=0; i<attr.size(); i++) {
+                if (attr[i] == cond.attr) {
+                    condPos = i;
+                    break;
+                }
+            }
+            if (condPos == -1) {
+                std::cerr << "Attr not found in cond test!" << std::endl;
+            }
+            if (!cond.test(tup.element[condPos])) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
