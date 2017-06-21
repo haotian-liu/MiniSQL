@@ -17,13 +17,22 @@ namespace Api
 
     size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list);
 
-    size_t delete_op(const DeleteQuery &);
+    size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list);
 
-    size_t select(const SelectQuery &);
+    size_t select(const std::string &table_name, const std::vector<Condition> &condition_list);
 
-    size_t update(const UpdateQuery &);
+    size_t select(const std::string &table_name,
+                  const std::vector<Condition> &condition_list,
+                  const std::vector<std::string> &attr_list
+    );
 
-    bool create_table(const CreateTableQuery &);
+    size_t update(const std::string &table_name,
+                  const std::string &attr,
+                  const SqlValue &value,
+                  const std::vector<Condition> &condition_list
+    );
+
+    bool create_table(const std::string &table_name);   //TODO: fixme on table schema parsing.
 
     bool create_index(const CreateIndexQuery &);
 

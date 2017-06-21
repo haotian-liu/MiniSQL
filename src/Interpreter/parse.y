@@ -34,8 +34,13 @@
     RW_INTO
     RW_VALUES
     RW_SET
+
     RW_USE
     RW_DATABASE
+
+    RW_INTEGER
+    RW_FLOAT
+    RW_CHAR
 
     RW_EXIT
     RW_TEST
@@ -75,6 +80,8 @@
 
 %type <schema> schema_item;
 %type <schema_list> table_schema_definition;
+
+%type <val_type> value_type;
 
 %type <dummy> top_stmt
     test
@@ -233,15 +240,20 @@ table_schema_definition: table_schema_definition ',' schema_item
     }
     | schema_item
     {
-        $$ = std::vector<std::pair<std::string, std::string>>();
+        $$ = std::vector<std::pair<std::string, SqlValueType>>();
         $$.push_back($1);
     }
     ;
 
-schema_item: T_STRING T_STRING
+schema_item: T_STRING value_type
     {
         $$ = std::make_pair($1, $2);
     }
+    ;
+
+value_type: RW_INTEGER { $$.type = SqlValueTypeBase::Integer; }
+    | RW_FLOAT { $$.type = SqlValueTypeBase::Float; }
+    | RW_CHAR '(' T_INT ')' { $$.type = SqlValueTypeBase::String; $$.charSize = $3; }
     ;
 
 attr_list: attr_list ',' T_NSTRING
@@ -289,9 +301,9 @@ value_list: value_list ',' value
     ;
 
 value:
-    T_INT { $$.type = SqlValueType::Integer; $$.i = $1; }
-    | T_REAL { $$.type = SqlValueType::Float; $$.r = $1; }
-    | T_ASTRING { $$.type = SqlValueType::String; $$.str = $1; }
+    T_INT { $$.type.type = SqlValueTypeBase::Integer; $$.i = $1; }
+    | T_REAL { $$.type.type = SqlValueTypeBase::Float; $$.r = $1; }
+    | T_ASTRING { $$.type.type = SqlValueTypeBase::String; $$.str = $1; }
     ;
 
 operator:

@@ -14,6 +14,9 @@
 #include "operator.h"
 #include "../../include/DataStructure.h"
 
+using namespace MINISQL_BASE;
+
+/*
 enum class SqlValueType
 {
     Integer,
@@ -49,8 +52,10 @@ inline std::ostream &operator<<(std::ostream &os, SqlValueType &tp)
         case SqlValueType::Float:
             os << "Float";
             break;
+*/
 /*        default:
-            throw std::runtime_error("Invalid SqlValueType");*/
+            throw std::runtime_error("Invalid SqlValueType");*//*
+
     }
     return os;
 }
@@ -65,6 +70,7 @@ struct SqlValue
 };
 
 static_assert(!std::is_pod<SqlValue>::value);
+*/
 
 struct Condition
 {
@@ -176,7 +182,7 @@ public:
         type = QueryType::CREATE_TABLE;
     }
     std::string table_name;
-    std::vector<std::pair<std::string, std::string>> table_schema_list;
+    std::vector<std::pair<std::string, SqlValueType>> table_schema_list;
 };
 
 class CreateIndexQuery final : public QueryRequest
