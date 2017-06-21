@@ -15,18 +15,18 @@ using namespace MINISQL_BASE;
 
 class RecordManager {
 public:
-    RecordManager();
-    ~RecordManager();
-    bool createTable(string table);
-    bool dropTable(string table);
+    RecordManager(BufferManager *bm) : bm(bm) {}
+    ~RecordManager() = default;
+    bool createTable(string &table);
+    bool dropTable(string &table);
 
-    bool createIndex(string table, string index);
-    bool dropIndex(string table, string index);
+    bool createIndex(string &table, string &index);
+    bool dropIndex(string &table, string &index);
 
-    bool insertRecord(Table table, Tuple record);
-    bool selectRecord(Table table, vector<string> &attr, vector<Cond> &cond);
+    bool insertRecord(Table &table, Tuple &record);
+    bool selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond);
 
-    bool deleteRecord(Table table, vector<Cond> &cond);
+    bool deleteRecord(Table &table, vector<Cond> &cond);
 
 private:
     BufferManager *bm;

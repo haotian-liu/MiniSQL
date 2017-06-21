@@ -4,41 +4,33 @@
 
 #include "RecordManager.h"
 
-RecordManager::RecordManager() {
-
-}
-
-RecordManager::~RecordManager() {
-
-}
-
-bool RecordManager::createTable(string table) {
+bool RecordManager::createTable(string &table) {
     string tableFileStr = tableFile(table);
     bm->getFileBlock(tableFileStr);
     return true;
 }
 
-bool RecordManager::dropTable(string table) {
+bool RecordManager::dropTable(string &table) {
     string tableFileStr = tableFile(table);
     bm->removeFileNode(tableFileStr);
     bm->removeFile(tableFileStr);
     return true;
 }
 
-bool RecordManager::createIndex(string table, string index) {
+bool RecordManager::createIndex(string &table, string &index) {
     string indexFileStr = indexFile(table, index);
     bm->getFileBlock(indexFileStr);
     return true;
 }
 
-bool RecordManager::dropIndex(string table, string index) {
+bool RecordManager::dropIndex(string &table, string &index) {
     string indexFileStr = indexFile(table, index);
     bm->removeFileNode(indexFileStr);
     bm->removeFile(indexFileStr);
     return true;
 }
 
-bool RecordManager::insertRecord(Table table, Tuple record) {
+bool RecordManager::insertRecord(Table &table, Tuple &record) {
     char *block = bm->getFileBlock(tableFile(table.Name));
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
@@ -82,7 +74,7 @@ bool RecordManager::insertRecord(Table table, Tuple record) {
     }
 }
 
-bool RecordManager::selectRecord(Table table, vector<string> &attr, vector<Cond> &cond) {
+bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond) {
     char *block = bm->getFileBlock(tableFile(table.Name));
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
@@ -105,7 +97,7 @@ bool RecordManager::selectRecord(Table table, vector<string> &attr, vector<Cond>
     dumpResult(res);
 }
 
-bool RecordManager::deleteRecord(Table table, vector<Cond> &cond) {
+bool RecordManager::deleteRecord(Table &table, vector<Cond> &cond) {
     char *block = bm->getFileBlock(tableFile(table.Name));
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
