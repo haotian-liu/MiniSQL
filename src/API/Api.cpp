@@ -36,22 +36,26 @@ namespace Api
     bool create_table(const std::string &table_name,
                       const std::vector<std::pair<std::string, SqlValueType>> &schema_list)
     {
-        return false;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        return rm->createTable(table_name);
     }
 
     bool create_index(const std::string &table_name, const std::string &attribute_name)
     {
-        return false;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        return rm->createIndex(table_name, attribute_name);
     }
 
     bool drop_table(const std::string &table_name)
     {
-        return false;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        return rm->dropTable(table_name);
     }
 
     bool drop_index(const std::string &table_name, const std::string &attribute_name)
     {
-        return false;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        return rm->dropIndex(table_name, attribute_name);
     }
 
     size_t select(const std::string &table_name, const std::vector<Condition> &condition_list)

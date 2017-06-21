@@ -17,13 +17,22 @@ namespace Api
     class ApiHelper
     {
     public:
+        static ApiHelper *getApiHelper()
+        {
+            return (helper == nullptr) ? helper = new ApiHelper() : helper;
+        }
+
         RecordManager *getRecordManager();
 
         IndexManager *getIndexManager();
 
     private:
-        RecordManager *rm;
-        IndexManager *im;
+        ApiHelper() = default;
+
+        static ApiHelper *helper = nullptr;
+
+        RecordManager *rm = nullptr;
+        IndexManager *im = nullptr;
     };
 }
 
