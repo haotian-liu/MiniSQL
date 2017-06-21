@@ -30,12 +30,6 @@ namespace MINISQL_BASE {
     const char UnUsed = 0;
     const char Used = 1;
 
-    struct Cond {
-        Cond() = default;
-        Cond(std::string attr, std::string value, int cond) : attr(attr), value(value), cond(cond) {}
-        int cond;
-        std::string attr, value;
-    };
     inline int getSize(int type, int size=0) {
         switch (type) {
             case MINISQL_TYPE_INT:
@@ -84,6 +78,32 @@ namespace MINISQL_BASE {
         float r;
         int strLength;
         std::string str;
+
+        bool operator<(SqlValue& e) {
+            switch (type) {
+                case SqlValueType::Integer:
+                    return i < e.i;
+                case SqlValueType::Float:
+                    return r < e.r;
+                case SqlValueType::String:
+                    return str < e.str;
+            }
+        }
+
+        bool operator==(SqlValue& e) {
+            switch (type) {
+                case SqlValueType::Integer:
+                    return i == e.i;
+                case SqlValueType::Float:
+                    return r == e.r;
+                case SqlValueType::String:
+                    return str == e.str;
+            }
+        }
+
+        bool operator>(SqlValue &e) { return !operator<(e); }
+        bool operator<=(SqlValue &e) { return operator<(e) && operator==(e); }
+        bool operator>=(SqlValue &e) { return !operator<(e) && operator<(e); }
     };
 
     typedef struct SqlValue Element;
@@ -98,6 +118,31 @@ namespace MINISQL_BASE {
 
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
+    };
+
+    struct Cond {
+        Cond() = default;
+        Cond(std::string attr, Element value, int cond) : attr(attr), value(value), cond(cond) {}
+        int cond;
+        std::string attr;
+        Element value;
+
+        bool test(Element &a, Element &b) {
+            switch (cond) {
+                case MINISQL_COND_EQUAL:
+                    return a == b;
+                case MINISQL_COND_LEQUAL:
+                    return a <= b;
+                case MINISQL_COND_GEQUAL:
+                    return a >= b;
+                case MINISQL_COND_LESS:
+                    return a < b;
+                case MINISQL_COND_MORE:
+                    return a > b;
+                default:
+                    std::cerr << "Undefined condition!" << std::endl;
+            }
+        }
     };
 
     struct Row {
