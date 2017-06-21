@@ -150,18 +150,18 @@ namespace MINISQL_BASE {
         std::string attr;
         Element value;
 
-        bool test(Element &a, Element &b) {
+        bool test(Element &e) {
             switch (cond) {
                 case MINISQL_COND_EQUAL:
-                    return a == b;
+                    return e == value;
                 case MINISQL_COND_LEQUAL:
-                    return a <= b;
+                    return e <= value;
                 case MINISQL_COND_GEQUAL:
-                    return a >= b;
+                    return e >= value;
                 case MINISQL_COND_LESS:
-                    return a < b;
+                    return e < value;
                 case MINISQL_COND_MORE:
-                    return a > b;
+                    return e > value;
                 default:
                     std::cerr << "Undefined condition!" << std::endl;
             }
