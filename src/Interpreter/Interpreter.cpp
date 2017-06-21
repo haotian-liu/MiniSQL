@@ -21,6 +21,7 @@
 #include "../API/Api.h"
 
 #include "parser_public.h"
+#include "../API/ApiHelper.h"
 
 QueryRequest *query = nullptr;
 
@@ -77,7 +78,7 @@ void dispatch()
     auto insert_query = dynamic_cast<InsertQuery *>(query);
     if (insert_query)
     {
-        auto insert_count = Api::insert(insert_query->table_name, insert_query->value_list);
+        auto insert_count = Api::insert(Api::get_db_name_prefix() + insert_query->table_name, insert_query->value_list);
 
         delete insert_query;
         query = nullptr;
@@ -90,10 +91,12 @@ void dispatch()
         size_t row_count{0};
         if (select_query->isSelectAll)
         {
-            row_count = Api::select(select_query->table_name, select_query->condition_list);
+            row_count = Api::select(Api::get_db_name_prefix() + select_query->table_name, select_query->condition_list);
         } else
         {
-            row_count = Api::select(select_query->table_name, select_query->condition_list, select_query->attr_list);
+            row_count = Api::select(Api::get_db_name_prefix() + select_query->table_name,
+                                    select_query->condition_list,
+                                    select_query->attr_list);
         }
 
         delete select_query;
@@ -120,7 +123,8 @@ void dispatch()
     auto create_table_query = dynamic_cast<CreateTableQuery *>(query);
     if (create_table_query)
     {
-        auto r = Api::create_table(create_table_query->table_name, create_table_query->table_schema_list);
+        auto r = Api::create_table(Api::get_db_name_prefix() + create_table_query->table_name,
+                                   create_table_query->table_schema_list);
 
         delete create_table_query;
         query = nullptr;
@@ -130,7 +134,8 @@ void dispatch()
     auto create_index_query = dynamic_cast<CreateIndexQuery *>(query);
     if (create_index_query)
     {
-        auto r = Api::create_index(create_index_query->table_name, create_index_query->attr_name);
+        auto r = Api::create_index(Api::get_db_name_prefix() + create_index_query->table_name,
+                                   create_index_query->attr_name);
 
         delete create_index_query;
         query = nullptr;
@@ -140,7 +145,7 @@ void dispatch()
     auto drop_table_query = dynamic_cast<DropTableQuery *>(query);
     if (drop_table_query)
     {
-        auto r = Api::drop_table(drop_table_query->table_name);
+        auto r = Api::drop_table(Api::get_db_name_prefix() + drop_table_query->table_name);
 
         delete drop_table_query;
         query = nullptr;
@@ -150,7 +155,7 @@ void dispatch()
     auto drop_index_query = dynamic_cast<DropIndexQuery *>(query);
     if (drop_index_query)
     {
-        auto r = Api::drop_index(drop_index_query->table_name, drop_index_query->attr_name);
+        auto r = Api::drop_index(Api::get_db_name_prefix() + drop_index_query->table_name, drop_index_query->attr_name);
 
         delete drop_index_query;
         query = nullptr;

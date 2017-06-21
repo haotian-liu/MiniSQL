@@ -21,7 +21,8 @@ namespace Api
     {
         if (!is_database_assigned)
         {
-            throw std::runtime_error("database not assigned!");
+            return std::string();
+            //throw std::runtime_error("database not assigned!");
         }
 
         return std::string("db_") + database_name + "_";
@@ -29,7 +30,7 @@ namespace Api
 
     size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list)
     {
-        auto real_table_name = Api::get_db_name_prefix() + table_name;
+        auto real_table_name = table_name;
         return 0;
     }
 
