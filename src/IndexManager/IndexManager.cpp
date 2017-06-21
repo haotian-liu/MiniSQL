@@ -4,19 +4,14 @@
 
 #include "IndexManager.h"
 
-IndexManager::IndexManager() {
-
-}
-
 IndexManager::~IndexManager() {
 
 }
 
-bool IndexManager::create(string filename, int type) {
-    // fixme !!! add char size later !!!
-    int itemSize = MINISQL_BASE::getSize(type);
-    int treeDegree = MINISQL_BASE::getDegree(type);
-    switch (type) {
+bool IndexManager::create(string filename, SqlValueType type) {
+    int itemSize = type.getSize();
+    int treeDegree = type.getDegree();
+    switch (type.M()) {
         case MINISQL_TYPE_INT:
             intBPTree = new BPTree<int>(filename, itemSize, treeDegree);
             intIndexMap.insert(intMap::value_type(filename, intBPTree));
@@ -35,8 +30,8 @@ bool IndexManager::create(string filename, int type) {
     }
 }
 
-bool IndexManager::drop(string filename, int type) {
-    switch (type) {
+bool IndexManager::drop(string filename, SqlValueType type) {
+    switch (type.M()) {
         case MINISQL_TYPE_INT:
             intBPIterator = intIndexMap.find(filename);
             delete intBPIterator->second;
@@ -58,42 +53,42 @@ bool IndexManager::drop(string filename, int type) {
     }
 }
 
-int IndexManager::search(string filename, string key, int type) {
-    switch (type) {
+int IndexManager::search(string filename, Element &e) {
+    switch (e.type.M()) {
         case MINISQL_TYPE_INT:
-            return intIndexMap.find(filename)->second->find(std::atoi(key.c_str()));
+            return intIndexMap.find(filename)->second->find(e.i);
         case MINISQL_TYPE_FLOAT:
-            return floatIndexMap.find(filename)->second->find(std::atof(key.c_str()));
+            return floatIndexMap.find(filename)->second->find(e.r);
         case MINISQL_TYPE_CHAR:
-            return charIndexMap.find(filename)->second->find(key);
+            return charIndexMap.find(filename)->second->find(e.str);
         default:
             cerr << "Undefined type!" << endl;
             break;
     }
 }
 
-bool IndexManager::insert(string filename, string key, int offset, int type) {
-    switch (type) {
+bool IndexManager::insert(string filename, Element &e, int offset) {
+    switch (e.type.M()) {
         case MINISQL_TYPE_INT:
-            return intIndexMap.find(filename)->second->insert(std::atoi(key.c_str()), offset);
+            return intIndexMap.find(filename)->second->insert(e.i, offset);
         case MINISQL_TYPE_FLOAT:
-            return floatIndexMap.find(filename)->second->insert(std::atof(key.c_str()), offset);
+            return floatIndexMap.find(filename)->second->insert(e.r, offset);
         case MINISQL_TYPE_CHAR:
-            return charIndexMap.find(filename)->second->insert(key, offset);
+            return charIndexMap.find(filename)->second->insert(e.str, offset);
         default:
             cerr << "Undefined type!" << endl;
             break;
     }
 }
 
-bool IndexManager::removeKey(string filename, string key, int type) {
-    switch (type) {
+bool IndexManager::removeKey(string filename, Element &e) {
+    switch (e.type.M()) {
         case MINISQL_TYPE_INT:
-            return intIndexMap.find(filename)->second->remove(std::atoi(key.c_str()));
+            return intIndexMap.find(filename)->second->remove(e.i);
         case MINISQL_TYPE_FLOAT:
-            return floatIndexMap.find(filename)->second->remove(std::atof(key.c_str()));
+            return floatIndexMap.find(filename)->second->remove(e.r);
         case MINISQL_TYPE_CHAR:
-            return charIndexMap.find(filename)->second->remove(key);
+            return charIndexMap.find(filename)->second->remove(e.str);
         default:
             cerr << "Undefined type!" << endl;
             break;
