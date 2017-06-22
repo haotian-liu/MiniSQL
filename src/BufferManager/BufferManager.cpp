@@ -12,6 +12,10 @@ char *BufferManager::getFileBlock(string filename) {
     return nullptr;
 }
 
+char *BufferManager::getFileBlock(string filename, int offset) {
+    return nullptr;
+}
+
 void BufferManager::setDirty(const char *dest) {
 
 }

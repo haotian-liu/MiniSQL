@@ -21,6 +21,7 @@ public:
     bool create(string filename, SqlValueType type);
     bool drop(string filename, SqlValueType type);
     int search(string filename, Element &e);
+    int searchHead(string filename, int attrType) const;
     int searchNext(string filename);
     bool finishSearch(string filename);
     bool insert(string filename, Element &e, int offset);

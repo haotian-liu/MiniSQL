@@ -118,3 +118,21 @@ bool IndexManager::removeKey(string filename, Element &e) {
             break;
     }
 }
+
+int IndexManager::searchHead(string filename, int attrType) const {
+    BPTree::NodeSearchParse node;
+    switch (attrType) {
+        case MINISQL_TYPE_INT:
+            node.node = intIndexMap.find(filename)->second->getHeadNode();
+        case MINISQL_TYPE_FLOAT:
+            node.node = floatIndexMap.find(filename)->second->getHeadNode();
+        case MINISQL_TYPE_CHAR:
+            node.node = charIndexMap.find(filename)->second->getHeadNode();
+        default:
+            cerr << "Undefined type!" << endl;
+            break;
+    }
+    node.index = 0;
+    indexOffsetMap[filename] = node;
+    return node.node->keyOffset[node.index];
+}

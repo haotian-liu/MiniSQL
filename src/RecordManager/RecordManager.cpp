@@ -3,6 +3,7 @@
 //
 
 #include "RecordManager.h"
+#include "../../include/DataStructure.h"
 
 bool RecordManager::createTable(string &table) {
     string tableFileStr = tableFile(table);
@@ -95,6 +96,52 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
     }
 
     dumpResult(res);
+}
+
+bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond, IndexHint &indexHint) {
+    string tableFileName = tableFile(table.Name);
+    int offset;
+    if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
+        offset = im->searchHead(tableFileName, indexHint.attrType);
+    } else {
+        offset = im->search(tableFileName, indexHint.cond.value);
+    }
+
+    int length = table.recordLength + 1;
+    int blocks = BlockSize / length;
+    char *block = bm->getFileBlock(tableFileName, offset) + offset % BlockSize;
+    Tuple tup;
+    Row row;
+    Result res;
+    Element e;
+    bool degrade = false;
+    int threshold = indexHint.capacity / blocks / 3;
+    int cnt = 0;
+
+    while (block) {
+        convertToTuple(block, 0, table.attrType, tup);
+        if (condsTest(cond, tup, table.attrNames)) {
+            row = tup.fetchRow(table.attrNames, attr);
+            res.row.push_back(row);
+        } else {
+            e = tup.fetchElement(table.attrNames, indexHint.attrName);
+            if (!indexHint.cond.test(e)) {
+                break;
+            }
+        }
+        block = bm->getFileBlock(tableFile(table.Name));
+        cnt++;
+        if (cnt > threshold) {
+            degrade = true;
+            break;
+        }
+    }
+
+    if (!degrade) {
+        dumpResult(res);
+    } else {
+        selectRecord(table, attr, cond);
+    }
 }
 
 bool RecordManager::deleteRecord(Table &table, vector<Cond> &cond) {

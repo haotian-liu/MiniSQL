@@ -15,6 +15,7 @@ public:
     void removeFileNode(string filename);
     void removeFile(string filename);
     char *getFileBlock(string filename);
+    char *getFileBlock(string filename, int offset);
     void setDirty(const char *dest);
 };
 

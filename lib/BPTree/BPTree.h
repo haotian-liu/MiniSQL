@@ -185,6 +185,7 @@ public:
     BPTree(string fileName, int sizeofKey, int degree);
     ~BPTree();
 
+    TreeNode getHeadNode() const { return head; }
     int find(const T &key);
     NodeSearchParse findNode(const T &key);
     bool insert(const T &key, int offset);
