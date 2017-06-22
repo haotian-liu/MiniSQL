@@ -256,5 +256,10 @@ namespace MINISQL_BASE {
         }
     }
 
+    struct IndexHint {
+        std::string attrName;
+        int capacity;
+    };
+
 }
 #endif //MINISQL_DATASTRUCTURE_H

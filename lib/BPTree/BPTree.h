@@ -176,19 +176,21 @@ void BPTreeNode<T>::removeAt(int index) {
 template<typename T>
 class BPTree {
 public:
-    BPTree(string fileName, int sizeofKey, int degree);
-    ~BPTree();
-
-    int find(const T &key);
-    bool insert(const T &key, int offset);
-    bool remove(const T &key);
-
-private:
     typedef BPTreeNode<T>* TreeNode;
     struct NodeSearchParse {
         int index;
         TreeNode node;
     };
+
+    BPTree(string fileName, int sizeofKey, int degree);
+    ~BPTree();
+
+    int find(const T &key);
+    NodeSearchParse findNode(const T &key);
+    bool insert(const T &key, int offset);
+    bool remove(const T &key);
+
+private:
     string fileName;
     TreeNode root, head;
     int sizeofKey, level, keyCount, nodeCount, degree;
@@ -268,6 +270,14 @@ int BPTree<T>::find(const T &key) {
     if (!root) { return -1; }
     if (findKeyFromNode(root, key, res)) { return res.node->keyOffset[res.index]; }
     else { return -1; }
+}
+
+template<typename T>
+NodeSearchParse BPTree<T>::findNode(const T &key) {
+    NodeSearchParse res;
+    if (!root) { return nullptr; }
+    if (findKeyFromNode(root, key, res)) { return res; }
+    else { return nullptr; }
 }
 
 template<typename T>
