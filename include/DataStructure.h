@@ -175,14 +175,13 @@ namespace MINISQL_BASE {
             return row;
         }
 
-        Element &fetchElement(std::vector<std::string> &attrTable, std::string &attrFetch) const {
+        const Element &fetchElement(std::vector<std::string> &attrTable, std::string &attrFetch) const {
             for (int i=0; i<attrTable.size(); i++) {
                 if (attrFetch == attrTable[i]) {
                     return element[i];
                 }
             }
             std::cerr << "Undefined attr in element fetching from tuple!!" << std::endl;
-            return nullptr;
         }
     };
 

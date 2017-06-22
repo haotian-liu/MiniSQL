@@ -21,21 +21,25 @@ public:
     bool create(string filename, SqlValueType type);
     bool drop(string filename, SqlValueType type);
     int search(string filename, Element &e);
-    int searchHead(string filename, int attrType) const;
-    int searchNext(string filename);
-    bool finishSearch(string filename);
+    int searchHead(string filename, int attrType);
+    int searchNext(string filename, int attrType);
+    bool finishSearch(string filename, int attrType);
     bool insert(string filename, Element &e, int offset);
     bool removeKey(string filename, Element &e);
 private:
     typedef map<string, BPTree<int>*> intMap;
     typedef map<string, BPTree<float>*> floatMap;
     typedef map<string, BPTree<string>*> charMap;
-    typedef map<string, BPTree::NodeSearchParse> offsetMap;
+    typedef map<string, NodeSearchParse<int>> intOMap;
+    typedef map<string, NodeSearchParse<float>> floatOMap;
+    typedef map<string, NodeSearchParse<string>> charOMap;
 
     intMap intIndexMap;
     floatMap floatIndexMap;
     charMap charIndexMap;
-    offsetMap indexOffsetMap;
+    intOMap intOffsetMap;
+    floatOMap floatOffsetMap;
+    charOMap charOffsetMap;
 
     BPTree<int> *intBPTree;
     BPTree<float> *floatBPTree;

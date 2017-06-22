@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "../../include/DataStructure.h"
 
 using namespace std;
 
@@ -174,20 +175,22 @@ void BPTreeNode<T>::removeAt(int index) {
 }
 
 template<typename T>
+struct NodeSearchParse {
+    int index;
+    BPTreeNode<T>* node;
+};
+
+template<typename T>
 class BPTree {
 public:
     typedef BPTreeNode<T>* TreeNode;
-    struct NodeSearchParse {
-        int index;
-        TreeNode node;
-    };
 
     BPTree(string fileName, int sizeofKey, int degree);
     ~BPTree();
 
     TreeNode getHeadNode() const { return head; }
     int find(const T &key);
-    NodeSearchParse findNode(const T &key);
+    NodeSearchParse<T> findNode(const T &key);
     bool insert(const T &key, int offset);
     bool remove(const T &key);
 
@@ -197,7 +200,7 @@ private:
     int sizeofKey, level, keyCount, nodeCount, degree;
 
     void initBPTree();
-    bool findKeyFromNode(TreeNode node, const T &key, NodeSearchParse &res);
+    bool findKeyFromNode(TreeNode node, const T &key, NodeSearchParse<T> &res);
     void cascadeInsert(TreeNode node);
     bool cascadeDelete(TreeNode node);
 
@@ -242,7 +245,7 @@ void BPTree<T>::initBPTree() {
 }
 
 template<typename T>
-bool BPTree<T>::findKeyFromNode(TreeNode node, const T &key, NodeSearchParse &res) {
+bool BPTree<T>::findKeyFromNode(TreeNode node, const T &key, NodeSearchParse<T> &res) {
     int index;
     if (node->search(key, index)) {
         if (node->isLeaf) {
@@ -267,23 +270,23 @@ bool BPTree<T>::findKeyFromNode(TreeNode node, const T &key, NodeSearchParse &re
 
 template<typename T>
 int BPTree<T>::find(const T &key) {
-    NodeSearchParse res;
+    NodeSearchParse<T> res;
     if (!root) { return -1; }
     if (findKeyFromNode(root, key, res)) { return res.node->keyOffset[res.index]; }
     else { return -1; }
 }
 
 template<typename T>
-NodeSearchParse BPTree<T>::findNode(const T &key) {
-    NodeSearchParse res;
-    if (!root) { return nullptr; }
+NodeSearchParse<T> BPTree<T>::findNode(const T &key) {
+    NodeSearchParse<T> res;
+    if (!root) { return res; }
     if (findKeyFromNode(root, key, res)) { return res; }
-    else { return nullptr; }
+    else { return res; }
 }
 
 template<typename T>
 bool BPTree<T>::insert(const T &key, int offset) {
-    NodeSearchParse res;
+    NodeSearchParse<T> res;
     if (!root) { initBPTree(); }
     if (findKeyFromNode(root, key, res)) {
         cerr << "Insert duplicate key!" << endl;
@@ -327,7 +330,7 @@ void BPTree<T>::cascadeInsert(BPTree::TreeNode node) {
 
 template<typename T>
 bool BPTree<T>::remove(const T &key) {
-    NodeSearchParse res;
+    NodeSearchParse<T> res;
     if (!root) {
         cerr << "Dequeuing empty BPTree!" << endl;
         return false;

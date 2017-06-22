@@ -54,40 +54,92 @@ bool IndexManager::drop(string filename, SqlValueType type) {
 }
 
 int IndexManager::search(string filename, Element &e) {
-    BPTree::NodeSearchParse node;
+    NodeSearchParse<int> intNode;
+    NodeSearchParse<float> floatNode;
+    NodeSearchParse<string> charNode;
     switch (e.type.M()) {
         case MINISQL_TYPE_INT:
-            node = intIndexMap.find(filename)->second->findNode(e.i);
+            intNode = intIndexMap.find(filename)->second->findNode(e.i);
+            intOffsetMap[filename] = intNode;
+            return intNode.node->keyOffset[intNode.index];
+        case MINISQL_TYPE_FLOAT:
+            floatNode = floatIndexMap.find(filename)->second->findNode(e.r);
+            floatOffsetMap[filename] = floatNode;
+            return floatNode.node->keyOffset[floatNode.index];
+        case MINISQL_TYPE_CHAR:
+            charNode = charIndexMap.find(filename)->second->findNode(e.str);
+            charOffsetMap[filename] = charNode;
+            return charNode.node->keyOffset[charNode.index];
+        default:
+            cerr << "Undefined type!" << endl;
+            return -1;
+    }
+}
+
+int IndexManager::searchNext(string filename, int attrType) {
+    NodeSearchParse<int> intNode;
+    NodeSearchParse<float> floatNode;
+    NodeSearchParse<string> charNode;
+
+    switch (attrType) {
+        case MINISQL_TYPE_INT:
+            intNode = intOffsetMap.find(filename)->second;
+            intOffsetMap[filename] = intNode;
+            intNode.index++;
+            if (intNode.index == intNode.node->cnt) {
+                intNode.node = intNode.node->sibling;
+                intNode.index = 0;
+            }
+            if (intNode.node != nullptr) {
+                return intNode.node->keyOffset[intNode.index];
+            }
             break;
         case MINISQL_TYPE_FLOAT:
-            node = floatIndexMap.find(filename)->second->findNode(e.r);
+            floatNode = floatOffsetMap.find(filename)->second;
+            floatOffsetMap[filename] = floatNode;
+            floatNode.index++;
+            if (floatNode.index == floatNode.node->cnt) {
+                floatNode.node = floatNode.node->sibling;
+                floatNode.index = 0;
+            }
+            if (floatNode.node != nullptr) {
+                return floatNode.node->keyOffset[floatNode.index];
+            }
             break;
         case MINISQL_TYPE_CHAR:
-            node = charIndexMap.find(filename)->second->findNode(e.str);
+            charNode = charOffsetMap.find(filename)->second;
+            charOffsetMap[filename] = charNode;
+            charNode.index++;
+            if (charNode.index == charNode.node->cnt) {
+                charNode.node = charNode.node->sibling;
+                charNode.index = 0;
+            }
+            if (charNode.node != nullptr) {
+                return charNode.node->keyOffset[charNode.index];
+            }
             break;
         default:
             cerr << "Undefined type!" << endl;
             return -1;
     }
-    indexOffsetMap[filename] = node;
-    return node.node->keyOffset[node.index];
-}
-
-int IndexManager::searchNext(string filename) {
-    BPTree::NodeSearchParse &node = indexOffsetMap.find(filename)->second;
-    node.index++;
-    if (node.index == node.node->cnt) {
-        node.node = node.node->sibling;
-        node.index = 0;
-    }
-    if (node.node != nullptr) {
-        return node.node->keyOffset[node.index];
-    }
     return -1;
 }
 
-bool IndexManager::finishSearch(string filename) {
-    indexOffsetMap.erase(filename);
+bool IndexManager::finishSearch(string filename, int attrType) {
+    switch (attrType) {
+        case MINISQL_TYPE_INT:
+            intOffsetMap.erase(filename);
+            break;
+        case MINISQL_TYPE_FLOAT:
+            floatOffsetMap.erase(filename);
+            break;
+        case MINISQL_TYPE_CHAR:
+            charOffsetMap.erase(filename);
+            break;
+        default:
+            cerr << "Undefined type!" << endl;
+            break;
+    }
     return true;
 }
 
@@ -119,20 +171,28 @@ bool IndexManager::removeKey(string filename, Element &e) {
     }
 }
 
-int IndexManager::searchHead(string filename, int attrType) const {
-    BPTree::NodeSearchParse node;
+int IndexManager::searchHead(string filename, int attrType) {
+    NodeSearchParse<int> intNode;
+    NodeSearchParse<float> floatNode;
+    NodeSearchParse<string> charNode;
     switch (attrType) {
         case MINISQL_TYPE_INT:
-            node.node = intIndexMap.find(filename)->second->getHeadNode();
+            intNode.node = intIndexMap.find(filename)->second->getHeadNode();
+            intNode.index = 0;
+            intOffsetMap[filename] = intNode;
+            return intNode.node->keyOffset[intNode.index];
         case MINISQL_TYPE_FLOAT:
-            node.node = floatIndexMap.find(filename)->second->getHeadNode();
+            floatNode.node = floatIndexMap.find(filename)->second->getHeadNode();
+            floatNode.index = 0;
+            floatOffsetMap[filename] = floatNode;
+            return floatNode.node->keyOffset[floatNode.index];
         case MINISQL_TYPE_CHAR:
-            node.node = charIndexMap.find(filename)->second->getHeadNode();
+            charNode.node = charIndexMap.find(filename)->second->getHeadNode();
+            charNode.index = 0;
+            charOffsetMap[filename] = charNode;
+            return charNode.node->keyOffset[charNode.index];
         default:
             cerr << "Undefined type!" << endl;
             break;
     }
-    node.index = 0;
-    indexOffsetMap[filename] = node;
-    return node.node->keyOffset[node.index];
 }
