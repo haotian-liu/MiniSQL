@@ -45,6 +45,7 @@ namespace MINISQL_BASE {
     struct SqlValueType {
         SqlValueTypeBase type;
         int charSize; // charSize does not include the terminating zero of string!
+        bool unique = false;
 
         inline int M() const {
             switch (type) {

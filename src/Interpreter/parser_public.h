@@ -45,6 +45,7 @@ typedef struct yystype
     int i;
     double r;
     std::string str;
+    bool b;
     void *dummy;    //for non-final nodes dummy part in AST.
     Operator op;
     SqlValue val;

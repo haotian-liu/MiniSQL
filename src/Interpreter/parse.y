@@ -10,6 +10,7 @@
 #include <string>
 #include <cstdlib>
 #include <memory>
+#include <utility>
 
 #include "QueryRequest.h"
 #include "Interpreter.h"
@@ -39,6 +40,7 @@
     RW_INTO
     RW_VALUES
     RW_SET
+    RW_UNIQUE
 
     RW_USE
     RW_DATABASE
@@ -83,6 +85,7 @@
 
 %type <val_list> value_list;
 
+%type <b> op_unique;
 %type <schema> schema_item;
 %type <schema_list> table_schema_definition;
 
@@ -250,15 +253,20 @@ table_schema_definition: table_schema_definition ',' schema_item
     }
     ;
 
-schema_item: T_STRING value_type
+schema_item: T_STRING value_type op_unique
     {
         $$ = std::make_pair($1, $2);
+        $$.second.unique = $3;
     }
     ;
 
 value_type: RW_INTEGER { $$.type = SqlValueTypeBase::Integer; }
     | RW_FLOAT { $$.type = SqlValueTypeBase::Float; }
     | RW_CHAR '(' T_INT ')' { $$.type = SqlValueTypeBase::String; $$.charSize = $3; }
+    ;
+
+op_unique: RW_UNIQUE { $$ = true; }
+    | nothing { $$ = false; }
     ;
 
 attr_list: attr_list ',' T_NSTRING

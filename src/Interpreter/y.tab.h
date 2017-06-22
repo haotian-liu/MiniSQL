@@ -59,26 +59,27 @@ extern int yydebug;
     RW_INTO = 269,
     RW_VALUES = 270,
     RW_SET = 271,
-    RW_USE = 272,
-    RW_DATABASE = 273,
-    RW_INTEGER = 274,
-    RW_FLOAT = 275,
-    RW_CHAR = 276,
-    RW_EXIT = 277,
-    RW_TEST = 278,
-    T_LT = 279,
-    T_GT = 280,
-    T_GE = 281,
-    T_LE = 282,
-    T_EQ = 283,
-    T_NE = 284,
-    T_EOF = 285,
-    NO_TOKEN = 286,
-    T_INT = 287,
-    T_REAL = 288,
-    T_STRING = 289,
-    T_QSTRING = 290,
-    T_RQSTRING = 291
+    RW_UNIQUE = 272,
+    RW_USE = 273,
+    RW_DATABASE = 274,
+    RW_INTEGER = 275,
+    RW_FLOAT = 276,
+    RW_CHAR = 277,
+    RW_EXIT = 278,
+    RW_TEST = 279,
+    T_LT = 280,
+    T_GT = 281,
+    T_GE = 282,
+    T_LE = 283,
+    T_EQ = 284,
+    T_NE = 285,
+    T_EOF = 286,
+    NO_TOKEN = 287,
+    T_INT = 288,
+    T_REAL = 289,
+    T_STRING = 290,
+    T_QSTRING = 291,
+    T_RQSTRING = 292
   };
 #endif
 /* Tokens.  */
@@ -96,26 +97,27 @@ extern int yydebug;
 #define RW_INTO 269
 #define RW_VALUES 270
 #define RW_SET 271
-#define RW_USE 272
-#define RW_DATABASE 273
-#define RW_INTEGER 274
-#define RW_FLOAT 275
-#define RW_CHAR 276
-#define RW_EXIT 277
-#define RW_TEST 278
-#define T_LT 279
-#define T_GT 280
-#define T_GE 281
-#define T_LE 282
-#define T_EQ 283
-#define T_NE 284
-#define T_EOF 285
-#define NO_TOKEN 286
-#define T_INT 287
-#define T_REAL 288
-#define T_STRING 289
-#define T_QSTRING 290
-#define T_RQSTRING 291
+#define RW_UNIQUE 272
+#define RW_USE 273
+#define RW_DATABASE 274
+#define RW_INTEGER 275
+#define RW_FLOAT 276
+#define RW_CHAR 277
+#define RW_EXIT 278
+#define RW_TEST 279
+#define T_LT 280
+#define T_GT 281
+#define T_GE 282
+#define T_LE 283
+#define T_EQ 284
+#define T_NE 285
+#define T_EOF 286
+#define NO_TOKEN 287
+#define T_INT 288
+#define T_REAL 289
+#define T_STRING 290
+#define T_QSTRING 291
+#define T_RQSTRING 292
 
 /* Value type.  */
 

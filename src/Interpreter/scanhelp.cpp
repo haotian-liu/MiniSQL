@@ -34,6 +34,7 @@ int get_id(const std::string &s)
     if (tok == "into")r = RW_INTO;
     if (tok == "values")r = RW_VALUES;
     if (tok == "set")r = RW_SET;
+    if (tok == "unique")r = RW_UNIQUE;
 
     if (tok == "use")r = RW_USE;
     if (tok == "database")r = RW_DATABASE;
