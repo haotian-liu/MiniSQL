@@ -69,4 +69,15 @@ namespace Api
     {
         return 0;
     }
+
+    size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list)
+    {
+        return 0;
+    }
+
+    size_t update(const std::string &table_name, const std::string &attr, const SqlValue &value,
+                  const std::vector<Condition> &condition_list)
+    {
+        return 0;
+    }
 }

@@ -28,6 +28,8 @@ QueryRequest *query = nullptr;
 char input_s[INPUT_LENGTH];
 size_t input_len;
 
+std::string file_name;
+
 bool isExit = false;
 
 void main_repl_loop()
@@ -65,6 +67,14 @@ void main_repl_loop()
 
 void dispatch()
 {
+    auto e_file = dynamic_cast<ExecFileQuery *>(query);
+    if (e_file)
+    {
+        exec_file(file_name);
+        delete e_file;
+        query = nullptr;
+        return;
+    }
     auto use_db_query = dynamic_cast<UseDatabaseQuery *>(query);
     if (use_db_query)
     {
@@ -162,4 +172,9 @@ void dispatch()
         return;
     }
     return;
+}
+
+void exec_file(const std::string &file_name)
+{
+
 }

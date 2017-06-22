@@ -18,4 +18,6 @@ void main_repl_loop();
 
 void dispatch();
 
+void exec_file(const std::string &file_name);
+
 #endif //MINISQL_INTERPRETER_H

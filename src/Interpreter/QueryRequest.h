@@ -106,6 +106,9 @@ public:
     virtual ~QueryRequest() = 0;
 };
 
+class ExecFileQuery final : public QueryRequest
+{};
+
 class SelectQuery final : public QueryRequest
 {
 public:

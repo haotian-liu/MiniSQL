@@ -44,6 +44,7 @@
 
     RW_USE
     RW_DATABASE
+    RW_EXECFILE
 
     RW_INTEGER
     RW_FLOAT
@@ -97,6 +98,7 @@
     dml
     ddl
     use_database
+    execfile
 
 %type <dummy>
     insert
@@ -117,6 +119,7 @@ top_stmt: exit
     | dml
     | ddl
     | use_database
+    | execfile
     ;
 
 dml: insert
@@ -129,6 +132,14 @@ ddl: create_table
     | create_index
     | drop_table
     | drop_index
+    ;
+
+execfile: RW_EXECFILE T_ASTRING
+    {
+        file_name = $2;
+        auto e = new ExecFileQuery();
+        query = e;
+    }
     ;
 
 use_database: RW_USE RW_DATABASE T_NSTRING

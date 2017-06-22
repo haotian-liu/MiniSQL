@@ -25,6 +25,8 @@ int yyparse();
 extern char input_s[INPUT_LENGTH];
 extern size_t input_len;
 
+extern std::string file_name;
+
 extern bool isExit;
 
 #ifdef YYSTYPE

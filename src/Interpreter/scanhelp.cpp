@@ -38,6 +38,7 @@ int get_id(const std::string &s)
 
     if (tok == "use")r = RW_USE;
     if (tok == "database")r = RW_DATABASE;
+    if (tok == "execfile")r = RW_EXECFILE;
 
     if (tok == "integer")r = RW_INTEGER;
     if (tok == "char")r = RW_CHAR;
