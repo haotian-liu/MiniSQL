@@ -35,9 +35,13 @@ namespace Api
     }
 
     bool create_table(const std::string &table_name,
-                      const std::vector<std::pair<std::string, SqlValueType>> &schema_list)
+                      const std::vector<std::pair<std::string, SqlValueType>> &schema_list,
+                      const std::string &primary_key_name
+    )
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+
         return rm->createTable(table_name);
     }
 

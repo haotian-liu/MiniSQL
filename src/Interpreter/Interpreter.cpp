@@ -80,7 +80,7 @@ void main_repl_loop [[noreturn]]()
                 do_parse();
             }
         }
-        if(!complete)
+        if (!complete)
         {
             std::cout << "Statement not complete>" << std::endl;
         }
@@ -178,7 +178,8 @@ void dispatch()
     if (create_table_query)
     {
         auto r = Api::create_table(Api::get_db_name_prefix() + create_table_query->table_name,
-                                   create_table_query->table_schema_list);
+                                   create_table_query->table_schema_list,
+                                   create_table_query->primary_key_name);
 
         delete create_table_query;
         query = nullptr;
@@ -223,7 +224,7 @@ void exec_file(const std::string &file_name)
     std::cout << "Executing SQL file: " << file_name << std::endl;
     std::ifstream file(file_name);
 
-    while(!file.eof())
+    while (!file.eof())
     {
         memset(input_tmp, 0, INPUT_LENGTH);
         file.getline(input_tmp, INPUT_LENGTH);
