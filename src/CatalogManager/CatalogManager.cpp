@@ -37,7 +37,7 @@ void CatalogManager::creat_new_table(string table_name,			//字符串类型 表�
                                      int num_of_attrs,			//表中属性的数目
                                      AttrPointer primary_key)
 {
-    Table tmp;
+    ::Table tmp;
     tmp.table_name = table_name;
     tmp.num_of_attrs = num_of_attrs;
     tmp.num_of_records = 0;

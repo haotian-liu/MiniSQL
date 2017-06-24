@@ -42,7 +42,19 @@ namespace Api
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
         auto num_of_attr = schema_list.size();
+
+        for (auto &it: schema_list)
+        {
+            if (it.second.type == SqlValueTypeBase::String)
+            {
+                if (it.second.charSize < 1 || it.second.charSize > 255)
+                {
+                    return false;
+                }
+            }
+        }
 
         if (!primary_key_name.empty())
         {
@@ -62,7 +74,6 @@ namespace Api
                 return false;
             }
         }
-
 
 
         return rm->createTable(table_name);
