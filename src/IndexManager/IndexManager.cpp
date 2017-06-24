@@ -8,7 +8,7 @@ IndexManager::~IndexManager() {
 
 }
 
-bool IndexManager::create(string filename, SqlValueType type) {
+bool IndexManager::create(const string &filename, const SqlValueType &type) {
     int itemSize = type.getSize();
     int treeDegree = type.getDegree();
     switch (type.M()) {
@@ -30,7 +30,7 @@ bool IndexManager::create(string filename, SqlValueType type) {
     }
 }
 
-bool IndexManager::drop(string filename, SqlValueType type) {
+bool IndexManager::drop(const string &filename, const SqlValueType &type) {
     switch (type.M()) {
         case MINISQL_TYPE_INT:
             intBPIterator = intIndexMap.find(filename);
@@ -53,21 +53,97 @@ bool IndexManager::drop(string filename, SqlValueType type) {
     }
 }
 
-int IndexManager::search(string filename, Element &e) {
+int IndexManager::search(const string &filename, const Element &e) {
+    NodeSearchParse<int> intNode;
+    NodeSearchParse<float> floatNode;
+    NodeSearchParse<string> charNode;
     switch (e.type.M()) {
         case MINISQL_TYPE_INT:
-            return intIndexMap.find(filename)->second->find(e.i);
+            intNode = intIndexMap.find(filename)->second->findNode(e.i);
+            intOffsetMap[filename] = intNode;
+            return intNode.node->keyOffset[intNode.index];
         case MINISQL_TYPE_FLOAT:
-            return floatIndexMap.find(filename)->second->find(e.r);
+            floatNode = floatIndexMap.find(filename)->second->findNode(e.r);
+            floatOffsetMap[filename] = floatNode;
+            return floatNode.node->keyOffset[floatNode.index];
         case MINISQL_TYPE_CHAR:
-            return charIndexMap.find(filename)->second->find(e.str);
+            charNode = charIndexMap.find(filename)->second->findNode(e.str);
+            charOffsetMap[filename] = charNode;
+            return charNode.node->keyOffset[charNode.index];
+        default:
+            cerr << "Undefined type!" << endl;
+            return -1;
+    }
+}
+
+int IndexManager::searchNext(const string &filename, int attrType) {
+    NodeSearchParse<int> intNode;
+    NodeSearchParse<float> floatNode;
+    NodeSearchParse<string> charNode;
+
+    switch (attrType) {
+        case MINISQL_TYPE_INT:
+            intNode = intOffsetMap.find(filename)->second;
+            intOffsetMap[filename] = intNode;
+            intNode.index++;
+            if (intNode.index == intNode.node->cnt) {
+                intNode.node = intNode.node->sibling;
+                intNode.index = 0;
+            }
+            if (intNode.node != nullptr) {
+                return intNode.node->keyOffset[intNode.index];
+            }
+            break;
+        case MINISQL_TYPE_FLOAT:
+            floatNode = floatOffsetMap.find(filename)->second;
+            floatOffsetMap[filename] = floatNode;
+            floatNode.index++;
+            if (floatNode.index == floatNode.node->cnt) {
+                floatNode.node = floatNode.node->sibling;
+                floatNode.index = 0;
+            }
+            if (floatNode.node != nullptr) {
+                return floatNode.node->keyOffset[floatNode.index];
+            }
+            break;
+        case MINISQL_TYPE_CHAR:
+            charNode = charOffsetMap.find(filename)->second;
+            charOffsetMap[filename] = charNode;
+            charNode.index++;
+            if (charNode.index == charNode.node->cnt) {
+                charNode.node = charNode.node->sibling;
+                charNode.index = 0;
+            }
+            if (charNode.node != nullptr) {
+                return charNode.node->keyOffset[charNode.index];
+            }
+            break;
+        default:
+            cerr << "Undefined type!" << endl;
+            return -1;
+    }
+    return -1;
+}
+
+bool IndexManager::finishSearch(const string &filename, int attrType) {
+    switch (attrType) {
+        case MINISQL_TYPE_INT:
+            intOffsetMap.erase(filename);
+            break;
+        case MINISQL_TYPE_FLOAT:
+            floatOffsetMap.erase(filename);
+            break;
+        case MINISQL_TYPE_CHAR:
+            charOffsetMap.erase(filename);
+            break;
         default:
             cerr << "Undefined type!" << endl;
             break;
     }
+    return true;
 }
 
-bool IndexManager::insert(string filename, Element &e, int offset) {
+bool IndexManager::insert(const string &filename, const Element &e, int offset) {
     switch (e.type.M()) {
         case MINISQL_TYPE_INT:
             return intIndexMap.find(filename)->second->insert(e.i, offset);
@@ -81,7 +157,7 @@ bool IndexManager::insert(string filename, Element &e, int offset) {
     }
 }
 
-bool IndexManager::removeKey(string filename, Element &e) {
+bool IndexManager::removeKey(const string &filename, const Element &e) {
     switch (e.type.M()) {
         case MINISQL_TYPE_INT:
             return intIndexMap.find(filename)->second->remove(e.i);
@@ -89,6 +165,32 @@ bool IndexManager::removeKey(string filename, Element &e) {
             return floatIndexMap.find(filename)->second->remove(e.r);
         case MINISQL_TYPE_CHAR:
             return charIndexMap.find(filename)->second->remove(e.str);
+        default:
+            cerr << "Undefined type!" << endl;
+            break;
+    }
+}
+
+int IndexManager::searchHead(const string &filename, int attrType) {
+    NodeSearchParse<int> intNode;
+    NodeSearchParse<float> floatNode;
+    NodeSearchParse<string> charNode;
+    switch (attrType) {
+        case MINISQL_TYPE_INT:
+            intNode.node = intIndexMap.find(filename)->second->getHeadNode();
+            intNode.index = 0;
+            intOffsetMap[filename] = intNode;
+            return intNode.node->keyOffset[intNode.index];
+        case MINISQL_TYPE_FLOAT:
+            floatNode.node = floatIndexMap.find(filename)->second->getHeadNode();
+            floatNode.index = 0;
+            floatOffsetMap[filename] = floatNode;
+            return floatNode.node->keyOffset[floatNode.index];
+        case MINISQL_TYPE_CHAR:
+            charNode.node = charIndexMap.find(filename)->second->getHeadNode();
+            charNode.index = 0;
+            charOffsetMap[filename] = charNode;
+            return charNode.node->keyOffset[charNode.index];
         default:
             cerr << "Undefined type!" << endl;
             break;

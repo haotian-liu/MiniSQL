@@ -32,9 +32,9 @@ namespace MINISQL_BASE {
     const char UnUsed = 0;
     const char Used = 1;
 
-    inline std::string dbFile(std::string db) { return db + ".db"; }
-    inline std::string tableFile(std::string table) { return table + ".tb"; }
-    inline std::string indexFile(std::string table, std::string index) { return table + "_" + index + ".ind"; }
+    inline std::string dbFile(const std::string &db) { return db + ".db"; }
+    inline std::string tableFile(const std::string &table) { return table + ".tb"; }
+    inline std::string indexFile(const std::string &table, const std::string &index) { return table + "_" + index + ".ind"; }
 
     enum class SqlValueTypeBase {
         Integer,
@@ -95,7 +95,7 @@ namespace MINISQL_BASE {
             }
         }
 
-        bool operator<(SqlValue& e) {
+        bool operator<(const SqlValue& e) const {
             switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i < e.i;
@@ -108,7 +108,7 @@ namespace MINISQL_BASE {
             }
         }
 
-        bool operator==(SqlValue& e) {
+        bool operator==(const SqlValue& e) const {
             switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i == e.i;
@@ -121,9 +121,9 @@ namespace MINISQL_BASE {
             }
         }
 
-        bool operator>(SqlValue &e) { return !operator<(e); }
-        bool operator<=(SqlValue &e) { return operator<(e) && operator==(e); }
-        bool operator>=(SqlValue &e) { return !operator<(e) && operator<(e); }
+        bool operator>(const SqlValue &e) const { return !operator<(e); }
+        bool operator<=(const SqlValue &e) const { return operator<(e) && operator==(e); }
+        bool operator>=(const SqlValue &e) const { return !operator<(e) && operator<(e); }
 
         void reset() {
             str.clear();
@@ -156,7 +156,7 @@ namespace MINISQL_BASE {
     struct Tuple {
         std::vector<Element> element;
 
-        Row fetchRow(std::vector<std::string> &attrTable, std::vector<std::string> &attrFetch) const {
+        Row fetchRow(const std::vector<std::string> &attrTable, const std::vector<std::string> &attrFetch) const {
             Row row;
             bool attrFound;
             row.col.reserve(attrFetch.size());
@@ -175,6 +175,15 @@ namespace MINISQL_BASE {
             }
             return row;
         }
+
+        const Element &fetchElement(const std::vector<std::string> &attrTable, const std::string &attrFetch) const {
+            for (int i=0; i<attrTable.size(); i++) {
+                if (attrFetch == attrTable[i]) {
+                    return element[i];
+                }
+            }
+            std::cerr << "Undefined attr in element fetching from tuple!!" << std::endl;
+        }
     };
 
     struct Table {
@@ -189,12 +198,12 @@ namespace MINISQL_BASE {
 
     struct Cond {
         Cond() = default;
-        Cond(std::string attr, Element value, int cond) : attr(attr), value(value), cond(cond) {}
+        Cond(const std::string &attr, const Element &value, int cond) : attr(attr), value(value), cond(cond) {}
         int cond;
         std::string attr;
         Element value;
 
-        bool test(Element &e) {
+        bool test(const Element &e) const {
             switch (cond) {
                 case MINISQL_COND_EQUAL:
                     return e == value;
@@ -212,7 +221,7 @@ namespace MINISQL_BASE {
         }
     };
 
-    inline bool condsTest(std::vector<Cond> &conds, Tuple &tup, std::vector<std::string> &attr) {
+    inline bool condsTest(const std::vector<Cond> &conds, const Tuple &tup, const std::vector<std::string> &attr) {
         int condPos;
         for (Cond cond : conds) {
             condPos = -1;
@@ -232,7 +241,7 @@ namespace MINISQL_BASE {
         return true;
     }
 
-    inline void convertToTuple(const char *blockBuffer, int offset, std::vector<SqlValueType> &attrType, Tuple &tup) {
+    inline void convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
         tup.element.clear();
@@ -256,6 +265,13 @@ namespace MINISQL_BASE {
             tup.element.push_back(e);
         }
     }
+
+    struct IndexHint {
+        Cond cond;
+        std::string attrName;
+        int attrType;
+        int capacity;
+    };
 
 }
 #endif //MINISQL_DATASTRUCTURE_H
