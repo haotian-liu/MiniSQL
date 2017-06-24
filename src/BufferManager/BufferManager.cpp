@@ -233,7 +233,7 @@ char * BufferManager::get_blank_block_addr(unsigned int table_index)
     return (char*)&(ptr_buffer[res]);
 }
 //提供给index和record manager来获取 修改 增加块
-char * BufferManager::get_block(string filename, unsigned int offset, bool allocate = false)
+char * BufferManager::get_block(string filename, unsigned int offset, bool allocate)
 {
     unsigned int number,i,mark;
     //int total_size = CatalogManager::get_total_size_of_attr(filename);
