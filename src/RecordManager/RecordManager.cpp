@@ -33,7 +33,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     Element attr;
     const char *dest;
 
-    for (auto attrType : table.attrType) {
+    for (auto const &attrType : table.attrType) {
         if (attrType.attrName == index.attrName) {
             attr.type = attrType;
             break;
@@ -227,9 +227,9 @@ bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
 }
 
 void RecordManager::dumpResult(const Result &res) const {
-    for (auto row : res.row) {
+    for (auto const &row : res.row) {
         cout << " | ";
-        for (auto col : row.col) {
+        for (auto const &col : row.col) {
             cout << col << " | ";
         }
         cout << endl;

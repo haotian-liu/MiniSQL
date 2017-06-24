@@ -188,7 +188,7 @@ namespace MINISQL_BASE {
 
     struct Table {
         Table() {};
-        Table(const Table& T) : DbName(T.DbName), Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength), recordCnt(T.recordCnt), size(T.size) {};
+        Table(const Table& T) : DbName(T.DbName), Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength), recordCnt(T.recordCnt), size(T.size), attrType(T.attrType), attrNames(T.attrNames), indexNames(T.indexNames) {};
 
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
