@@ -7,6 +7,9 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <sstream>
+#include <fstream>
+#include <algorithm>
 
 #ifdef NO_GNU_READLINE
 #warning GNU readline is not enabled
@@ -28,40 +31,81 @@ QueryRequest *query = nullptr;
 char input_s[INPUT_LENGTH];
 size_t input_len;
 
+char input_tmp[INPUT_LENGTH];
+
+char half[INPUT_LENGTH];
+char *half_ptr;
+
 std::string file_name;
 
 bool isExit = false;
 
-void main_repl_loop()
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+
+void main_repl_loop [[noreturn]]()
 {
+    half_ptr = &half[0];
     while (true)
     {
+        memset(input_tmp, 0, INPUT_LENGTH);
 #ifdef NO_GNU_READLINE
         std::cout << "\n>>> ";
-        std::cin.getline(input_s, INPUT_LENGTH);
+        std::cin.getline(input_tmp, INPUT_LENGTH);
 #else
         char *rl = readline("MiniSQL>");
         if (!rl)
             continue;
-        std::strcpy(input_s, rl);
+        std::strcpy(input_tmp, rl);
         std::free(rl);
 #endif
-        input_len = std::strlen(input_s);
-        yyparse();
-        if (isExit)
+
+        //copy temp input to buffer to form a multi-line completed statement.
+        input_tmp[strlen(input_tmp)] = ' ';
+        auto tmp_len = strlen(input_tmp);
+        bool complete{false};
+        for (int i = 0; i < tmp_len; ++i)
         {
-            std::cout << "Bye!\n";
-            break;
+            *half_ptr++ = input_tmp[i];
+            if (half_ptr[-1] == ';')
+            {
+                complete = true;
+                memset(input_s, 0, INPUT_LENGTH);
+                std::strncpy(input_s, half, half_ptr - half);
+
+                half_ptr = half;
+                memset(half, 0, INPUT_LENGTH);
+
+                //before do_parse() invoke, we should set input_s and input_len to a correct value.
+                input_len = std::strlen(input_s);
+                do_parse();
+            }
         }
-        if (query == nullptr)
+        if(!complete)
         {
-            continue;
-        } else
-        {
-            auto start_time = std::chrono::system_clock::now();
-            dispatch();
-            auto finish_time = std::chrono::system_clock::now();
+            std::cout << "Statement not complete>" << std::endl;
         }
+    }
+}
+
+#pragma clang diagnostic pop
+
+void do_parse()
+{
+    yyparse();
+    if (isExit)
+    {
+        std::cout << "Bye!\n";
+        std::exit(0);
+    }
+    if (query == nullptr)
+    {
+        return;
+    } else
+    {
+        auto start_time = std::chrono::system_clock::now();
+        dispatch();
+        auto finish_time = std::chrono::system_clock::now();
     }
 }
 
@@ -176,5 +220,5 @@ void dispatch()
 
 void exec_file(const std::string &file_name)
 {
-
+    std::cout << "Executing SQL file: " << file_name << std::endl;
 }

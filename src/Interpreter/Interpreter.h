@@ -14,7 +14,9 @@ class Interpreter
 
 };
 
-void main_repl_loop();
+void main_repl_loop [[noreturn]]();
+
+void do_parse();
 
 void dispatch();
 
