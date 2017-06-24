@@ -8,7 +8,7 @@ IndexManager::~IndexManager() {
 
 }
 
-bool IndexManager::create(string filename, SqlValueType type) {
+bool IndexManager::create(const string &filename, const SqlValueType &type) {
     int itemSize = type.getSize();
     int treeDegree = type.getDegree();
     switch (type.M()) {
@@ -30,7 +30,7 @@ bool IndexManager::create(string filename, SqlValueType type) {
     }
 }
 
-bool IndexManager::drop(string filename, SqlValueType type) {
+bool IndexManager::drop(const string &filename, const SqlValueType &type) {
     switch (type.M()) {
         case MINISQL_TYPE_INT:
             intBPIterator = intIndexMap.find(filename);
@@ -53,7 +53,7 @@ bool IndexManager::drop(string filename, SqlValueType type) {
     }
 }
 
-int IndexManager::search(string filename, Element &e) {
+int IndexManager::search(const string &filename, const Element &e) {
     NodeSearchParse<int> intNode;
     NodeSearchParse<float> floatNode;
     NodeSearchParse<string> charNode;
@@ -76,7 +76,7 @@ int IndexManager::search(string filename, Element &e) {
     }
 }
 
-int IndexManager::searchNext(string filename, int attrType) {
+int IndexManager::searchNext(const string &filename, int attrType) {
     NodeSearchParse<int> intNode;
     NodeSearchParse<float> floatNode;
     NodeSearchParse<string> charNode;
@@ -125,7 +125,7 @@ int IndexManager::searchNext(string filename, int attrType) {
     return -1;
 }
 
-bool IndexManager::finishSearch(string filename, int attrType) {
+bool IndexManager::finishSearch(const string &filename, int attrType) {
     switch (attrType) {
         case MINISQL_TYPE_INT:
             intOffsetMap.erase(filename);
@@ -143,7 +143,7 @@ bool IndexManager::finishSearch(string filename, int attrType) {
     return true;
 }
 
-bool IndexManager::insert(string filename, Element &e, int offset) {
+bool IndexManager::insert(const string &filename, const Element &e, int offset) {
     switch (e.type.M()) {
         case MINISQL_TYPE_INT:
             return intIndexMap.find(filename)->second->insert(e.i, offset);
@@ -157,7 +157,7 @@ bool IndexManager::insert(string filename, Element &e, int offset) {
     }
 }
 
-bool IndexManager::removeKey(string filename, Element &e) {
+bool IndexManager::removeKey(const string &filename, const Element &e) {
     switch (e.type.M()) {
         case MINISQL_TYPE_INT:
             return intIndexMap.find(filename)->second->remove(e.i);
@@ -171,7 +171,7 @@ bool IndexManager::removeKey(string filename, Element &e) {
     }
 }
 
-int IndexManager::searchHead(string filename, int attrType) {
+int IndexManager::searchHead(const string &filename, int attrType) {
     NodeSearchParse<int> intNode;
     NodeSearchParse<float> floatNode;
     NodeSearchParse<string> charNode;

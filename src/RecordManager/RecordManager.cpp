@@ -5,31 +5,31 @@
 #include "RecordManager.h"
 #include "../../include/DataStructure.h"
 
-bool RecordManager::createTable(string &table) {
+bool RecordManager::createTable(const string &table) {
     string tableFileStr = tableFile(table);
     bm->create_table(tableFileStr);
     return true;
 }
 
-bool RecordManager::dropTable(string &table) {
+bool RecordManager::dropTable(const string &table) {
     string tableFileStr = tableFile(table);
     bm->removeFile(tableFileStr);
     return true;
 }
 
-bool RecordManager::createIndex(string &table, string &index) {
+bool RecordManager::createIndex(const string &table, const string &index) {
     string indexFileStr = indexFile(table, index);
     bm->create_table(indexFileStr);
     return true;
 }
 
-bool RecordManager::dropIndex(string &table, string &index) {
+bool RecordManager::dropIndex(const string &table, const string &index) {
     string indexFileStr = indexFile(table, index);
     bm->removeFile(indexFileStr);
     return true;
 }
 
-bool RecordManager::insertRecord(Table &table, Tuple &record) {
+bool RecordManager::insertRecord(const Table &table, const Tuple &record) {
     string tableName = tableFile(table.Name);
     unsigned int blockID = bm->get_last_block(tableName);
     char *block = bm->get_block(tableName, blockID);
@@ -81,7 +81,7 @@ bool RecordManager::insertRecord(Table &table, Tuple &record) {
     return true;
 }
 
-bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond) {
+bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
     unsigned int blockID = 0;
     char *block = bm->get_block(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
@@ -106,7 +106,7 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
     dumpResult(res);
 }
 
-bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond, IndexHint &indexHint) {
+bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint) {
     string tableFileName = tableFile(table.Name);
     int offset;
     if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
@@ -153,7 +153,7 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
     }
 }
 
-bool RecordManager::deleteRecord(Table &table, vector<Cond> &cond) {
+bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
     unsigned int blockOffset = 0;
     char *block = bm->get_block(tableFile(table.Name), blockOffset);
     int length = table.recordLength + 1;
@@ -176,7 +176,7 @@ bool RecordManager::deleteRecord(Table &table, vector<Cond> &cond) {
     }
 }
 
-void RecordManager::dumpResult(Result &res) const {
+void RecordManager::dumpResult(const Result &res) const {
     for (auto row : res.row) {
         cout << " | ";
         for (auto col : row.col) {

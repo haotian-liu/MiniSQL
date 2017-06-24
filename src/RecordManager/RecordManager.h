@@ -18,23 +18,23 @@ class RecordManager {
 public:
     RecordManager(BufferManager *bm, IndexManager *im) : bm(bm), im(im) {}
     ~RecordManager() = default;
-    bool createTable(string &table);
-    bool dropTable(string &table);
+    bool createTable(const string &table);
+    bool dropTable(const string &table);
 
-    bool createIndex(string &table, string &index);
-    bool dropIndex(string &table, string &index);
+    bool createIndex(const string &table, const string &index);
+    bool dropIndex(const string &table, const string &index);
 
-    bool insertRecord(Table &table, Tuple &record);
-    bool selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond);
-    bool selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond, IndexHint &indexHint);
+    bool insertRecord(const Table &table, const Tuple &record);
+    bool selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond);
+    bool selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint);
 
-    bool deleteRecord(Table &table, vector<Cond> &cond);
+    bool deleteRecord(const Table &table, const vector<Cond> &cond);
 
 private:
     BufferManager *bm;
     IndexManager *im;
 
-    void dumpResult(Result &res) const;
+    void dumpResult(const Result &res) const;
 };
 
 

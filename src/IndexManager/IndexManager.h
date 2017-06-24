@@ -18,14 +18,14 @@ public:
 
     // fixme!!! destructor needs to be implemented to release memory of B+Tree instances
     ~IndexManager();
-    bool create(string filename, SqlValueType type);
-    bool drop(string filename, SqlValueType type);
-    int search(string filename, Element &e);
-    int searchHead(string filename, int attrType);
-    int searchNext(string filename, int attrType);
-    bool finishSearch(string filename, int attrType);
-    bool insert(string filename, Element &e, int offset);
-    bool removeKey(string filename, Element &e);
+    bool create(const string &filename, const SqlValueType &type);
+    bool drop(const string &filename, const SqlValueType &type);
+    int search(const string &filename, const Element &e);
+    int searchHead(const string &filename, int attrType);
+    int searchNext(const string &filename, int attrType);
+    bool finishSearch(const string &filename, int attrType);
+    bool insert(const string &filename, const Element &e, int offset);
+    bool removeKey(const string &filename, const Element &e);
 private:
     typedef map<string, BPTree<int>*> intMap;
     typedef map<string, BPTree<float>*> floatMap;
