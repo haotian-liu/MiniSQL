@@ -12,7 +12,13 @@ namespace Api
 
     RecordManager *ApiHelper::getRecordManager()
     {
-        return (rm == nullptr) ? rm = new RecordManager() : rm;
+        if (rm == nullptr)
+        {
+            auto im = getIndexManager();
+            auto bm = getBufferManager();
+            rm = new RecordManager(bm, im);
+        }
+        return rm;
     }
 
     IndexManager *ApiHelper::getIndexManager()
