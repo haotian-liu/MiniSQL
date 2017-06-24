@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "../RecordManager/RecordManager.h"
+#include "../CatalogManager/CatalogManager.h"
 #include "Api.h"
 #include "ApiHelper.h"
 
@@ -41,6 +42,20 @@ namespace Api
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto num_of_attr = schema_list.size();
+        for(auto &it: schema_list)
+        {
+            if(it.first == primary_key_name)
+            {
+
+            }
+            it.second.type == SqlValueTypeBase ::String;
+
+        }
+        if(!primary_key_name.empty())
+        {
+            auto pp = new Attr();
+        }
 
         return rm->createTable(table_name);
     }

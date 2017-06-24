@@ -5,6 +5,8 @@
 #ifndef MINISQL_API_H
 #define MINISQL_API_H
 
+#include <vector>
+#include <utility>
 #include <cstddef>
 #include <string>
 #include <stdexcept>
