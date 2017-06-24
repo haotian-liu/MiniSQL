@@ -22,7 +22,7 @@ char* BufferManager::get_specified_block(string filename, int offset)
         }
     }
     //如果该块不在buffer中 则从文件中读取
-    i = get_blank_block_ind(index_table);
+    i = get_blank_block_ind();
     ptr_buffer[i].mark_block(filename, offset);
 
     fstream fp;
@@ -175,7 +175,7 @@ void BufferManager::initialize_blocks()
 
 //首先查找表中是否有空位写入
 //如果没有空位 用LRU找一块block清除后写入
-unsigned int BufferManager::get_blank_block_ind(unsigned int table_index)
+unsigned int BufferManager::get_blank_block_ind()
 {
     int i,res;
     char * p;
@@ -200,7 +200,6 @@ unsigned int BufferManager::get_blank_block_ind(unsigned int table_index)
         ptr_buffer[res].flush_one_block();
     }
     using_block(res);
-    ptr_buffer[res].index_table = table_index;
     return res;
 }
 
@@ -234,7 +233,7 @@ char * BufferManager::get_blank_block_addr(unsigned int table_index)
     return (char*)&(ptr_buffer[res]);
 }
 //提供给index和record manager来获取 修改 增加块
-char * BufferManager::get_block(short int index_table,string filename, unsigned int offset)
+char * BufferManager::get_block(string filename, unsigned int offset)
 {
     unsigned int number,i,mark;
     //int total_size = CatalogManager::get_total_size_of_attr(filename);
@@ -250,7 +249,7 @@ char * BufferManager::get_block(short int index_table,string filename, unsigned 
         }
     }
     //如果该块不在buffer中 则从文件中读取
-    i = get_blank_block_ind(index_table);
+    i = get_blank_block_ind();
     ptr_buffer[i].mark_block(filename, offset);
 
     fstream fp;

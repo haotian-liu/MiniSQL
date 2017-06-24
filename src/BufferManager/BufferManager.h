@@ -50,14 +50,15 @@ public:
     //char* get_next_block(string filename);
     //void setDirty(const char *dest);		//可以不用外部调用 buffer内部可做
     char* get_next_block_for_insert();
-    char* get_block(short int index_table, string filename, unsigned int offset);
+    char* get_block(string filename, unsigned int offset);
     char* get_blank_block_addr(unsigned int table_index);
-    unsigned int get_blank_block_ind(unsigned int table_index);
+    unsigned int get_blank_block_ind();
     //返回一个空的block（用于新增），类型为table_index
 
     void flush_all_blocks();			//把所有block的数据写回文件内
     void flush_one_block();				//把这个block的数据写回文件内
     void initialize_blocks();			//初始化
+    void setDirty(unsigned int offset) {} // dummy delete definition
     static int get_LRU();				//最近使用次数 返回LRU
     static void using_block(int);		//标记第i块block为正在使用
     static void create_table(string);

@@ -7,32 +7,31 @@
 
 bool RecordManager::createTable(string &table) {
     string tableFileStr = tableFile(table);
-    bm->getFileBlock(tableFileStr);
+    bm->create_table(tableFileStr);
     return true;
 }
 
 bool RecordManager::dropTable(string &table) {
     string tableFileStr = tableFile(table);
-    bm->removeFileNode(tableFileStr);
     bm->removeFile(tableFileStr);
     return true;
 }
 
 bool RecordManager::createIndex(string &table, string &index) {
     string indexFileStr = indexFile(table, index);
-    bm->getFileBlock(indexFileStr);
+    bm->create_table(indexFileStr);
     return true;
 }
 
 bool RecordManager::dropIndex(string &table, string &index) {
     string indexFileStr = indexFile(table, index);
-    bm->removeFileNode(indexFileStr);
     bm->removeFile(indexFileStr);
     return true;
 }
 
 bool RecordManager::insertRecord(Table &table, Tuple &record) {
-    char *block = bm->getFileBlock(tableFile(table.Name));
+    int blockID = 0; // fixme !!! get blank block needs to know the last offset!
+    char *block = bm->get_block(tableFile(table.Name), blockID); // fixme !!! get blank block needs to know the last offset!
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
     int offset = 1;
@@ -67,7 +66,7 @@ bool RecordManager::insertRecord(Table &table, Tuple &record) {
                 }
             }
             block[i * length] = Used;
-            bm->setDirty(block);
+            bm->setDirty(blockID);
             return true;
         }
         cerr << "All blocks are used!" << endl;
@@ -76,7 +75,8 @@ bool RecordManager::insertRecord(Table &table, Tuple &record) {
 }
 
 bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond) {
-    char *block = bm->getFileBlock(tableFile(table.Name));
+    unsigned int blockID = 0;
+    char *block = bm->get_block(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
     Tuple tup;
@@ -92,7 +92,8 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
                 res.row.push_back(row);
             }
         }
-        block = bm->getFileBlock(tableFile(table.Name));
+        blockID++;
+        block = bm->get_block(tableFile(table.Name), blockID);
     }
 
     dumpResult(res);
@@ -109,7 +110,8 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
 
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
-    char *block = bm->getFileBlock(tableFileName, offset) + offset % BlockSize;
+    unsigned int blockOffset = offset / blocks;
+    char *block = bm->get_block(tableFileName, blockOffset) + offset % BlockSize;
     Tuple tup;
     Row row;
     Result res;
@@ -129,7 +131,7 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
                 break;
             }
         }
-        block = bm->getFileBlock(tableFile(table.Name));
+        block = bm->get_block(tableFile(table.Name), blockOffset);
         cnt++;
         if (cnt > threshold) {
             degrade = true;
@@ -145,7 +147,8 @@ bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond
 }
 
 bool RecordManager::deleteRecord(Table &table, vector<Cond> &cond) {
-    char *block = bm->getFileBlock(tableFile(table.Name));
+    unsigned int blockOffset = 0;
+    char *block = bm->get_block(tableFile(table.Name), blockOffset);
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
     Tuple tup;
@@ -160,8 +163,9 @@ bool RecordManager::deleteRecord(Table &table, vector<Cond> &cond) {
                 block[i * length] = UnUsed;
             }
         }
-        bm->setDirty(block);
-        block = bm->getFileBlock(tableFile(table.Name));
+        bm->setDirty(blockOffset);
+        blockOffset++;
+        block = bm->get_block(tableFile(table.Name), blockOffset);
     }
 }
 
