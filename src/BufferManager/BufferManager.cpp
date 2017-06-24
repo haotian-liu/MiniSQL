@@ -3,19 +3,40 @@
 
 using namespace std;
 
-BufferManager *ptr_buffer = NULL;
-
-
-BufferManager* BufferManager::ptr_buffer=nullptr;	//遍历用的指针
-BufferManager* BufferManager::block_now = nullptr;
-BufferManager* BufferManager::block_for_insert = nullptr;
+void BufferManager::clear_block(int i)
+{
+    ptr_buffer[i].filename = "";
+    memset(ptr_buffer[i].content, 0, FILE_BLOCK_SIZE);
+    ptr_buffer[i].is_written = false;
+    ptr_buffer[i].being_used = false;
+    ptr_buffer[i].offset = 0;
+    ptr_buffer[i].ID = i;
+    ptr_buffer[i].LRU_count = 0;
+    ptr_buffer[i].block_address = reinterpret_cast<char *>(static_cast<void *>(&ptr_buffer[i].content));
+    //cout << "&ptr_buffer[" << i << "].content:" << &ptr_buffer[i].content << endl;
+    //const char* tmp = static_cast<const char *>(ptr_buffer[i].content);
+    //printf(" ptr_buffer[i].block_address : %s\n", ptr_buffer[i].block_address);
+    //cout << "static_cast:" << ptr_buffer[i].block_address <<endl;
+}
+int BufferManager::get_block_for_insert(bool choose)
+{
+    int ind;
+    if (choose)
+    {
+        ind = get_blank_block_ind();
+        ptr_for_insert = &(ptr_buffer[ind]);
+    }
+    mark_is_written(ind);
+    return ptr_for_insert->ID;
+    //return (char*)(block_for_insert);
+}
 
 char* BufferManager::get_specified_block(string filename, int offset)
 {
     unsigned int number, i, mark,count=0;
     for (int i = 0;i < MAX_BLOCKS; i++)
     {
-        if (filename == ptr_buffer[i].filename && ptr_buffer[i].offset == offset)
+        if (ptr_buffer[i].filename == filename && ptr_buffer[i].offset == offset)//如果此块在buffer中 直接返回
         {
             using_block(i);
             return (char*)&(ptr_buffer[i]);
@@ -23,23 +44,20 @@ char* BufferManager::get_specified_block(string filename, int offset)
     }
     //如果该块不在buffer中 则从文件中读取
     i = get_blank_block_ind();
-    ptr_buffer[i].mark_block(filename, offset);
+    mark_block(i,filename, offset);
 
     fstream fp;
     fp.open(filename, ios::in | ios::out | ios::app | ios::binary);
     if (!fp.good())
+    {
         cerr << filename << "file open err" << endl;
-    fp.seekg(ios::beg + offset*BLOCK_SIZE);
-    fp.read(const_cast<char *>(ptr_buffer[i].block_address.c_str()), BLOCK_SIZE);
+        exit(0);
+    }
+    fp.seekg(ios::beg + offset*FILE_BLOCK_SIZE);
+    fp.read(ptr_buffer[i].block_address, FILE_BLOCK_SIZE);
     fp.close();
-    //block_now = &(ptr_buffer[i]);
     using_block(i);
     return (char*)&(ptr_buffer[i]);
-}
-
-void BufferManager::set_file_name(string filename_in)
-{
-    this->filename = filename_in;
 }
 
 void BufferManager::removeFile(string filename_in)	//删除整个文件 buffer和file一起
@@ -62,114 +80,20 @@ void BufferManager::removeFile(string filename_in)	//删除整个文件 buffer�
     }
 }
 
-//返回存放filename的第一个block
-//char * BufferManager::getFileBlock(string filename)
-//{
-//	unsigned int number, i, mark;
-//	//int total_size = CatalogManager::get_total_size_of_attr(filename);
-//	//int ID = total_size / BLOCK_SIZE;
-//	for (int i = 0; i<MAX_BLOCKS; i++)
-//	{
-//		if (filename == ptr_buffer[i].filename)
-//		{			
-//			//cout << "ID = " << i << endl;
-//			using_block(i);
-//			return (char*)&(ptr_buffer[i]);
-//		}
-//	}
-//	//如果该块不在buffer中 则从文件中读取
-//	i = get_blank_block_ind(index_table);
-//	ptr_buffer[i].mark_block(filename, offset);
-//
-//	fstream fp;
-//	fp.open(filename, ios::in | ios::out | ios::app | ios::binary);
-//	if (!fp.good())
-//		cerr << filename << "file open err" << endl;
-//	fp.seekg(ios::beg + offset*BLOCK_SIZE);
-//	fp.read(const_cast<char *>(ptr_buffer[i].block_address.c_str()), BLOCK_SIZE);
-//	fp.close();
-//	block_now = &(ptr_buffer[i]);
-//	using_block(i);
-//	return (char*)(block_now);
-//}
-
-//返回继上次返回后面的第一个名为filename的block 
-//如果不存在则返回nullptr
-//char* BufferManager::get_next_block(string filename)
-//{
-//	BufferManager* tmp = block_now;
-//	unsigned int ID_tmp = tmp->ID;
-//	int i = ID_tmp + 1;
-//	while (ptr_buffer[i].filename != filename && i <= MAX_BLOCKS)
-//		i++;
-//	if (i == MAX_BLOCKS)
-//		return nullptr;
-//	block_now = &(ptr_buffer[i]);
-//	block_now->mark_is_written();
-//	return (char*)block_now;
-//}
-
-//在需要插入的时候返回当前最后一个使用过的block
-//可能存在已满的问题所以需要继续用get_next_block_for_insert
-//char* BufferManager::get_block_for_insert()
-//{
-//	for (int i = 0; i<MAX_BLOCKS; i++)
-//	{
-//		if (!ptr_buffer[i].index_table && ptr_buffer[i].is_written==false)
-//		{
-//			using_block(i);
-//			block_for_insert = &ptr_buffer[i];
-//			return (char*)(block_for_insert);
-//		}
-//	}
-//}
-
-char* BufferManager::get_next_block_for_insert()
-{
-    BufferManager* tmp = block_for_insert;
-    unsigned int ID_tmp = tmp->ID;
-    if (ID_tmp < MAX_BLOCKS)
-    {
-        block_for_insert = &(ptr_buffer[ID_tmp + 1]);
-        block_for_insert->mark_is_written();
-        return (char*)block_for_insert;
-    }
-    else return nullptr;
-
-}
-
-
 
 //新建立一个空文件
 //没有自己加后缀，默认输入的in string已经是有后缀的文件了？
 void BufferManager::create_table(string in)
 {
     ofstream f1(in);
-
 }
 
 
 void BufferManager::initialize_blocks()
 {
-
-    ptr_buffer = new BufferManager[MAX_BLOCKS];		//申请上线的内存量并依次初始化
-
     for (int i = 0; i<MAX_BLOCKS; i++)
-    {
-        ptr_buffer[i].block_address = "\0";
-        ptr_buffer[i].index_table = 0;
-        ptr_buffer[i].filename = "\0";
-        memset(ptr_buffer[i].content, 0, BLOCK_SIZE);
-        ptr_buffer[i].is_written = false;
-        ptr_buffer[i].being_used = false;
-        ptr_buffer[i].offset = 0;
-        ptr_buffer[i].ID = i;
-        ptr_buffer[i].LRU_count = 0;
-    }
-
-    BufferManager::ptr_buffer = ptr_buffer;	//遍历用的指针
-    BufferManager::block_now = ptr_buffer;
-    BufferManager::block_for_insert = ptr_buffer;
+        clear_block(i);
+    ptr_for_insert = &(ptr_buffer[MAX_BLOCKS - 1]);
 }
 
 
@@ -181,58 +105,51 @@ unsigned int BufferManager::get_blank_block_ind()
     char * p;
     for (i = 0; i < MAX_BLOCKS; i++)
     {
-        if (!ptr_buffer[i].index_table && !ptr_buffer[i].being_used)
+        if (ptr_buffer[i].filename!="")
             break;
     }
     if (i < MAX_BLOCKS)	//如果找到空块
     {
-        char* tmp = const_cast<char *>(block_address.c_str());
         res = i;
-        ptr_buffer[res].block_address = new char[BLOCK_SIZE];
-        for (p = tmp; p < ptr_buffer[res].block_address.c_str() + BLOCK_SIZE; p++)
-        {
-            *p = '\0';//初始化为空
-        }
     }
+
     else if (i >= MAX_BLOCKS)
     {
         res = get_LRU();
-        ptr_buffer[res].flush_one_block();
+        flush_one_block(res);
     }
     using_block(res);
+    mark_being_used(i);
+    clear_block(res);
     return res;
 }
 
 //char * BufferManager::get_blank_block(unsigned int table_index)
-char * BufferManager::get_blank_block_addr(unsigned int table_index)
+char * BufferManager::get_blank_block_addr()
 {
     int i, res;
     char * p;
     for (i = 0; i < MAX_BLOCKS; i++)
     {
-        if (!ptr_buffer[i].index_table && !ptr_buffer[i].being_used)
+        if (ptr_buffer[i].filename != "")
             break;
     }
     if (i < MAX_BLOCKS)	//如果找到空块
     {
-        char* tmp = const_cast<char *>(block_address.c_str());
         res = i;
-        ptr_buffer[res].block_address = new char[BLOCK_SIZE];
-        for (p = tmp; p < ptr_buffer[res].block_address.c_str() + BLOCK_SIZE; p++)
-        {
-            *p = '\0';//初始化为空
-        }
     }
+
     else if (i >= MAX_BLOCKS)
     {
         res = get_LRU();
-        ptr_buffer[res].flush_one_block();
+        flush_one_block(res);
     }
     using_block(res);
-    ptr_buffer[res].index_table = table_index;
+    mark_being_used(res);
     return (char*)&(ptr_buffer[res]);
 }
 //提供给index和record manager来获取 修改 增加块
+
 char * BufferManager::get_block(string filename, unsigned int offset, bool allocate)
 {
     unsigned int number,i,mark;
@@ -240,9 +157,8 @@ char * BufferManager::get_block(string filename, unsigned int offset, bool alloc
     //int ID = total_size / BLOCK_SIZE;
     for(int i=0;i<MAX_BLOCKS;i++)
     {
-        if(filename==ptr_buffer[i].filename &&
-           ptr_buffer[i].offset == offset &&
-           ptr_buffer[i].index_table == index_table)
+        if(ptr_buffer[i].filename==filename &&
+           ptr_buffer[i].offset == offset)
         {
             using_block(i);
             return (char*)(&ptr_buffer[i]);
@@ -250,38 +166,38 @@ char * BufferManager::get_block(string filename, unsigned int offset, bool alloc
     }
     //如果该块不在buffer中 则从文件中读取
     i = get_blank_block_ind();
-    ptr_buffer[i].mark_block(filename, offset);
+    mark_block(i,filename, offset);
 
     fstream fp;
     fp.open(filename, ios::in | ios::out | ios::app | ios::binary);
     if (!fp.good())
         cerr << filename<<"file open err" << endl;
-    fp.seekg(ios::beg + offset*BLOCK_SIZE);
-    fp.read(const_cast<char *>(ptr_buffer[i].block_address.c_str()), BLOCK_SIZE);
+    fp.seekg(ios::beg + offset*FILE_BLOCK_SIZE);
+    fp.read((char*)(ptr_buffer[i].content), FILE_BLOCK_SIZE);
     fp.close();
     using_block(i);
     return (char*)(&ptr_buffer[i]);
 }
 
-void BufferManager::mark_block(string filename_in, unsigned int offset)
+void BufferManager::mark_block(int ind,string filename_in, unsigned int offset)
 {
-    this->filename = filename_in;
-    this->offset = offset;
+    ptr_buffer[ind].filename = filename_in;
+    ptr_buffer[ind].offset = offset;
 }
 
-void BufferManager::mark_is_written()
+void BufferManager::mark_is_written(int ind)
 {
-    this->is_written = true;
+    ptr_buffer[ind].is_written = true;
 }
 
-void BufferManager::mark_being_used()
+void BufferManager::mark_being_used(int ind)
 {
-    this->being_used = true;
+    ptr_buffer[ind].being_used = true;
 }
 
-void BufferManager::end_being_used()
+void BufferManager::end_being_used(int ind)
 {
-    this->being_used = false;
+    ptr_buffer[ind].being_used = false;
 }
 
 void BufferManager::using_block(int n)
@@ -310,21 +226,22 @@ int BufferManager::get_LRU()
     return num;
 }
 
-void BufferManager::flush_one_block()
+void BufferManager::flush_one_block(int ind)
 {
-    if (is_written && index_table==MINISQL_BLOCK_INDEX)
-    {
-        string filename_new = filename + ".ind";
-        char* tmp = const_cast<char *>(block_address.c_str());
-        fstream fp;
-        fp.open(filename_new, ios::in | ios::out | ios::app | ios::binary);
-        if (!fp.good())
-            cerr << filename<< " open err" << endl;
-        fp.seekg(ios::beg + offset*BLOCK_SIZE);
-        fp.write(tmp, BLOCK_SIZE);
-        fp.close();
-    }
-    else if (is_written && index_table == MINISQL_BLOCK_TABLE)
+    //cout << "flush one block" << endl;
+    //cout << "ID:"<< ind << endl;
+    //cout << "block_address" << ptr_buffer[ind].block_address << endl;
+    //cout << "LRU:" << ptr_buffer[ind].LRU_count << endl;
+    char* tmp = ptr_buffer[ind].block_address + BLOCK_HEADER_SIZE;
+    fstream fp;
+    fp.open(ptr_buffer[ind].filename, ios::in | ios::out | ios::app | ios::binary);
+    //if (!fp.good())
+    //	cerr << ptr_buffer[ind].filename << " open err" << endl;
+    fp.seekg(ios::beg +(ptr_buffer[ind].offset)*FILE_BLOCK_SIZE);
+    fp.write(tmp, FILE_BLOCK_SIZE);
+    fp.close();
+    //}
+    /*else if (is_written && index_table == MINISQL_BLOCK_TABLE)
     {
         string filename_new = filename + ".tb";
         char* tmp = const_cast<char *>(block_address.c_str());
@@ -335,14 +252,14 @@ void BufferManager::flush_one_block()
         fp.seekg(ios::beg + offset*BLOCK_SIZE);
         fp.write(tmp, BLOCK_SIZE);
         fp.close();
-    }
+    }*/
 }
 
 void BufferManager::flush_all_blocks()
 {
     for(int i=0;i<MAX_BLOCKS;i++)
     {
-        ptr_buffer[i].flush_one_block();
+        flush_one_block(i);
         if(ptr_buffer[i].block_address != "\0")
             ptr_buffer[i].block_address = nullptr;
         if(ptr_buffer[i].filename != "\0")
