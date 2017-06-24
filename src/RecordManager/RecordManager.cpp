@@ -17,9 +17,52 @@ bool RecordManager::dropTable(const string &table) {
     return true;
 }
 
-bool RecordManager::createIndex(const string &table, const string &index) {
-    string indexFileStr = indexFile(table, index);
+bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
+    string indexFileStr = indexFile(table.Name, index.attrName);
+    // Call BM to create index file
     bm->create_table(indexFileStr);
+    // Call IM to create index tree
+    im->create(indexFileStr, index);
+    // Add initial values to index tree
+    unsigned int blockID = 0;
+    char *block = bm->get_block(tableFile(table.Name), blockID);
+    int length = table.recordLength + 1;
+    int blocks = BlockSize / length;
+    int offset = 1;
+    Tuple tup;
+    Element attr;
+    const char *dest;
+
+    for (auto attrType : table.attrType) {
+        if (attrType.attrName == index.attrName) {
+            attr.type = attrType;
+            break;
+        }
+        offset += attrType.getSize();
+    }
+
+    while (block) {
+        for (int i=0; i<blocks; i++) {
+            if (block[i * length] != Used) { continue; }
+            dest = block + i * length + offset;
+            switch (attr.M()) {
+                case MINISQL_TYPE_INT:
+                    memcpy(&attr.i, dest, attr.type.getSize());
+                    break;
+                case MINISQL_TYPE_FLOAT:
+                    memcpy(&attr.r, dest, attr.type.getSize());
+                    break;
+                case MINISQL_TYPE_CHAR:
+                    memcpy(const_cast<char *>(attr.str.c_str()), dest, attr.type.getSize());
+                    break;
+                default:
+                    cerr << "Undefined type in RM::createIndex." << endl;
+            }
+            im->insert(indexFileStr, attr, blockID * blocks + i);
+        }
+        blockID++;
+        block = bm->get_block(tableFile(table.Name), blockID);
+    }
     return true;
 }
 

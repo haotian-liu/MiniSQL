@@ -43,8 +43,9 @@ namespace MINISQL_BASE {
     };
 
     struct SqlValueType {
+        std::string attrName;
         SqlValueTypeBase type;
-        int charSize; // charSize does not include the terminating zero of string!
+        size_t charSize; // charSize does not include the terminating zero of string!
 
         inline int M() const {
             switch (type) {
@@ -57,7 +58,7 @@ namespace MINISQL_BASE {
             }
         }
 
-        inline int getSize() const {
+        inline size_t getSize() const {
             switch (M()) {
                 case MINISQL_TYPE_INT:
                     return sizeof(int);
@@ -69,7 +70,7 @@ namespace MINISQL_BASE {
         }
 
         inline int getDegree() const {
-            int keySize = getSize();
+            size_t keySize = getSize();
             int degree = BlockSize / (keySize + sizeof(int));
 
             return degree;
@@ -83,7 +84,7 @@ namespace MINISQL_BASE {
         int strLength;
         std::string str;
 
-        inline int M() const {
+        inline size_t M() const {
             switch (type.type) {
                 case SqlValueTypeBase::Integer:
                     return MINISQL_TYPE_INT;

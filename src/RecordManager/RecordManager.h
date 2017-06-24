@@ -21,7 +21,7 @@ public:
     bool createTable(const string &table);
     bool dropTable(const string &table);
 
-    bool createIndex(const string &table, const string &index);
+    bool createIndex(const Table &table, const SqlValueType &index);
     bool dropIndex(const string &table, const string &index);
 
     bool insertRecord(const Table &table, const Tuple &record);
