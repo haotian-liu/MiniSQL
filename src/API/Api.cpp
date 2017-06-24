@@ -43,19 +43,27 @@ namespace Api
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
         auto num_of_attr = schema_list.size();
-        for(auto &it: schema_list)
+
+        if (!primary_key_name.empty())
         {
-            if(it.first == primary_key_name)
+            bool pri_schema_found = false;
+            SqlValueType primary_key_type;
+            for (auto &it: schema_list)
             {
-
+                if (it.first == primary_key_name)
+                {
+                    pri_schema_found = true;
+                    primary_key_type = it.second;
+                }
             }
-            it.second.type == SqlValueTypeBase ::String;
+            if (!pri_schema_found)
+            {
+                std::cout << "Primary key not found!" << std::endl;
+                return false;
+            }
+        }
 
-        }
-        if(!primary_key_name.empty())
-        {
-            auto pp = new Attr();
-        }
+
 
         return rm->createTable(table_name);
     }
