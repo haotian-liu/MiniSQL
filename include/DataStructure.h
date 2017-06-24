@@ -194,6 +194,7 @@ namespace MINISQL_BASE {
         int attrCnt, recordLength, recordCnt, size;
         std::vector<SqlValueType> attrType;
         std::vector<std::string> attrNames;
+        std::vector<std::string> indexNames;
     };
 
     struct Cond {
