@@ -76,7 +76,6 @@ void main_repl_loop [[noreturn]]()
                 half_ptr = half;
                 memset(half, 0, INPUT_LENGTH);
 
-                //before do_parse() invoke, we should set input_s and input_len to a correct value.
                 input_len = std::strlen(input_s);
                 do_parse();
             }
@@ -90,6 +89,7 @@ void main_repl_loop [[noreturn]]()
 
 #pragma clang diagnostic pop
 
+///before do_parse() invoke, we should set input_s and input_len to a correct value.
 void do_parse()
 {
     yyparse();
@@ -221,4 +221,39 @@ void dispatch()
 void exec_file(const std::string &file_name)
 {
     std::cout << "Executing SQL file: " << file_name << std::endl;
+    std::ifstream file(file_name);
+
+    while(!file.eof())
+    {
+        memset(input_tmp, 0, INPUT_LENGTH);
+        file.getline(input_tmp, INPUT_LENGTH);
+
+        std::cout << input_tmp << std::endl;
+
+        //code below copied from main loop:
+        //copy temp input to buffer to form a multi-line completed statement.
+        input_tmp[strlen(input_tmp)] = ' ';
+        auto tmp_len = strlen(input_tmp);
+        bool complete{false};
+        for (int i = 0; i < tmp_len; ++i)
+        {
+            *half_ptr++ = input_tmp[i];
+            if (half_ptr[-1] == ';')
+            {
+                complete = true;
+                memset(input_s, 0, INPUT_LENGTH);
+                std::strncpy(input_s, half, half_ptr - half);
+
+                half_ptr = half;
+                memset(half, 0, INPUT_LENGTH);
+
+                input_len = std::strlen(input_s);
+                do_parse();
+            }
+        }
+        if (!complete)
+        {
+            std::cout << "Statement not complete>" << std::endl;
+        }
+    }
 }
