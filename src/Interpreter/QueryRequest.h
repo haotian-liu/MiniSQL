@@ -186,6 +186,7 @@ public:
     }
     std::string table_name;
     std::vector<std::pair<std::string, SqlValueType>> table_schema_list;
+    std::string primary_key_name;
 };
 
 class CreateIndexQuery final : public QueryRequest

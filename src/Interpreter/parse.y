@@ -41,6 +41,8 @@
     RW_VALUES
     RW_SET
     RW_UNIQUE
+    RW_PRIMARY
+    RW_KEY
 
     RW_USE
     RW_DATABASE
@@ -89,6 +91,8 @@
 %type <b> op_unique;
 %type <schema> schema_item;
 %type <schema_list> table_schema_definition;
+
+%type <str> op_primary_key;
 
 %type <val_type> value_type;
 
@@ -151,11 +155,12 @@ use_database: RW_USE RW_DATABASE T_NSTRING
     }
     ;
 
-create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition ')'
+create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition op_primary_key ')'
     {
         auto create_table_query = new CreateTableQuery();
         create_table_query->table_name = $3;
         create_table_query->table_schema_list = $5;
+        create_table_query->primary_key_name = $6;
 
         query = create_table_query;
     }
@@ -241,6 +246,15 @@ insert: RW_INSERT RW_INTO T_NSTRING RW_VALUES '(' value_list ')'
         query = insert_query;
     }
     ;
+
+op_primary_key: ',' RW_PRIMARY RW_KEY '(' T_NSTRING ')'
+    {
+        $$ = $5;
+    }
+    | nothing
+    {
+        $$ = "";
+    }
 
 op_where: RW_WHERE condition_list
     {
