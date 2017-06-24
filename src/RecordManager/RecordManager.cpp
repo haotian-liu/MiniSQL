@@ -30,48 +30,55 @@ bool RecordManager::dropIndex(string &table, string &index) {
 }
 
 bool RecordManager::insertRecord(Table &table, Tuple &record) {
-    int blockID = 0; // fixme !!! get blank block needs to know the last offset!
-    char *block = bm->get_block(tableFile(table.Name), blockID); // fixme !!! get blank block needs to know the last offset!
+    string tableName = tableFile(table.Name);
+    unsigned int blockID = bm->get_last_block(tableName);
+    char *block = bm->get_block(tableName, blockID);
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
     int offset = 1;
     string strFixed;
     int lengthOffset;
 
-    while (true) {
-        for (int i=0; i<blocks; i++) {
-            if (block[i * length] != UnUsed) { continue; }
-            for (auto attr = record.element.begin(); attr < record.element.end(); attr++) {
-                switch (attr->type.M()) {
-                    case MINISQL_TYPE_CHAR:
-                        strFixed = attr->str;
-                        lengthOffset = attr->strLength - strFixed.length();
-                        if (lengthOffset > 0) {
-                            strFixed.insert(0, lengthOffset, 0);
-                        }
-                        memcpy(block + i * length + offset, strFixed.c_str(), attr->strLength + 1);
-                        offset += attr->strLength + 1;
-                        break;
-                    case MINISQL_TYPE_INT:
-                        memcpy(block + i * length + offset, &attr->i, sizeof(int));
-                        offset += sizeof(int);
-                        break;
-                    case MINISQL_TYPE_FLOAT:
-                        memcpy(block + i * length + offset, &attr->r, sizeof(float));
-                        offset += sizeof(float);
-                        break;
-                    default:
-                        cerr << "Undefined type!!" << endl;
-                        break;
-                }
-            }
-            block[i * length] = Used;
-            bm->setDirty(blockID);
-            return true;
-        }
-        cerr << "All blocks are used!" << endl;
-        return false;
+    bool validBlock = false;
+
+    for (int i=0; i<blocks; i++) {
+        if (block[i * length] != UnUsed) { continue; }
+        validBlock = true;
+        block += i * length;
+        break;
     }
+
+    if (!validBlock) {
+        block = bm->get_block(tableName, ++blockID, true); // get next block (should be empty) and get the first unit
+    }
+
+    for (auto attr = record.element.begin(); attr < record.element.end(); attr++) {
+        switch (attr->type.M()) {
+            case MINISQL_TYPE_CHAR:
+                strFixed = attr->str;
+                lengthOffset = attr->strLength - strFixed.length();
+                if (lengthOffset > 0) {
+                    strFixed.insert(0, lengthOffset, 0);
+                }
+                memcpy(block + offset, strFixed.c_str(), attr->strLength + 1);
+                offset += attr->strLength + 1;
+                break;
+            case MINISQL_TYPE_INT:
+                memcpy(block + offset, &attr->i, sizeof(int));
+                offset += sizeof(int);
+                break;
+            case MINISQL_TYPE_FLOAT:
+                memcpy(block + offset, &attr->r, sizeof(float));
+                offset += sizeof(float);
+                break;
+            default:
+                cerr << "Undefined type!!" << endl;
+                break;
+        }
+    }
+    block[0] = Used;
+    bm->setDirty(blockID);
+    return true;
 }
 
 bool RecordManager::selectRecord(Table &table, vector<string> &attr, vector<Cond> &cond) {

@@ -50,8 +50,9 @@ public:
     //char* get_next_block(string filename);
     //void setDirty(const char *dest);		//可以不用外部调用 buffer内部可做
     char* get_next_block_for_insert();
-    char* get_block(string filename, unsigned int offset);
+    char* get_block(string filename, unsigned int offset, bool allocate=false);
     char* get_blank_block_addr(unsigned int table_index);
+    unsigned int get_last_block(string filename) { return 0; } // dummy def for last block retrieval
     unsigned int get_blank_block_ind();
     //返回一个空的block（用于新增），类型为table_index
 
