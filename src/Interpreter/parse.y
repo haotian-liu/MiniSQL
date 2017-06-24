@@ -10,6 +10,7 @@
 #include <string>
 #include <cstdlib>
 #include <memory>
+#include <utility>
 
 #include "QueryRequest.h"
 #include "Interpreter.h"
@@ -18,6 +19,11 @@
 #include "y.tab.h"
 
 %}
+
+%define parse.error verbose
+%define parse.lac full
+
+//%define api.pure full
 
 %token
     RW_CREATE
@@ -34,8 +40,17 @@
     RW_INTO
     RW_VALUES
     RW_SET
+    RW_UNIQUE
+    RW_PRIMARY
+    RW_KEY
+
     RW_USE
     RW_DATABASE
+    RW_EXECFILE
+
+    RW_INTEGER
+    RW_FLOAT
+    RW_CHAR
 
     RW_EXIT
     RW_TEST
@@ -73,8 +88,13 @@
 
 %type <val_list> value_list;
 
+%type <b> op_unique;
 %type <schema> schema_item;
 %type <schema_list> table_schema_definition;
+
+%type <str> op_primary_key;
+
+%type <val_type> value_type;
 
 %type <dummy> top_stmt
     test
@@ -82,6 +102,7 @@
     dml
     ddl
     use_database
+    execfile
 
 %type <dummy>
     insert
@@ -102,6 +123,7 @@ top_stmt: exit
     | dml
     | ddl
     | use_database
+    | execfile
     ;
 
 dml: insert
@@ -116,6 +138,14 @@ ddl: create_table
     | drop_index
     ;
 
+execfile: RW_EXECFILE T_ASTRING
+    {
+        file_name = $2;
+        auto e = new ExecFileQuery();
+        query = e;
+    }
+    ;
+
 use_database: RW_USE RW_DATABASE T_NSTRING
     {
         auto use_db_query = new UseDatabaseQuery();
@@ -125,11 +155,12 @@ use_database: RW_USE RW_DATABASE T_NSTRING
     }
     ;
 
-create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition ')'
+create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition op_primary_key ')'
     {
         auto create_table_query = new CreateTableQuery();
         create_table_query->table_name = $3;
         create_table_query->table_schema_list = $5;
+        create_table_query->primary_key_name = $6;
 
         query = create_table_query;
     }
@@ -216,6 +247,15 @@ insert: RW_INSERT RW_INTO T_NSTRING RW_VALUES '(' value_list ')'
     }
     ;
 
+op_primary_key: ',' RW_PRIMARY RW_KEY '(' T_NSTRING ')'
+    {
+        $$ = $5;
+    }
+    | nothing
+    {
+        $$ = "";
+    }
+
 op_where: RW_WHERE condition_list
     {
         $$ = $2;
@@ -233,15 +273,25 @@ table_schema_definition: table_schema_definition ',' schema_item
     }
     | schema_item
     {
-        $$ = std::vector<std::pair<std::string, std::string>>();
+        $$ = std::vector<std::pair<std::string, SqlValueType>>();
         $$.push_back($1);
     }
     ;
 
-schema_item: T_STRING T_STRING
+schema_item: T_STRING value_type op_unique
     {
         $$ = std::make_pair($1, $2);
+        $$.second.unique = $3;
     }
+    ;
+
+value_type: RW_INTEGER { $$.type = SqlValueTypeBase::Integer; }
+    | RW_FLOAT { $$.type = SqlValueTypeBase::Float; }
+    | RW_CHAR '(' T_INT ')' { $$.type = SqlValueTypeBase::String; $$.charSize = $3; }
+    ;
+
+op_unique: RW_UNIQUE { $$ = true; }
+    | nothing { $$ = false; }
     ;
 
 attr_list: attr_list ',' T_NSTRING
@@ -289,9 +339,9 @@ value_list: value_list ',' value
     ;
 
 value:
-    T_INT { $$.type = SqlValueType::Integer; $$.i = $1; }
-    | T_REAL { $$.type = SqlValueType::Float; $$.r = $1; }
-    | T_ASTRING { $$.type = SqlValueType::String; $$.str = $1; }
+    T_INT { $$.type.type = SqlValueTypeBase::Integer; $$.i = $1; }
+    | T_REAL { $$.type.type = SqlValueTypeBase::Float; $$.r = $1; }
+    | T_ASTRING { $$.type.type = SqlValueTypeBase::String; $$.str = $1; }
     ;
 
 operator:
@@ -316,4 +366,13 @@ test: RW_TEST { std::cout << "YOUR INPUT IS TOOOOOO SIMPLE, SOMETIMES NAIVE!\n";
 %%
 
 bool bFlag; /* no meanings. */
+
+inline int yyerror(const char *s)
+{
+    //std::cerr << "error: ";
+    std::cerr << s << std::endl;
+    //std::cerr << "line: " << yylineno << " on token " << yytext << std::endl;
+    yywrap();
+    return 1;
+}
 

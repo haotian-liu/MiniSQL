@@ -25,6 +25,8 @@ int yyparse();
 extern char input_s[INPUT_LENGTH];
 extern size_t input_len;
 
+extern std::string file_name;
+
 extern bool isExit;
 
 #ifdef YYSTYPE
@@ -45,28 +47,21 @@ typedef struct yystype
     int i;
     double r;
     std::string str;
+    bool b;
     void *dummy;    //for non-final nodes dummy part in AST.
     Operator op;
     SqlValue val;
     Condition cond;
-    std::pair<std::string, std::string> schema;
+    std::pair<std::string, SqlValueType> schema;
     std::vector<std::string> str_list;
     std::vector<Condition> cond_list;
     std::vector<SqlValue> val_list;
-    std::vector<std::pair<std::string, std::string>> schema_list;
+    std::vector<std::pair<std::string, SqlValueType>> schema_list;
+    SqlValueType val_type;
 } YYSTYPE;
 
-extern "C" inline int yyerror(const char *s)
-{
-    std::cerr << "error: ";
-    std::cerr << s << std::endl;
-}
+int yyerror(const char *s);
 
-/*
-extern "C" inline int yywrap()
-{
-    return 1;
-}
- */
+extern "C" int yywrap();
 
 #endif //MINISQL_PARSER_PUBLIC_H

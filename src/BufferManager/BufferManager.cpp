@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "BufferManager.h"
 #include "../CatalogManager/CatalogManager.h"
 

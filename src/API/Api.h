@@ -5,6 +5,8 @@
 #ifndef MINISQL_API_H
 #define MINISQL_API_H
 
+#include <vector>
+#include <utility>
 #include <cstddef>
 #include <string>
 #include <stdexcept>
@@ -17,22 +19,31 @@ namespace Api
 
     size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list);
 
-    size_t delete_op(const DeleteQuery &);
+    size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list);
 
-    size_t select(const SelectQuery &);
+    size_t select(const std::string &table_name, const std::vector<Condition> &condition_list);
 
-    size_t update(const UpdateQuery &);
+    size_t select(const std::string &table_name,
+                  const std::vector<Condition> &condition_list,
+                  const std::vector<std::string> &attr_list
+    );
 
-    bool create_table(const CreateTableQuery &);
+    size_t update(const std::string &table_name,
+                  const std::string &attr,
+                  const SqlValue &value,
+                  const std::vector<Condition> &condition_list
+    );
 
-    bool create_index(const CreateIndexQuery &);
+    bool create_table(const std::string &table_name,
+                      const std::vector<std::pair<std::string, SqlValueType>> &schema_list,
+                      const std::string &primary_key_name = ""
+    );
 
-    bool drop_table(const DropTableQuery &);
+    bool create_index(const std::string &table_name, const std::string &attribute_name);
 
-    bool drop_index(const DropIndexQuery &);
+    bool drop_table(const std::string &table_name);
 
-    extern std::string database_name;
-    extern bool is_database_assigned;
+    bool drop_index(const std::string &table_name, const std::string &attribute_name);
 
     std::string get_db_name_prefix();
 }

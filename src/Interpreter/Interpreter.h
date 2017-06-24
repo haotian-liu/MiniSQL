@@ -14,8 +14,12 @@ class Interpreter
 
 };
 
-void main_repl_loop();
+void main_repl_loop [[noreturn]]();
+
+void do_parse();
 
 void dispatch();
+
+void exec_file(const std::string &file_name);
 
 #endif //MINISQL_INTERPRETER_H

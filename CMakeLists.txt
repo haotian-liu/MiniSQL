@@ -24,6 +24,7 @@ set(SOURCE_FILES main.cpp
         src/Interpreter/parser_public.h
         src/BufferManager/BufferManager.cpp
         include/DataStructure.h
+        src/API/ApiHelper.cpp
         )
 
 add_executable(MiniSQL ${SOURCE_FILES})

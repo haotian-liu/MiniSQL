@@ -17,3 +17,5 @@ create index asfd(sdgsdc);
 
 drop table afaf;
 drop index sdfsdf(dfsd);
+
+execfile "~/n.sql";

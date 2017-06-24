@@ -18,8 +18,6 @@
 
 %}
 
-%option noyywrap
-
 letter      [A-Za-z]
 digit       [0-9]
 num         {digit}+
@@ -54,3 +52,11 @@ s_num       [+\-]?{num}
 %%
 
 #include "scanhelp.cpp"
+
+inline int yywrap()
+{
+    yy_flush_buffer(YY_CURRENT_BUFFER);
+    { BEGIN INITIAL; }
+    return 1;
+}
+

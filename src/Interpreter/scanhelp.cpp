@@ -34,8 +34,17 @@ int get_id(const std::string &s)
     if (tok == "into")r = RW_INTO;
     if (tok == "values")r = RW_VALUES;
     if (tok == "set")r = RW_SET;
+    if (tok == "unique")r = RW_UNIQUE;
+    if (tok == "primary")r = RW_PRIMARY;
+    if (tok == "key")r = RW_KEY;
+
     if (tok == "use")r = RW_USE;
     if (tok == "database")r = RW_DATABASE;
+    if (tok == "execfile")r = RW_EXECFILE;
+
+    if (tok == "int")r = RW_INTEGER;
+    if (tok == "char")r = RW_CHAR;
+    if (tok == "float")r = RW_FLOAT;
 
     if (tok == "naive")r = RW_TEST;
 

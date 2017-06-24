@@ -1,11 +1,15 @@
 #ifndef _catalog_H_
 #define _catalog_H_
-#include "../../include/DataStructure.h"
 
 #include <list>
+#include <string>
+#include <iostream>
+#include <fstream>
 
-using namespace MINISQL_BASE;
+#include "../../include/DataStructure.h"
+
 using namespace std;
+using namespace MINISQL_BASE;
 
 /*每次新建表的时候调用creat_new_table(string table_name,int num_of_attrs) 输入表名和attr数目
 /*然后依次插入attr，用insert_attrs_after_creat_tabl(.....)
@@ -17,16 +21,16 @@ using namespace std;
 typedef struct struct_attr* AttrPointer;
 typedef struct struct_attr
 {
-    string attr_name;			//字符串类型 属性的名称
-    int type;					//类型
-    int length;					//属性长度
-    int offset;					//在table里面的偏移量
-    bool if_primary_key;		//是否是主键
-    bool if_unique;				//是否唯一
-    AttrPointer Next;			//指向下一个属性
-}Attr;
+    string attr_name;            //字符串类型 属性的名称
+    int type;                    //类型
+    int length;                    //属性长度
+    int offset;                    //在table里面的偏移量
+    bool if_primary_key;        //是否是主键
+    bool if_unique;                //是否唯一
+    AttrPointer Next;            //指向下一个属性
+} Attr;
 
-typedef struct struct_table* TablePointer;
+typedef struct struct_table *TablePointer;
 typedef struct struct_table
 {
     string table_name;			//字符串类型 表名

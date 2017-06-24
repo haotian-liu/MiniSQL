@@ -46,6 +46,7 @@ namespace MINISQL_BASE {
         std::string attrName;
         SqlValueTypeBase type;
         size_t charSize; // charSize does not include the terminating zero of string!
+        bool unique = false;
 
         inline int M() const {
             switch (type) {
