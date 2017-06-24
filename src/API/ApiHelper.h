@@ -8,6 +8,7 @@
 #include <string>
 #include "../RecordManager/RecordManager.h"
 #include "../IndexManager/IndexManager.h"
+#include "../CatalogManager/CatalogManager.h"
 
 namespace Api
 {
@@ -28,6 +29,8 @@ namespace Api
 
         BufferManager *getBufferManager();
 
+        CatalogManager *getCatalogManager();
+
     private:
         ApiHelper() = default;
 
@@ -36,6 +39,7 @@ namespace Api
         RecordManager *rm = nullptr;
         IndexManager *im = nullptr;
         BufferManager *bm = nullptr;
+        CatalogManager *cm = nullptr;
     };
 }
 

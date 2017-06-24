@@ -31,5 +31,10 @@ namespace Api
         return (bm == nullptr) ? bm = new BufferManager() : bm;
     }
 
+    CatalogManager *ApiHelper::getCatalogManager()
+    {
+        return (cm == nullptr) ? cm = new CatalogManager() : cm;
+    }
+
     ApiHelper *ApiHelper::helper = nullptr;
 }
