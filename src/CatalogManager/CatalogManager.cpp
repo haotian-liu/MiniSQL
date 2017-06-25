@@ -49,8 +49,6 @@ void CatalogManager::Flush() const
 {
     std::ofstream ofs(meta_file_name);
 
-    std::cout << tables.size() << endl;
-
     for (const auto &tb: tables)
     {
         ofs << tb.Name << std::endl;
@@ -94,7 +92,6 @@ void CatalogManager::Flush() const
             {
                 otbfs << 0 << std::endl << "-" << std::endl;
             }
-            otbfs << std::endl;
             ++i;
         }
         otbfs.close();
@@ -168,5 +165,13 @@ bool CatalogManager::TableExist(const std::string &table_name) const
     {
         return (tb.Name == table_name);
     }) != tables.end();
+}
+
+Table &CatalogManager::GetTable(const std::string &table_name)
+{
+    return *std::find_if(tables.begin(), tables.end(), [&table_name](const Table &tb)
+    {
+        return (tb.Name == table_name);
+    });
 }
 

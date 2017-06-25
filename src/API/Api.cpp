@@ -4,6 +4,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 
 #include "../RecordManager/RecordManager.h"
 #include "../CatalogManager/CatalogManager.h"
@@ -40,6 +41,44 @@ namespace Api
             std::cout << "Table not found!" << std::endl;
             return 0;
         }
+
+        auto &tb = cm->GetTable(table_name);
+        if (tb.attrNames.size() != value_list.size())
+        {
+            std::cout << "Number of values not fit!" << std::endl;
+            return 0;
+        }
+
+        size_t i;
+        for (i = 0; i < value_list.size(); ++i)
+        {
+            if (value_list[i].type.type != tb.attrType[i].type)
+            {
+                std::cout << "Type mismatch!" << std::endl;
+                return 0;
+            }
+            if (value_list[i].type.type == SqlValueTypeBase::String)
+            {
+                if (value_list[i].str.length() > tb.attrType[i].charSize)
+                {
+                    std::cout << "String too long!" << std::endl;
+                    return 0;
+                }
+            }
+        }
+
+        Tuple t;
+        t.element = value_list;
+        auto offset = rm->insertRecord(tb, t);
+
+        for (const auto &id: tb.index)
+        {
+            auto it = std::find(tb.attrNames.begin(), tb.attrNames.end(), id.first);
+            im->insert(indexFile(tb.Name, id.first),
+                       value_list[it - tb.attrNames.begin()], offset);
+        }
+
+        std::cout << "Insert finished. 1 row affected." << std::endl;
         return 0;
     }
 
@@ -91,6 +130,7 @@ namespace Api
             }
         }
         cm->CreateTable(table_name, schema_list, primary_key_name);
+        std::cout << "Create table " << table_name << " success." << std::endl;
         cm->Flush();
 
         return rm->createTable(table_name);

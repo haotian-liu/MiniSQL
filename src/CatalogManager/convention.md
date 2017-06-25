@@ -13,4 +13,3 @@
 * is unique: 0 or 1
 * is index: 0 or 1
 * index name: a string, anything for no index, index name for index.
-* LF

@@ -18,6 +18,8 @@ public:
 
     bool TableExist(const std::string &table_name) const;
 
+    Table &GetTable(const std::string &table_name);
+
     CatalogManager();
 
     ~CatalogManager();

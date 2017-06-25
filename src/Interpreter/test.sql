@@ -20,6 +20,11 @@ drop index sdfsdf(dfsd);
 
 execfile "~/n.sql";
 
+================== BATCH TEST BEGIN
+
 create table t1(a int, b char(20), primary key(a));
 create table t2(a float, b char(20), primary key(a));
 create table q(k int);
+
+insert into q values(42);
+insert into tq(24, "asd");
