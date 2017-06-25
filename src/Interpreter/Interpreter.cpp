@@ -210,7 +210,7 @@ void dispatch()
     auto drop_index_query = dynamic_cast<DropIndexQuery *>(query);
     if (drop_index_query)
     {
-        auto r = Api::drop_index(Api::get_db_name_prefix() + drop_index_query->table_name, drop_index_query->attr_name);
+        auto r = Api::drop_index(Api::get_db_name_prefix() + drop_index_query->index_name);
 
         delete drop_index_query;
         query = nullptr;

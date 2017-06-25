@@ -91,10 +91,11 @@ namespace Api
         return rm->dropTable(table_name);
     }
 
-    bool drop_index(const std::string &table_name, const std::string &attribute_name)
+    bool drop_index(const std::string &index_name)
     {
+        std::string table_name;
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
-        return rm->dropIndex(table_name, attribute_name);
+        return rm->dropIndex(table_name, index_name);
     }
 
     size_t select(const std::string &table_name, const std::vector<Condition> &condition_list)

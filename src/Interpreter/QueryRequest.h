@@ -198,6 +198,7 @@ public:
     }
     std::string table_name;
     std::string attr_name;
+    std::string index_name;
 };
 
 class DropTableQuery final : public QueryRequest
@@ -217,7 +218,6 @@ public:
     {
         type = QueryType::DROP_INDEX;
     }
-    std::string table_name;
-    std::string attr_name;
+    std::string index_name;
 };
 #endif //MINISQL_QUERYREQUEST_H

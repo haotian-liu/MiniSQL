@@ -37,6 +37,7 @@ int get_id(const std::string &s)
     if (tok == "unique")r = RW_UNIQUE;
     if (tok == "primary")r = RW_PRIMARY;
     if (tok == "key")r = RW_KEY;
+    if (tok == "on")r = RW_ON;
 
     if (tok == "use")r = RW_USE;
     if (tok == "database")r = RW_DATABASE;

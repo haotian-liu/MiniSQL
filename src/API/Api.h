@@ -43,7 +43,7 @@ namespace Api
 
     bool drop_table(const std::string &table_name);
 
-    bool drop_index(const std::string &table_name, const std::string &attribute_name);
+    bool drop_index(const std::string &index_name);
 
     std::string get_db_name_prefix();
 }

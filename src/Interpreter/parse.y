@@ -43,6 +43,7 @@
     RW_UNIQUE
     RW_PRIMARY
     RW_KEY
+    RW_ON
 
     RW_USE
     RW_DATABASE
@@ -166,11 +167,12 @@ create_table: RW_CREATE RW_TABLE T_STRING '(' table_schema_definition op_primary
     }
     ;
 
-create_index: RW_CREATE RW_INDEX T_STRING '(' T_STRING ')'
+create_index: RW_CREATE RW_INDEX T_STRING RW_ON T_STRING '(' T_STRING ')'
     {
         auto create_index_query = new CreateIndexQuery();
-        create_index_query->table_name = $3;
-        create_index_query->attr_name = $5;
+        create_index_query->index_name = $3;
+        create_index_query->table_name = $5;
+        create_index_query->attr_name = $7;
 
         query = create_index_query;
     }
@@ -185,15 +187,15 @@ drop_table: RW_DROP RW_TABLE T_STRING
     }
     ;
 
-drop_index: RW_DROP RW_INDEX T_STRING '(' T_STRING ')'
+drop_index: RW_DROP RW_INDEX T_STRING
     {
         auto drop_index_query = new DropIndexQuery();
-        drop_index_query->table_name = $3;
-        drop_index_query->attr_name = $5;
+        drop_index_query->index_name = $3;
 
         query = drop_index_query;
     }
     ;
+
 update: RW_UPDATE T_NSTRING RW_SET T_NSTRING T_EQ value op_where
     {
         auto update_query = new UpdateQuery();
