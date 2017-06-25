@@ -1,5 +1,6 @@
 #include <string>
 #include <list>
+#include <fstream>
 
 #include "CatalogManager.h"
 
@@ -15,10 +16,20 @@ void CatalogManager::CreateTable(const std::string &table_name, int num_of_attrs
 
 CatalogManager::CatalogManager()
 {
-
+    std::ifstream ifs(meta_file_name);
+    std::string tb_name;
+    while (!ifs.eof())
+    {
+        ifs >> tb_name;
+    }
 }
 
 CatalogManager::~CatalogManager()
+{
+
+}
+
+void CatalogManager::Flush() const
 {
 
 }

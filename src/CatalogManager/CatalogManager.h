@@ -20,6 +20,8 @@ public:
 
     ~CatalogManager();
 
+    void Flush() const;
+
 private:
     std::list<Table> tables;
 
