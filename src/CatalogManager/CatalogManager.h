@@ -133,7 +133,7 @@ typedef struct struct_attr
 	string attr_name;				//字符串类型 属性的名称
 	int type;						//类型
 	int length;                    //属性长度
-	int offset;                    //在table里面的偏移量
+	int blockID;                    //在table里面的偏移量
 	bool if_primary_key;			//是否是主键
 	bool if_unique;                //是否唯一
 	AttrPointer Next;            //指向下一个属性
@@ -188,7 +188,7 @@ public:
 	void insert_attrs_after_creat_table(string attr_name,            //字符串类型 属性的名称
 		int type,                    //类型
 		int length,                    //属性长度
-		int offset,                    //在table里面的偏移量
+		int blockID,                    //在table里面的偏移量
 		bool if_primary_key,        //是否是主键
 		bool if_unique);                //是否唯一)
 
