@@ -51,17 +51,13 @@ Block &BufferManager::getLRU() {
 
 // remove the buffer node with file instance
 void BufferManager::removeFile(string filename) {
-    const char *temp = filename.c_str();
-    for (int i = 0; i < MaxBlocks; i++) {
-        if (blockBuffer[i].filename == filename) {
-            blockBuffer[i].filename = nullptr;
-            blockBuffer[i].dirty = false;
-            blockBuffer[i].busy = false;
+    for (auto &block : blockBuffer) {
+        if (block.filename == filename) {
+            block.reset();
         }
     }
-    if (remove(temp)) {
-        printf("Could not delete the file &s /n", temp);
-        exit(0);
+    if (remove(filename.c_str())) {
+        cerr << "Fail to remove file: " << filename << endl;
     }
 }
 
@@ -98,7 +94,7 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     fstream fp;
     fp.open(filename, ios::in | ios::out | ios::ate | ios::binary);
     if (!fp.good())
-        cerr << filename << "file open err" << endl;
+        cerr << "Fail to open file: " << filename << "." << endl;
     fp.seekg(0, ios_base::end);
     int blockOffset = fp.tellg() / BlockSize;
     cout << "Detected blockOffset: " << blockOffset << endl;
