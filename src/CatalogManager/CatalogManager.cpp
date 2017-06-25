@@ -1,6 +1,8 @@
+#include <vector>
 #include <string>
 #include <list>
 #include <fstream>
+#include <algorithm>
 
 #include "CatalogManager.h"
 
@@ -26,7 +28,53 @@ CatalogManager::~CatalogManager()
 
 void CatalogManager::Flush() const
 {
-
+    std::ofstream ofs(meta_file_name);
+    for (const auto &tb: tables)
+    {
+        ofs << tb.Name << std::endl;
+        std::ofstream otbfs(tb.Name + ".catalog");
+        uint16_t i{0};
+        for (const auto &attr_name: tb.attrNames)
+        {
+            otbfs << attr_name << std::endl;
+            const auto &attr = tb.attrType[i];
+            switch (attr.type)
+            {
+                case SqlValueTypeBase::Integer:
+                    otbfs << "int" << std::endl;
+                    break;
+                case SqlValueTypeBase::Float:
+                    otbfs << "float" << std::endl;
+                    break;
+                case SqlValueTypeBase::String:
+                    otbfs << "char" << std::endl;
+                    break;
+            }
+            if (attr.type == SqlValueTypeBase::String)
+            {
+                otbfs << attr.charSize << std::endl;
+            } else
+            {
+                otbfs << 0 << std::endl;
+            }
+            otbfs << (attr.primary ? 1 : 0) << std::endl;
+            otbfs << (attr.unique ? 1 : 0) << std::endl;
+            auto ind = std::find_if(tb.index.begin(), tb.index.end(),
+                                    [&attr_name](const std::pair<std::string, std::string> &p)
+                                    {
+                                        return p.first == attr_name;
+                                    });
+            if (ind != tb.index.end())
+            {
+                otbfs << 1 << std::endl << ind->second << std::endl;
+            } else
+            {
+                otbfs << 0 << std::endl << "-" << std::endl;
+            }
+            otbfs << std::endl;
+            ++i;
+        }
+    }
 }
 
 void CatalogManager::LoadFromFile()
