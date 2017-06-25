@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
+#include <map>
+#include <utility>
 #include "../../include/DataStructure.h"
 
 using namespace std;
@@ -16,7 +18,7 @@ struct Block {
     unsigned int blockID; // block offset
     bool dirty; // whether need to write to disk
     bool busy; // whether is free or not
-    int LRU_count;
+    int LRUCount;
     char *address; // ? what is the use
     char content[BlockSize];
 
@@ -28,16 +30,16 @@ struct Block {
         address = content;
     }
 
-    void mark(string filename, unsigned int blockID, int ID) {
+    void mark(string filename, unsigned int blockID) {
         this->filename = filename;
         this->blockID = blockID;
-        this->id = ID;
     }
 
     Block &flush() {
         fstream fp;
-        fp.open(filename, ios::in | ios::out | ios::app | ios::binary);
-        fp.seekg(ios::beg + blockID * BlockSize);
+        fp.open(filename, ios::in | ios::out | ios::ate | ios::binary);
+        fp.seekg(blockID * BlockSize, ios::beg);
+        cout << "Flushing: " << content << endl;
         fp.write(content, BlockSize);
         fp.close();
         return *this;
@@ -53,11 +55,11 @@ public:
 
     unsigned int getBlockTail(string filename);
 
-    void setDirty(unsigned int offset); // fixme parameter is wrong!!
+    void setDirty(const string &filename, unsigned int blockID); // fixme parameter is wrong!!
 
     char *getBlock(string filename, unsigned int offset, bool allocate = false);
 
-    void flush_all_blocks(); // write all content in block to disk
+    void flushAllBlocks(); // write all content in block to disk
 
     void createFile(string);
 
@@ -67,17 +69,18 @@ public:
 
     void setFree(int id);
 
-    void mark_block(int ind, string filename, unsigned int offset);
-
 private:
+
+    typedef map<pair<string, unsigned int>, Block&> TypeBlockMap;
+
+    TypeBlockMap blockMap;
+
     std::vector<Block> blockBuffer;
 
     void setBusy(int id); // mark as using
 
     // find block id which is available
-    int getFreeBlockId();
-
-    int get_LRU();
+    Block& getFreeBlock();
 
     int maxLRU;
 };

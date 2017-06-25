@@ -120,7 +120,7 @@ bool RecordManager::insertRecord(const Table &table, const Tuple &record) {
         }
     }
     block[0] = Used;
-    bm->setDirty(blockID);
+    bm->setDirty(tableName, blockID);
     return true;
 }
 
@@ -220,7 +220,7 @@ bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
                 }
             }
         }
-        bm->setDirty(blockOffset);
+        bm->setDirty(tableFile(table.Name), blockOffset);
         blockOffset++;
         block = bm->getBlock(tableFile(table.Name), blockOffset);
     }
