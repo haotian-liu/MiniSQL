@@ -46,7 +46,8 @@ namespace Api
 
         if (cm->TableExist(table_name))
         {
-            std::cout << "Table exist" << std::endl;
+            std::cout << "Table already exists!" << std::endl;
+            return false;
         }
 
         auto num_of_attr = schema_list.size();
