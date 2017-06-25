@@ -39,7 +39,7 @@ namespace Api
                       const std::string &primary_key_name = ""
     );
 
-    bool create_index(const std::string &table_name, const std::string &attribute_name);
+    bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name);
 
     bool drop_table(const std::string &table_name);
 

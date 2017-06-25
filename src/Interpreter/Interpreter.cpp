@@ -189,7 +189,7 @@ void dispatch()
     if (create_index_query)
     {
         auto r = Api::create_index(Api::get_db_name_prefix() + create_index_query->table_name,
-                                   create_index_query->attr_name);
+                                   create_index_query->attr_name, create_index_query->index_name);
 
         delete create_index_query;
         query = nullptr;

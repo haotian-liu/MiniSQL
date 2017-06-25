@@ -79,7 +79,7 @@ namespace Api
         }
 
         std::cout << "Insert finished. 1 row affected." << std::endl;
-        return 0;
+        return 1;
     }
 
     bool create_table(const std::string &table_name,
@@ -136,11 +136,19 @@ namespace Api
         return rm->createTable(table_name);
     }
 
-    bool create_index(const std::string &table_name, const std::string &attribute_name)
+    bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
-        //fixme!!! fix implementation
-        //return rm->createIndex(table_name, attribute_name);
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+
+        if (!cm->TableExist(table_name))
+        {
+            std::cout << "Table not found!" << std::endl;
+            return false;
+        }
+        auto &tb = cm->GetTable(table_name);
     }
 
     bool drop_table(const std::string &table_name)

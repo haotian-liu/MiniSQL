@@ -175,3 +175,15 @@ Table &CatalogManager::GetTable(const std::string &table_name)
     });
 }
 
+bool CatalogManager::CheckIndexNameExists(const std::string &index_name) const
+{
+    for (const auto &t: tables)
+    {
+        for (auto &i: t.index)
+        {
+            if (i.second == index_name) return true;
+        }
+    }
+    return false;
+}
+

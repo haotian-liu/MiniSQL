@@ -20,6 +20,8 @@ public:
 
     Table &GetTable(const std::string &table_name);
 
+    bool CheckIndexNameExists(const std::string &index_name) const;
+
     CatalogManager();
 
     ~CatalogManager();
