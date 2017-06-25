@@ -17,13 +17,8 @@ unsigned int BufferManager::getBlockTail(string filename) {
     return 0;
 }
 
-void BufferManager::setDirty(const string &filename, unsigned int offset) {
-    auto parent = blockMap.find(make_pair(filename, offset));
-    if (parent == blockMap.end()) {
-        cerr << "Element not found!";
-        return;
-    }
-    Block &block = parent->second;
+void BufferManager::setDirty(const string &filename, unsigned int blockID) {
+    Block &block = findBlockPair(filename, blockID);
     block.dirty = true;
 }
 
@@ -102,7 +97,7 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     fp.seekg(0, ios_base::end);
     int blockOffset = fp.tellg() / BlockSize;
     cout << "Detected blockOffset: " << blockOffset << endl;
-    if (blockOffset < offset) {
+    if (offset >= blockOffset) {
         if (!allocate) { return nullptr; }
         if (blockOffset != offset) {
             cerr << "Requesting way beyond the tail!" << endl;
@@ -122,10 +117,18 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     return block.content;
 }
 
-void BufferManager::setFree(int id) {
-    Block &block = blockBuffer[id];
+void BufferManager::setFree(string filename, unsigned int blockID) {
+    Block &block = findBlockPair(filename, blockID);
     block.busy = false;
     blockMap.erase(make_pair(block.filename, block.blockID));
+}
+
+Block &BufferManager::findBlockPair(string filename, unsigned int blockID) const {
+    auto parent = blockMap.find(make_pair(filename, blockID));
+    if (parent == blockMap.end()) {
+        cerr << "Element not found!";
+    }
+    return parent->second;
 }
 
 void BufferManager::flushAllBlocks() {

@@ -57,7 +57,7 @@ public:
 
     void setDirty(const string &filename, unsigned int blockID); // fixme parameter is wrong!!
 
-    char *getBlock(string filename, unsigned int offset, bool allocate = false);
+    char *getBlock(string filename, unsigned int blockID, bool allocate = false);
 
     void flushAllBlocks(); // write all content in block to disk
 
@@ -67,10 +67,9 @@ public:
 
     void removeFile(string filename);
 
-    void setFree(int id);
+    void setFree(string filename, unsigned int blockID);
 
 private:
-
     typedef map<pair<string, unsigned int>, Block&> TypeBlockMap;
 
     TypeBlockMap blockMap;
@@ -81,6 +80,8 @@ private:
 
     // find block id which is available
     Block& getFreeBlock();
+
+    Block& findBlockPair(string filename, unsigned int blockID) const;
 
     int maxLRU;
 };
