@@ -43,6 +43,13 @@ namespace Api
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
         auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (cm->TableExist(table_name))
+        {
+            std::cout << "Table already exists!" << std::endl;
+            return false;
+        }
+
         auto num_of_attr = schema_list.size();
 
         for (auto &it: schema_list)
@@ -51,6 +58,7 @@ namespace Api
             {
                 if (it.second.charSize < 1 || it.second.charSize > 255)
                 {
+                    std::cout << "Char count out of range" << std::endl;
                     return false;
                 }
             }
@@ -73,6 +81,9 @@ namespace Api
                 std::cout << "Primary key not found!" << std::endl;
                 return false;
             }
+
+            cm->CreateTable(table_name, schema_list, primary_key_name);
+            cm->Flush();
         }
 
 
@@ -92,10 +103,11 @@ namespace Api
         return rm->dropTable(table_name);
     }
 
-    bool drop_index(const std::string &table_name, const std::string &attribute_name)
+    bool drop_index(const std::string &index_name)
     {
+        std::string table_name;
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
-        return rm->dropIndex(table_name, attribute_name);
+        return rm->dropIndex(table_name, index_name);
     }
 
     size_t select(const std::string &table_name, const std::vector<Condition> &condition_list)
