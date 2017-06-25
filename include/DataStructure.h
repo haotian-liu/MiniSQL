@@ -34,8 +34,12 @@ namespace MINISQL_BASE {
     const char Used = 1;
 
     inline std::string dbFile(const std::string &db) { return db + ".db"; }
+
     inline std::string tableFile(const std::string &table) { return table + ".tb"; }
-    inline std::string indexFile(const std::string &table, const std::string &index) { return table + "_" + index + ".ind"; }
+
+    inline std::string indexFile(const std::string &table, const std::string &index) {
+        return table + "_" + index + ".ind";
+    }
 
     enum class SqlValueTypeBase {
         Integer,
@@ -97,7 +101,7 @@ namespace MINISQL_BASE {
             }
         }
 
-        bool operator<(const SqlValue& e) const {
+        bool operator<(const SqlValue &e) const {
             switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i < e.i;
@@ -110,7 +114,7 @@ namespace MINISQL_BASE {
             }
         }
 
-        bool operator==(const SqlValue& e) const {
+        bool operator==(const SqlValue &e) const {
             switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i == e.i;
@@ -124,7 +128,9 @@ namespace MINISQL_BASE {
         }
 
         bool operator>(const SqlValue &e) const { return !operator<(e); }
+
         bool operator<=(const SqlValue &e) const { return operator<(e) && operator==(e); }
+
         bool operator>=(const SqlValue &e) const { return !operator<(e) && operator<(e); }
 
         void reset() {
@@ -164,7 +170,7 @@ namespace MINISQL_BASE {
             row.col.reserve(attrFetch.size());
             for (auto fetch : attrFetch) {
                 attrFound = false;
-                for (int i=0; i<attrTable.size(); i++) {
+                for (int i = 0; i < attrTable.size(); i++) {
                     if (fetch == attrTable[i]) {
                         row.col.push_back(element[i].toStr());
                         attrFound = true;
@@ -179,7 +185,7 @@ namespace MINISQL_BASE {
         }
 
         const Element &fetchElement(const std::vector<std::string> &attrTable, const std::string &attrFetch) const {
-            for (int i=0; i<attrTable.size(); i++) {
+            for (int i = 0; i < attrTable.size(); i++) {
                 if (attrFetch == attrTable[i]) {
                     return element[i];
                 }
@@ -190,7 +196,10 @@ namespace MINISQL_BASE {
 
     struct Table {
         Table() {};
-        Table(const Table& T) : DbName(T.DbName), Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength), recordCnt(T.recordCnt), size(T.size), attrType(T.attrType), attrNames(T.attrNames), indexNames(T.indexNames) {};
+
+        Table(const Table &T) : DbName(T.DbName), Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength),
+                                recordCnt(T.recordCnt), size(T.size), attrType(T.attrType), attrNames(T.attrNames),
+                                indexNames(T.indexNames) {};
 
         std::string DbName, Name;
         int attrCnt, recordLength, recordCnt, size;
@@ -201,7 +210,9 @@ namespace MINISQL_BASE {
 
     struct Cond {
         Cond() = default;
+
         Cond(const std::string &attr, const Element &value, int cond) : attr(attr), value(value), cond(cond) {}
+
         int cond;
         std::string attr;
         Element value;
@@ -228,7 +239,7 @@ namespace MINISQL_BASE {
         int condPos;
         for (Cond cond : conds) {
             condPos = -1;
-            for (int i=0; i<attr.size(); i++) {
+            for (int i = 0; i < attr.size(); i++) {
                 if (attr[i] == cond.attr) {
                     condPos = i;
                     break;
@@ -244,11 +255,12 @@ namespace MINISQL_BASE {
         return true;
     }
 
-    inline void convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup) {
+    inline void
+    convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
         tup.element.clear();
-        for (int i=0; i<attrType.size(); i++) {
+        for (int i = 0; i < attrType.size(); i++) {
             e.reset();
             e.type = attrType[i];
             switch (attrType[i].M()) {
