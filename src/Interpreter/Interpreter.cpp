@@ -95,6 +95,10 @@ void do_parse()
     if (isExit)
     {
         std::cout << "Bye!\n";
+        auto cm = Api::ApiHelper::getApiHelper()->getCatalogManager();
+        auto bm = Api::ApiHelper::getApiHelper()->getBufferManager();
+        cm->Flush();
+        bm->flushAllBlocks();
         exit(0);
     }
     if (query == nullptr)
