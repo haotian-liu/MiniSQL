@@ -23,6 +23,7 @@ set(SOURCE_FILES main.cpp
         src/BufferManager/BufferManager.cpp
         include/DataStructure.h
         src/API/ApiHelper.cpp
+        src/CatalogManager/CatalogManager.cpp
         )
 
 add_executable(MiniSQL ${SOURCE_FILES})

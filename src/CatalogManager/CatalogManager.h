@@ -8,18 +8,22 @@
 using namespace MINISQL_BASE;
 using namespace std;
 
-class CatalogManager
+class CatalogManager final
 {
 public:
-    void create_new_table(const std::string &table_name,
-                          int num_of_attrs,
-                          std::pair<std::string, SqlValueType> primary_key
+    void CreateTable(const std::string &table_name,
+                     int num_of_attrs,
+                     std::pair<std::string, SqlValueType> primary_key
     );
 
-    CatalogManager() = default;
+    CatalogManager();
 
-    ~CatalogManager() = default;
+    ~CatalogManager();
 
+private:
+    std::list<Table> tables;
+
+    static constexpr auto meta_file_name = "tables.meta";
 };
 
 #endif
