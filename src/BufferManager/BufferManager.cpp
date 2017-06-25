@@ -69,7 +69,7 @@ void BufferManager::createFile(string in) {
 }
 
 // Find clean blocks, if failed use LRU replacement
-Block& BufferManager::getFreeBlock() {
+Block &BufferManager::getFreeBlock() {
     Block bb;
     for (auto &block : blockBuffer) {
         if (!block.dirty && !block.busy) {

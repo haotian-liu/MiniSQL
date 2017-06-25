@@ -70,7 +70,7 @@ public:
     void setFree(string filename, unsigned int blockID);
 
 private:
-    typedef map<pair<string, unsigned int>, Block&> TypeBlockMap;
+    typedef map<pair<string, unsigned int>, Block &> TypeBlockMap;
 
     TypeBlockMap blockMap;
 
@@ -79,9 +79,9 @@ private:
     void setBusy(int id); // mark as using
 
     // find block id which is available
-    Block& getFreeBlock();
+    Block &getFreeBlock();
 
-    Block& findBlockPair(string filename, unsigned int blockID) const;
+    Block &findBlockPair(string filename, unsigned int blockID) const;
 
     int maxLRU;
 };

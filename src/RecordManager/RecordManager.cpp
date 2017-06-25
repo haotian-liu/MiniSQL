@@ -42,7 +42,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     }
 
     while (block) {
-        for (int i=0; i<recordsPerBlock; i++) {
+        for (int i = 0; i < recordsPerBlock; i++) {
             if (block[i * length] != Used) { continue; }
             dest = block + i * length + offset;
             switch (attr.M()) {
@@ -140,7 +140,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     Result res;
 
     while (block) {
-        for (int i=0; i<blocks; i++) {
+        for (int i = 0; i < blocks; i++) {
             if (block[i * length] != Used) { continue; }
             convertToTuple(block, i * length, table.attrType, tup);
             if (condsTest(cond, tup, table.attrNames)) {
@@ -155,7 +155,8 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     dumpResult(res);
 }
 
-bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint) {
+bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
+                                 const IndexHint &indexHint) {
     string tableFileName = tableFile(table.Name);
     unsigned int recordPos;
     if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
@@ -212,7 +213,7 @@ bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
     Tuple tup;
 
     while (block) {
-        for (int i=0; i<blocks; i++) {
+        for (int i = 0; i < blocks; i++) {
             if (block[i * length] != Used) { continue; }
             convertToTuple(block, i * length, table.attrType, tup);
             if (condsTest(cond, tup, table.attrNames)) {
