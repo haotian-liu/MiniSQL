@@ -29,6 +29,7 @@
 
 namespace MINISQL_BASE {
     const int BlockSize = 4096;
+    const int MaxBlocks = 128;
     const char UnUsed = 0;
     const char Used = 1;
 

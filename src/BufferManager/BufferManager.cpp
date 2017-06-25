@@ -7,41 +7,29 @@ using namespace std;
 
 void BufferManager::clear_block(int i)
 {
-    ptr_buffer[i].filename = "";
-    memset(ptr_buffer[i].content, 0, FILE_BLOCK_SIZE);
-    ptr_buffer[i].is_written = false;
-    ptr_buffer[i].being_used = false;
-    ptr_buffer[i].offset = 0;
-    ptr_buffer[i].ID = i;
-    ptr_buffer[i].LRU_count = 0;
-    ptr_buffer[i].block_address = reinterpret_cast<char *>(static_cast<void *>(&ptr_buffer[i].content));
-    //cout << "&ptr_buffer[" << i << "].content:" << &ptr_buffer[i].content << endl;
-    //const char* tmp = static_cast<const char *>(ptr_buffer[i].content);
-    //printf(" ptr_buffer[i].block_address : %s\n", ptr_buffer[i].block_address);
-    //cout << "static_cast:" << ptr_buffer[i].block_address <<endl;
-}
-int BufferManager::get_block_for_insert(bool choose)
-{
-    int ind;
-    if (choose)
-    {
-        ind = get_blank_block_ind();
-        ptr_for_insert = &(ptr_buffer[ind]);
-    }
-    mark_is_written(ind);
-    return ptr_for_insert->ID;
-    //return (char*)(block_for_insert);
+    blockBuffer[i].filename = "";
+    memset(blockBuffer[i].content, 0, BlockSize);
+    blockBuffer[i].is_written = false;
+    blockBuffer[i].being_used = false;
+    blockBuffer[i].offset = 0;
+    blockBuffer[i].ID = i;
+    blockBuffer[i].LRU_count = 0;
+    blockBuffer[i].block_address = reinterpret_cast<char *>(static_cast<void *>(&blockBuffer[i].content));
+    //cout << "&blockBuffer[" << i << "].content:" << &blockBuffer[i].content << endl;
+    //const char* tmp = static_cast<const char *>(blockBuffer[i].content);
+    //printf(" blockBuffer[i].block_address : %s\n", blockBuffer[i].block_address);
+    //cout << "static_cast:" << blockBuffer[i].block_address <<endl;
 }
 
 char* BufferManager::get_specified_block(string filename, int offset)
 {
     unsigned int number, i, mark,count=0;
-    for (int i = 0;i < MAX_BLOCKS; i++)
+    for (int i = 0;i < MaxBlocks; i++)
     {
-        if (ptr_buffer[i].filename == filename && ptr_buffer[i].offset == offset)//如果此块在buffer中 直接返回
+        if (blockBuffer[i].filename == filename && blockBuffer[i].offset == offset)//如果此块在buffer中 直接返回
         {
             using_block(i);
-            return (char*)&(ptr_buffer[i]);
+            return (char*)&(blockBuffer[i]);
         }
     }
     //如果该块不在buffer中 则从文件中读取
@@ -55,24 +43,24 @@ char* BufferManager::get_specified_block(string filename, int offset)
         cerr << filename << "file open err" << endl;
         exit(0);
     }
-    fp.seekg(ios::beg + offset*FILE_BLOCK_SIZE);
-    fp.read(ptr_buffer[i].block_address, FILE_BLOCK_SIZE);
+    fp.seekg(ios::beg + offset*BlockSize);
+    fp.read(blockBuffer[i].block_address, BlockSize);
     fp.close();
     using_block(i);
-    return (char*)&(ptr_buffer[i]);
+    return (char*)&(blockBuffer[i]);
 }
 
-void BufferManager::removeFile(string filename_in)	//删除整个文件 buffer和file一起
+void BufferManager::removeFile(string filename_in)  //删除整个文件 buffer和file一起
 {
     const char * temp = filename_in.c_str();
-    for (int i = 0; i<MAX_BLOCKS; i++)
+    for (int i = 0; i<MaxBlocks; i++)
     {
-        if (ptr_buffer[i].filename == filename_in)
+        if (blockBuffer[i].filename == filename_in)
         {
             int total_size = CatalogManager::get_total_size_of_attr(filename_in);
-            ptr_buffer[i].filename = nullptr;
-            ptr_buffer[i].is_written = false;
-            ptr_buffer[i].being_used = false;
+            blockBuffer[i].filename = nullptr;
+            blockBuffer[i].is_written = false;
+            blockBuffer[i].being_used = false;
         }
     }
     if (remove(temp))
@@ -93,9 +81,8 @@ void BufferManager::create_table(string in)
 
 void BufferManager::initialize_blocks()
 {
-    for (int i = 0; i<MAX_BLOCKS; i++)
+    for (int i = 0; i<MaxBlocks; i++)
         clear_block(i);
-    ptr_for_insert = &(ptr_buffer[MAX_BLOCKS - 1]);
 }
 
 
@@ -105,17 +92,17 @@ unsigned int BufferManager::get_blank_block_ind()
 {
     int i,res;
     char * p;
-    for (i = 0; i < MAX_BLOCKS; i++)
+    for (i = 0; i < MaxBlocks; i++)
     {
-        if (ptr_buffer[i].filename!="")
+        if (blockBuffer[i].filename!="")
             break;
     }
-    if (i < MAX_BLOCKS)	//如果找到空块
+    if (i < MaxBlocks) //如果找到空块
     {
         res = i;
     }
 
-    else if (i >= MAX_BLOCKS)
+    else if (i >= MaxBlocks)
     {
         res = get_LRU();
         flush_one_block(res);
@@ -131,24 +118,24 @@ char * BufferManager::get_blank_block_addr()
 {
     int i, res;
     char * p;
-    for (i = 0; i < MAX_BLOCKS; i++)
+    for (i = 0; i < MaxBlocks; i++)
     {
-        if (ptr_buffer[i].filename != "")
+        if (blockBuffer[i].filename != "")
             break;
     }
-    if (i < MAX_BLOCKS)	//如果找到空块
+    if (i < MaxBlocks) //如果找到空块
     {
         res = i;
     }
 
-    else if (i >= MAX_BLOCKS)
+    else if (i >= MaxBlocks)
     {
         res = get_LRU();
         flush_one_block(res);
     }
     using_block(res);
     mark_being_used(res);
-    return (char*)&(ptr_buffer[res]);
+    return (char*)&(blockBuffer[res]);
 }
 //提供给index和record manager来获取 修改 增加块
 
@@ -157,13 +144,13 @@ char * BufferManager::get_block(string filename, unsigned int offset, bool alloc
     unsigned int number,i,mark;
     //int total_size = CatalogManager::get_total_size_of_attr(filename);
     //int ID = total_size / BLOCK_SIZE;
-    for(int i=0;i<MAX_BLOCKS;i++)
+    for(int i=0;i<MaxBlocks;i++)
     {
-        if(ptr_buffer[i].filename==filename &&
-           ptr_buffer[i].offset == offset)
+        if(blockBuffer[i].filename==filename &&
+           blockBuffer[i].offset == offset)
         {
             using_block(i);
-            return (char*)(&ptr_buffer[i]);
+            return (char*)(&blockBuffer[i]);
         }
     }
     //如果该块不在buffer中 则从文件中读取
@@ -174,54 +161,54 @@ char * BufferManager::get_block(string filename, unsigned int offset, bool alloc
     fp.open(filename, ios::in | ios::out | ios::app | ios::binary);
     if (!fp.good())
         cerr << filename<<"file open err" << endl;
-    fp.seekg(ios::beg + offset*FILE_BLOCK_SIZE);
-    fp.read((char*)(ptr_buffer[i].content), FILE_BLOCK_SIZE);
+    fp.seekg(ios::beg + offset*BlockSize);
+    fp.read((char*)(blockBuffer[i].content), BlockSize);
     fp.close();
     using_block(i);
-    return (char*)(&ptr_buffer[i]);
+    return (char*)(&blockBuffer[i]);
 }
 
 void BufferManager::mark_block(int ind,string filename_in, unsigned int offset)
 {
-    ptr_buffer[ind].filename = filename_in;
-    ptr_buffer[ind].offset = offset;
+    blockBuffer[ind].filename = filename_in;
+    blockBuffer[ind].offset = offset;
 }
 
 void BufferManager::mark_is_written(int ind)
 {
-    ptr_buffer[ind].is_written = true;
+    blockBuffer[ind].is_written = true;
 }
 
 void BufferManager::mark_being_used(int ind)
 {
-    ptr_buffer[ind].being_used = true;
+    blockBuffer[ind].being_used = true;
 }
 
 void BufferManager::end_being_used(int ind)
 {
-    ptr_buffer[ind].being_used = false;
+    blockBuffer[ind].being_used = false;
 }
 
 void BufferManager::using_block(int n)
 {
-    ptr_buffer[n].being_used = true;
-    for(int i=0;i<MAX_BLOCKS;i++)
+    blockBuffer[n].being_used = true;
+    for(int i=0;i<MaxBlocks;i++)
     {
-        if(i!=n && !(ptr_buffer[i].being_used))		//不在被使用的块 count++
-            ptr_buffer[i].LRU_count ++;
+        if(i!=n && !(blockBuffer[i].being_used))     //不在被使用的块 count++
+            blockBuffer[i].LRU_count ++;
         else if(i==n)
-            ptr_buffer[i].LRU_count = 0;
+            blockBuffer[i].LRU_count = 0;
     }
 }
 
 int BufferManager::get_LRU()
 {
     int max = -1,num=-1;
-    for(int i=0;i<MAX_BLOCKS;i++)
+    for(int i=0;i<MaxBlocks;i++)
     {
-        if(ptr_buffer[i].LRU_count > max)
+        if(blockBuffer[i].LRU_count > max)
         {
-            max = ptr_buffer[i].LRU_count;
+            max = blockBuffer[i].LRU_count;
             num = i;
         }
     }
@@ -232,15 +219,15 @@ void BufferManager::flush_one_block(int ind)
 {
     //cout << "flush one block" << endl;
     //cout << "ID:"<< ind << endl;
-    //cout << "block_address" << ptr_buffer[ind].block_address << endl;
-    //cout << "LRU:" << ptr_buffer[ind].LRU_count << endl;
-    char* tmp = ptr_buffer[ind].block_address + BLOCK_HEADER_SIZE;
+    //cout << "block_address" << blockBuffer[ind].block_address << endl;
+    //cout << "LRU:" << blockBuffer[ind].LRU_count << endl;
+    char* tmp = blockBuffer[ind].block_address;
     fstream fp;
-    fp.open(ptr_buffer[ind].filename, ios::in | ios::out | ios::app | ios::binary);
+    fp.open(blockBuffer[ind].filename, ios::in | ios::out | ios::app | ios::binary);
     //if (!fp.good())
-    //	cerr << ptr_buffer[ind].filename << " open err" << endl;
-    fp.seekg(ios::beg +(ptr_buffer[ind].offset)*FILE_BLOCK_SIZE);
-    fp.write(tmp, FILE_BLOCK_SIZE);
+    //  cerr << blockBuffer[ind].filename << " open err" << endl;
+    fp.seekg(ios::beg +(blockBuffer[ind].offset)*BlockSize);
+    fp.write(tmp, BlockSize);
     fp.close();
     //}
     /*else if (is_written && index_table == MINISQL_BLOCK_TABLE)
@@ -259,12 +246,12 @@ void BufferManager::flush_one_block(int ind)
 
 void BufferManager::flush_all_blocks()
 {
-    for(int i=0;i<MAX_BLOCKS;i++)
+    for(int i=0;i<MaxBlocks;i++)
     {
         flush_one_block(i);
-        if(ptr_buffer[i].block_address != "\0")
-            ptr_buffer[i].block_address = nullptr;
-        if(ptr_buffer[i].filename != "\0")
-            ptr_buffer[i].filename = nullptr;
+        if(blockBuffer[i].block_address != "\0")
+            blockBuffer[i].block_address = nullptr;
+        if(blockBuffer[i].filename != "\0")
+            blockBuffer[i].filename = nullptr;
     }
 }
