@@ -70,7 +70,6 @@ void BufferManager::createFile(string in) {
 
 // Find clean blocks, if failed use LRU replacement
 Block &BufferManager::getFreeBlock() {
-    Block bb;
     for (auto &block : blockBuffer) {
         if (!block.dirty && !block.busy) {
             block.reset();
@@ -79,7 +78,7 @@ Block &BufferManager::getFreeBlock() {
         }
     }
 
-    bb = getLRU();
+    Block &bb = getLRU();
     bb.flush().reset();
     setBusy(bb.id);
 
