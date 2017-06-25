@@ -27,6 +27,9 @@
 #define MINISQL_COND_LESS 4
 #define MINISQL_COND_MORE 5
 
+#define INT_LENGTH 4
+#define FLOAT_LENGTH 4
+
 namespace MINISQL_BASE {
     const int BlockSize = 4096;
     const char UnUsed = 0;
@@ -45,6 +48,9 @@ namespace MINISQL_BASE {
     struct SqlValueType {
         SqlValueTypeBase type;
         int charSize; // charSize does not include the terminating zero of string!
+
+        ///following fileds only for attribute type, not a single sql value type.
+        bool primary = false;
         bool unique = false;
 
         inline int M() const {
@@ -194,6 +200,8 @@ namespace MINISQL_BASE {
         int attrCnt, recordLength, recordCnt, size;
         std::vector<SqlValueType> attrType;
         std::vector<std::string> attrNames;
+        /// for index, first stands for attr name, second stands for index name.
+        std::vector<std::pair<std::string, std::string>> index;
     };
 
     struct Cond {

@@ -22,10 +22,23 @@ public:
 
     void Flush() const;
 
+    bool isValid() const
+    { return validFlag; }
+
+private:
+    void LoadFromFile();
+
+    bool valid_assert(bool cond)
+    {
+        return cond ? cond : (validFlag = cond);
+    }
+
 private:
     std::list<Table> tables;
 
     static constexpr auto meta_file_name = "tables.meta";
+
+    bool validFlag = true;
 };
 
 #endif
