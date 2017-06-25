@@ -198,10 +198,19 @@ namespace MINISQL_BASE {
 
         std::string Name;
         int attrCnt, recordLength, recordCnt, size;
+
         std::vector<SqlValueType> attrType;
         std::vector<std::string> attrNames;
         /// for index, first stands for attr name, second stands for index name.
         std::vector<std::pair<std::string, std::string>> index;
+
+        friend std::ostream &operator<<(std::ostream &os, const Table &table)
+        {
+            os << "Name: " << table.Name << " attrCnt: " << table.attrCnt << " recordLength: " << table.recordLength
+               << " recordCnt: " << table.recordCnt << " size: " << table.size
+               << " attrNames: " << table.attrNames.size();
+            return os;
+        }
     };
 
     struct Cond {

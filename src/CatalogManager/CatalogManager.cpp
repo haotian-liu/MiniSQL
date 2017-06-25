@@ -35,6 +35,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 }
 
 CatalogManager::CatalogManager()
+        : tables(std::list<Table>())
 {
     LoadFromFile();
 }
@@ -52,6 +53,7 @@ void CatalogManager::Flush() const
         ofs << tb.Name << std::endl;
         std::ofstream otbfs(tb.Name + ".catalog");
         uint16_t i{0};
+
         for (const auto &attr_name: tb.attrNames)
         {
             otbfs << attr_name << std::endl;
@@ -92,14 +94,22 @@ void CatalogManager::Flush() const
             otbfs << std::endl;
             ++i;
         }
+        otbfs.close();
     }
+    ofs.close();
 }
 
 void CatalogManager::LoadFromFile()
 {
     std::ifstream ifs(meta_file_name);
+    if (!ifs.is_open())
+    {
+        std::ofstream touch(meta_file_name);
+        return;
+    }
+
     std::string tb_name;
-    while (!ifs.eof())
+    while (ifs.peek() != EOF)
     {
         ifs >> tb_name;
         auto file_name = tb_name + ".catalog";
@@ -143,8 +153,16 @@ void CatalogManager::LoadFromFile()
                 auto ind = std::make_pair(attr_name, index_name);
                 tb.index.push_back(ind);
             }
-        } while (!itbfs.eof());
+        } while (itbfs.peek() != EOF);
         tb.attrCnt = attr_cnts;
         tables.push_back(tb);
     }
+}
+
+bool CatalogManager::TableExist(const std::string &table_name) const
+{
+    return std::find_if(tables.begin(), tables.end(), [&table_name](const Table &tb)
+    {
+        return (tb.Name == table_name);
+    }) != tables.end();
 }

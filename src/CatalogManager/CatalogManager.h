@@ -16,6 +16,8 @@ public:
                      const std::string &primary_key_name
     );
 
+    bool TableExist(const std::string &table_name) const;
+
     CatalogManager();
 
     ~CatalogManager();

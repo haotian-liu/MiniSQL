@@ -43,6 +43,12 @@ namespace Api
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
         auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (cm->TableExist(table_name))
+        {
+            std::cout << "Table exist" << std::endl;
+        }
+
         auto num_of_attr = schema_list.size();
 
         for (auto &it: schema_list)
@@ -51,6 +57,7 @@ namespace Api
             {
                 if (it.second.charSize < 1 || it.second.charSize > 255)
                 {
+                    std::cout << "Char count out of range" << std::endl;
                     return false;
                 }
             }
@@ -73,6 +80,9 @@ namespace Api
                 std::cout << "Primary key not found!" << std::endl;
                 return false;
             }
+
+            cm->CreateTable(table_name, schema_list, primary_key_name);
+            cm->Flush();
         }
 
 

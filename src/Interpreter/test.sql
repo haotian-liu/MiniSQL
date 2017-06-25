@@ -19,3 +19,5 @@ drop table afaf;
 drop index sdfsdf(dfsd);
 
 execfile "~/n.sql";
+
+create table t1(a int, b char(20), primary key(a));
