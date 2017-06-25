@@ -20,9 +20,9 @@ public:
     ~IndexManager();
     bool create(const string &filename, const SqlValueType &type);
     bool drop(const string &filename, const SqlValueType &type);
-    int search(const string &filename, const Element &e);
-    int searchHead(const string &filename, int attrType);
-    int searchNext(const string &filename, int attrType);
+    unsigned int search(const string &filename, const Element &e);
+    unsigned int searchHead(const string &filename, int attrType);
+    unsigned int searchNext(const string &filename, int attrType);
     bool finishSearch(const string &filename, int attrType);
     bool insert(const string &filename, const Element &e, int offset);
     bool removeKey(const string &filename, const Element &e);

@@ -27,7 +27,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     unsigned int blockID = 0;
     char *block = bm->getBlock(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
-    int blocks = BlockSize / length;
+    int recordsPerBlock = BlockSize / length;
     int offset = 1;
     Tuple tup;
     Element attr;
@@ -42,7 +42,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     }
 
     while (block) {
-        for (int i=0; i<blocks; i++) {
+        for (int i=0; i<recordsPerBlock; i++) {
             if (block[i * length] != Used) { continue; }
             dest = block + i * length + offset;
             switch (attr.M()) {
@@ -58,7 +58,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
                 default:
                     cerr << "Undefined type in RM::createIndex." << endl;
             }
-            im->insert(indexFileStr, attr, blockID * blocks + i);
+            im->insert(indexFileStr, attr, blockID * recordsPerBlock + i);
         }
         blockID++;
         block = bm->getBlock(tableFile(table.Name), blockID);
@@ -72,26 +72,32 @@ bool RecordManager::dropIndex(const string &table, const string &index) {
     return true;
 }
 
-bool RecordManager::insertRecord(const Table &table, const Tuple &record) {
+unsigned int RecordManager::insertRecord(const Table &table, const Tuple &record) {
     string tableName = tableFile(table.Name);
     unsigned int blockID = bm->getBlockTail(tableName);
     char *block = bm->getBlock(tableName, blockID);
     int length = table.recordLength + 1;
-    int blocks = BlockSize / length;
+    int recordsPerBlock = BlockSize / length;
     int offset = 1;
     string strFixed;
     int lengthOffset;
 
     bool validBlock = false;
 
-    for (int i=0; i<blocks; i++) {
-        if (block[i * length] != UnUsed) { continue; }
+    int recordOffset = 0;
+
+    while (recordOffset < recordsPerBlock) {
+        if (block[recordOffset * length] != UnUsed) {
+            recordOffset++;
+            continue;
+        }
         validBlock = true;
-        block += i * length;
+        block += recordOffset * length;
         break;
     }
 
     if (!validBlock) {
+        recordOffset = 0;
         block = bm->getBlock(tableName, ++blockID, true); // get next block (should be empty) and get the first unit
     }
 
@@ -99,12 +105,12 @@ bool RecordManager::insertRecord(const Table &table, const Tuple &record) {
         switch (attr->type.M()) {
             case MINISQL_TYPE_CHAR:
                 strFixed = attr->str;
-                lengthOffset = attr->strLength - strFixed.length();
+                lengthOffset = attr->type.charSize - strFixed.length();
                 if (lengthOffset > 0) {
-                    strFixed.insert(0, lengthOffset, 0);
+                    strFixed.insert(strFixed.length(), lengthOffset, 0);
                 }
-                memcpy(block + offset, strFixed.c_str(), attr->strLength + 1);
-                offset += attr->strLength + 1;
+                memcpy(block + offset, strFixed.c_str(), attr->type.charSize + 1);
+                offset += attr->type.charSize + 1;
                 break;
             case MINISQL_TYPE_INT:
                 memcpy(block + offset, &attr->i, sizeof(int));
@@ -121,7 +127,7 @@ bool RecordManager::insertRecord(const Table &table, const Tuple &record) {
     }
     block[0] = Used;
     bm->setDirty(tableName, blockID);
-    return true;
+    return blockID * recordsPerBlock + recordOffset;
 }
 
 bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
@@ -151,17 +157,17 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
 
 bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint) {
     string tableFileName = tableFile(table.Name);
-    int offset;
+    unsigned int recordPos;
     if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
-        offset = im->searchHead(tableFileName, indexHint.attrType);
+        recordPos = im->searchHead(tableFileName, indexHint.attrType);
     } else {
-        offset = im->search(tableFileName, indexHint.cond.value);
+        recordPos = im->search(tableFileName, indexHint.cond.value);
     }
 
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
-    unsigned int blockOffset = offset / blocks;
-    char *block = bm->getBlock(tableFileName, blockOffset) + offset % BlockSize;
+    char *block;
+    unsigned int blockOffset;
     Tuple tup;
     Row row;
     Result res;
@@ -170,7 +176,9 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     int threshold = indexHint.capacity / blocks / 3;
     int cnt = 0;
 
-    while (block) {
+    while (recordPos != -1) {
+        blockOffset = recordPos / blocks;
+        block = bm->getBlock(tableFileName, blockOffset) + recordPos % BlockSize;
         convertToTuple(block, 0, table.attrType, tup);
         if (condsTest(cond, tup, table.attrNames)) {
             row = tup.fetchRow(table.attrNames, attr);
@@ -181,7 +189,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
                 break;
             }
         }
-        block = bm->getBlock(tableFile(table.Name), blockOffset);
+        recordPos = im->searchNext(tableFileName, indexHint.attrType);
         cnt++;
         if (cnt > threshold) {
             degrade = true;
@@ -202,8 +210,6 @@ bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
     Tuple tup;
-    Row row;
-    Result res;
 
     while (block) {
         for (int i=0; i<blocks; i++) {
