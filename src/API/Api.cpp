@@ -81,11 +81,9 @@ namespace Api
                 std::cout << "Primary key not found!" << std::endl;
                 return false;
             }
-
-            cm->CreateTable(table_name, schema_list, primary_key_name);
-            cm->Flush();
         }
-
+        cm->CreateTable(table_name, schema_list, primary_key_name);
+        cm->Flush();
 
         return rm->createTable(table_name);
     }

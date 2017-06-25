@@ -95,7 +95,7 @@ void do_parse()
     if (isExit)
     {
         std::cout << "Bye!\n";
-        std::exit(0);
+        exit(0);
     }
     if (query == nullptr)
     {
@@ -253,7 +253,6 @@ void exec_file(const std::string &file_name)
         }
         if (!complete)
         {
-            std::cout << "Statement not complete>" << std::endl;
         }
     }
 }
