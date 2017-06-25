@@ -50,7 +50,7 @@ void CatalogManager::Flush() const
     std::ofstream ofs(meta_file_name);
 
     //debug
-    std::cout << tables.size() << endl;
+    //std::cout << tables.size() << endl;
 
     for (const auto &tb: tables)
     {

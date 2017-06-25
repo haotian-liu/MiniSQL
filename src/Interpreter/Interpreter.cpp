@@ -82,7 +82,6 @@ void main_repl_loop [[noreturn]]()
         }
         if (!complete)
         {
-            std::cout << "Statement not complete>" << std::endl;
         }
     }
 }
