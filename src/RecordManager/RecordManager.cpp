@@ -7,7 +7,7 @@
 
 bool RecordManager::createTable(const string &table) {
     string tableFileStr = tableFile(table);
-    bm->create_table(tableFileStr);
+    bm->createTable(tableFileStr);
     return true;
 }
 
@@ -20,7 +20,7 @@ bool RecordManager::dropTable(const string &table) {
 bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     string indexFileStr = indexFile(table.Name, index.attrName);
     // Call BM to create index file
-    bm->create_table(indexFileStr);
+    bm->createTable(indexFileStr);
     // Call IM to create index tree
     im->create(indexFileStr, index);
     // Add initial values to index tree

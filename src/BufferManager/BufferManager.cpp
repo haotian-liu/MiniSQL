@@ -6,14 +6,7 @@
 using namespace std;
 
 void BufferManager::clearBlock(int i) {
-    blockBuffer[i].filename = "";
-    memset(blockBuffer[i].content, 0, BlockSize);
-    blockBuffer[i].dirty = false;
-    blockBuffer[i].busy = false;
-    blockBuffer[i].blockID = 0;
-    blockBuffer[i].ID = i;
-    blockBuffer[i].LRU_count = 0;
-    blockBuffer[i].address = reinterpret_cast<char *>(static_cast<void *>(&blockBuffer[i].content));
+    blockBuffer[i].reset();
 }
 
 unsigned int BufferManager::getBlockTail(string filename) {
@@ -21,10 +14,10 @@ unsigned int BufferManager::getBlockTail(string filename) {
 }
 
 void BufferManager::setDirty(unsigned int offset) {
-
+    //
 }
 
-//删除整个文件 buffer和file一起
+// remove the buffer node with file instance
 void BufferManager::removeFile(string filename_in) {
     const char *temp = filename_in.c_str();
     for (int i = 0; i < MaxBlocks; i++) {
@@ -41,7 +34,7 @@ void BufferManager::removeFile(string filename_in) {
     }
 }
 
-void BufferManager::create_table(string in) {
+void BufferManager::createTable(string in) {
     ofstream f1(in);
 }
 

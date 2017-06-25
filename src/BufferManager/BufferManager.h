@@ -24,6 +24,7 @@ struct Block {
         dirty = busy = false;
         LRU_count = 0;
         memset(content, 0, BlockSize);
+        address = content;
     }
 
     void mark(string filename, unsigned int blockID, int ID) {
@@ -49,14 +50,16 @@ public:
     ~BufferManager() = default;
 
     unsigned int getBlockTail(string filename);
+
     void setDirty(unsigned int offset);
 
     char *getBlock(string filename, unsigned int offset, bool allocate = false);
 
     void flush_all_blocks(); // write all content in block to disk
     int get_LRU();
+
     void using_block(int ind);            //标记第i块block为正在使用
-    void create_table(string);
+    void createTable(string);
 
     void removeFile(string filename);
 
@@ -72,6 +75,7 @@ private:
 
     // find block ID which is available
     unsigned int get_blank_block_ind();
+
     void flush_one_block(int ind); // flush block with ID
 };
 
