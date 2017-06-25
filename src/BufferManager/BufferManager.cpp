@@ -14,36 +14,14 @@ void BufferManager::clearBlock(int i) {
     blockBuffer[i].ID = i;
     blockBuffer[i].LRU_count = 0;
     blockBuffer[i].address = reinterpret_cast<char *>(static_cast<void *>(&blockBuffer[i].content));
-    //cout << "&blockBuffer[" << i << "].content:" << &blockBuffer[i].content << endl;
-    //const char* tmp = static_cast<const char *>(blockBuffer[i].content);
-    //printf(" blockBuffer[i].address : %s\n", blockBuffer[i].address);
-    //cout << "static_cast:" << blockBuffer[i].address <<endl;
 }
 
-char *BufferManager::get_specified_block(string filename, int offset) {
-    unsigned int number, i, mark, count = 0;
-    for (int i = 0; i < MaxBlocks; i++) {
-        if (blockBuffer[i].filename == filename && blockBuffer[i].blockID == offset)//如果此块在buffer中 直接返回
-        {
-            using_block(i);
-            return (char *) &(blockBuffer[i]);
-        }
-    }
-    //如果该块不在buffer中 则从文件中读取
-    i = get_blank_block_ind();
-    mark_block(i, filename, offset);
+unsigned int BufferManager::getBlockTail(string filename) {
+    return 0;
+}
 
-    fstream fp;
-    fp.open(filename, ios::in | ios::out | ios::app | ios::binary);
-    if (!fp.good()) {
-        cerr << filename << "file open err" << endl;
-        exit(0);
-    }
-    fp.seekg(ios::beg + offset * BlockSize);
-    fp.read(blockBuffer[i].address, BlockSize);
-    fp.close();
-    using_block(i);
-    return (char *) &(blockBuffer[i]);
+void BufferManager::setDirty(unsigned int offset) {
+
 }
 
 //删除整个文件 buffer和file一起
@@ -91,36 +69,13 @@ unsigned int BufferManager::get_blank_block_ind() {
         flush_one_block(res);
     }
     using_block(res);
-    mark_being_used(i);
+    setBusy(i);
     clearBlock(res);
     return res;
 }
 
-//char * BufferManager::get_blank_block(unsigned int table_index)
-char *BufferManager::get_blank_block_addr() {
-    int i, res;
-    char *p;
-    for (i = 0; i < MaxBlocks; i++) {
-        if (blockBuffer[i].filename != "")
-            break;
-    }
-    if (i < MaxBlocks) //如果找到空块
-    {
-        res = i;
-    } else if (i >= MaxBlocks) {
-        res = get_LRU();
-        flush_one_block(res);
-    }
-    using_block(res);
-    mark_being_used(res);
-    return (char *) &(blockBuffer[res]);
-}
-//提供给index和record manager来获取 修改 增加块
-
 char *BufferManager::getBlock(string filename, unsigned int offset, bool allocate) {
     unsigned int number, i, mark;
-    //int total_size = CatalogManager::get_total_size_of_attr(filename);
-    //int ID = total_size / BLOCK_SIZE;
     for (int i = 0; i < MaxBlocks; i++) {
         if (blockBuffer[i].filename == filename &&
             blockBuffer[i].blockID == offset) {
@@ -148,11 +103,11 @@ void BufferManager::mark_block(int ind, string filename_in, unsigned int offset)
     blockBuffer[ind].blockID = offset;
 }
 
-void BufferManager::mark_being_used(int ind) {
+void BufferManager::setBusy(int ind) {
     blockBuffer[ind].busy = true;
 }
 
-void BufferManager::end_being_used(int ind) {
+void BufferManager::setFree(int ind) {
     blockBuffer[ind].busy = false;
 }
 
@@ -178,31 +133,7 @@ int BufferManager::get_LRU() {
 }
 
 void BufferManager::flush_one_block(int ind) {
-    //cout << "flush one block" << endl;
-    //cout << "ID:"<< ind << endl;
-    //cout << "address" << blockBuffer[ind].address << endl;
-    //cout << "LRU:" << blockBuffer[ind].LRU_count << endl;
-    char *tmp = blockBuffer[ind].address;
-    fstream fp;
-    fp.open(blockBuffer[ind].filename, ios::in | ios::out | ios::app | ios::binary);
-    //if (!fp.good())
-    //  cerr << blockBuffer[ind].filename << " open err" << endl;
-    fp.seekg(ios::beg + (blockBuffer[ind].blockID) * BlockSize);
-    fp.write(tmp, BlockSize);
-    fp.close();
-    //}
-    /*else if (dirty && index_table == MINISQL_BLOCK_TABLE)
-    {
-        string filename_new = filename + ".tb";
-        char* tmp = const_cast<char *>(address.c_str());
-        fstream fp;
-        fp.open(filename_new, ios::in | ios::out | ios::app | ios::binary);
-        if (!fp.good())
-            cerr << filename << " open err" << endl;
-        fp.seekg(ios::beg + blockID*BLOCK_SIZE);
-        fp.write(tmp, BLOCK_SIZE);
-        fp.close();
-    }*/
+    blockBuffer[ind].flush();
 }
 
 void BufferManager::flush_all_blocks() {

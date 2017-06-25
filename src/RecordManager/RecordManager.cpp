@@ -74,7 +74,7 @@ bool RecordManager::dropIndex(const string &table, const string &index) {
 
 bool RecordManager::insertRecord(const Table &table, const Tuple &record) {
     string tableName = tableFile(table.Name);
-    unsigned int blockID = bm->get_last_block(tableName);
+    unsigned int blockID = bm->getBlockTail(tableName);
     char *block = bm->getBlock(tableName, blockID);
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
