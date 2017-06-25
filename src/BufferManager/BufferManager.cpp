@@ -13,13 +13,14 @@ BufferManager::BufferManager() {
     }
 }
 
-unsigned int BufferManager::getBlockTail(string filename) {
+int BufferManager::getBlockTail(string filename) {
     fstream fp;
     fp.open(filename, ios::in | ios::binary);
     if (!fp.good())
         cerr << filename << " open failed." << endl;
     fp.seekg(0, ios_base::end);
-    return (fp.tellg() / BlockSize - 1);
+    int k = fp.tellg();
+    return (k / BlockSize - 1);
 }
 
 void BufferManager::setDirty(const string &filename, unsigned int blockID) {

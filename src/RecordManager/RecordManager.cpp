@@ -24,7 +24,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     // Call IM to create index tree
     im->create(indexFileStr, index);
     // Add initial values to index tree
-    unsigned int blockID = 0;
+    int blockID = 0;
     char *block = bm->getBlock(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
     int recordsPerBlock = BlockSize / length;
@@ -72,10 +72,16 @@ bool RecordManager::dropIndex(const string &table, const string &index) {
     return true;
 }
 
-unsigned int RecordManager::insertRecord(const Table &table, const Tuple &record) {
+int RecordManager::insertRecord(const Table &table, const Tuple &record) {
     string tableName = tableFile(table.Name);
-    unsigned int blockID = bm->getBlockTail(tableName);
-    char *block = bm->getBlock(tableName, blockID);
+    int blockID = bm->getBlockTail(tableName);
+    char *block;
+    if (blockID < 0) {
+        blockID = 0;
+        block = bm->getBlock(tableName, blockID, true);
+    } else {
+        block = bm->getBlock(tableName, blockID);
+    }
     int length = table.recordLength + 1;
     int recordsPerBlock = BlockSize / length;
     int offset = 1;
@@ -131,7 +137,7 @@ unsigned int RecordManager::insertRecord(const Table &table, const Tuple &record
 }
 
 bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
-    unsigned int blockID = 0;
+    int blockID = 0;
     char *block = bm->getBlock(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;
@@ -158,7 +164,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
 bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
                                  const IndexHint &indexHint) {
     string tableFileName = tableFile(table.Name);
-    unsigned int recordPos;
+    int recordPos;
     if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
         recordPos = im->searchHead(tableFileName, indexHint.attrType);
     } else {
@@ -168,7 +174,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     int length = table.recordLength + 1;
     int recordsPerBlock = BlockSize / length;
     char *block;
-    unsigned int blockOffset;
+    int blockOffset;
     Tuple tup;
     Row row;
     Result res;
@@ -206,7 +212,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
 }
 
 bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
-    unsigned int blockOffset = 0;
+    int blockOffset = 0;
     char *block = bm->getBlock(tableFile(table.Name), blockOffset);
     int length = table.recordLength + 1;
     int blocks = BlockSize / length;

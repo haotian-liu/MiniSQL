@@ -24,11 +24,11 @@ public:
 
     bool drop(const string &filename, const SqlValueType &type);
 
-    unsigned int search(const string &filename, const Element &e);
+    int search(const string &filename, const Element &e);
 
-    unsigned int searchHead(const string &filename, int attrType);
+    int searchHead(const string &filename, int attrType);
 
-    unsigned int searchNext(const string &filename, int attrType);
+    int searchNext(const string &filename, int attrType);
 
     bool finishSearch(const string &filename, int attrType);
 

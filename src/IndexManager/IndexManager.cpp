@@ -53,7 +53,7 @@ bool IndexManager::drop(const string &filename, const SqlValueType &type) {
     }
 }
 
-unsigned int IndexManager::search(const string &filename, const Element &e) {
+int IndexManager::search(const string &filename, const Element &e) {
     NodeSearchParse<int> intNode;
     NodeSearchParse<float> floatNode;
     NodeSearchParse<string> charNode;
@@ -76,7 +76,7 @@ unsigned int IndexManager::search(const string &filename, const Element &e) {
     }
 }
 
-unsigned int IndexManager::searchNext(const string &filename, int attrType) {
+int IndexManager::searchNext(const string &filename, int attrType) {
     NodeSearchParse<int> intNode;
     NodeSearchParse<float> floatNode;
     NodeSearchParse<string> charNode;
@@ -171,7 +171,7 @@ bool IndexManager::removeKey(const string &filename, const Element &e) {
     }
 }
 
-unsigned int IndexManager::searchHead(const string &filename, int attrType) {
+int IndexManager::searchHead(const string &filename, int attrType) {
     NodeSearchParse<int> intNode;
     NodeSearchParse<float> floatNode;
     NodeSearchParse<string> charNode;

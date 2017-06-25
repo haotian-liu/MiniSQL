@@ -28,7 +28,7 @@ public:
 
     bool dropIndex(const string &table, const string &index);
 
-    unsigned int insertRecord(const Table &table, const Tuple &record);
+    int insertRecord(const Table &table, const Tuple &record);
 
     bool selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond);
 

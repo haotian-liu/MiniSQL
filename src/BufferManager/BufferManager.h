@@ -53,7 +53,7 @@ public:
 
     ~BufferManager() = default;
 
-    unsigned int getBlockTail(string filename);
+    int getBlockTail(string filename);
 
     void setDirty(const string &filename, unsigned int blockID); // fixme parameter is wrong!!
 
