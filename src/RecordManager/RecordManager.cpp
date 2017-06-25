@@ -166,7 +166,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     }
 
     int length = table.recordLength + 1;
-    int blocks = BlockSize / length;
+    int recordsPerBlock = BlockSize / length;
     char *block;
     unsigned int blockOffset;
     Tuple tup;
@@ -174,12 +174,12 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     Result res;
     Element e;
     bool degrade = false;
-    int threshold = indexHint.capacity / blocks / 3;
+    int threshold = indexHint.capacity / recordsPerBlock / 3;
     int cnt = 0;
 
     while (recordPos != -1) {
-        blockOffset = recordPos / blocks;
-        block = bm->getBlock(tableFileName, blockOffset) + recordPos % BlockSize;
+        blockOffset = recordPos / recordsPerBlock;
+        block = bm->getBlock(tableFileName, blockOffset) + recordPos % recordsPerBlock;
         convertToTuple(block, 0, table.attrType, tup);
         if (condsTest(cond, tup, table.attrNames)) {
             row = tup.fetchRow(table.attrNames, attr);
