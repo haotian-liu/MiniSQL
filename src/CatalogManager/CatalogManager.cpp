@@ -9,11 +9,29 @@
 using namespace std;
 
 
-void CatalogManager::CreateTable(const std::string &table_name, int num_of_attrs,
-                                 std::pair<std::string, SqlValueType> primary_key
+void CatalogManager::CreateTable(const std::string &table_name,
+                                 const std::vector<std::pair<std::string, SqlValueType>> &schema_list,
+                                 const std::string &primary_key_name
 )
 {
+    Table tb;
+    tb.Name = table_name;
+    tb.attrCnt = (int) schema_list.size();
+    uint32_t len{0};
 
+    for (const auto &sch: schema_list)
+    {
+        len += sch.second.getSize();
+        tb.attrNames.push_back(sch.first);
+        tb.attrType.push_back(sch.second);
+        if (sch.first == primary_key_name)
+        {
+            (tb.attrType.end() - 1)->primary = true;
+        }
+    }
+
+    tb.recordLength = len;
+    tables.push_back(tb);
 }
 
 CatalogManager::CatalogManager()
