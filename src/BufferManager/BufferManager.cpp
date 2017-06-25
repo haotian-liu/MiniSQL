@@ -51,7 +51,8 @@ void BufferManager::removeFile(string filename_in)	//删除整个文件 buffer�
     {
         if (ptr_buffer[i].filename == filename_in)
         {
-            int total_size = CatalogManager::get_total_size_of_attr(filename_in);
+            //FIXME: NEXT STATEMENT!
+            //int total_size = CatalogManager::get_total_size_of_attr(filename_in);
             ptr_buffer[i].filename = nullptr;
             ptr_buffer[i].is_written = false;
             ptr_buffer[i].being_used = false;

@@ -8,8 +8,6 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -lreadline)
 set(SOURCE_FILES main.cpp
         src/RecordManager/RecordManager.cpp
         src/RecordManager/RecordManager.h
-        src/CatalogManager/CatalogManager.cpp
-        src/CatalogManager/CatalogManager.h
         src/IndexManager/IndexManager.cpp
         src/IndexManager/IndexManager.h
         lib/BPTree/BPTree.h
