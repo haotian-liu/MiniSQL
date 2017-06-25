@@ -203,9 +203,9 @@ namespace MINISQL_BASE {
     struct Table {
         Table() {};
 
-        Table(const Table &T) : Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength),
+/*        Table(const Table &T) : Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength),
                                 recordCnt(T.recordCnt), size(T.size), attrType(T.attrType), attrNames(T.attrNames),
-                                indexNames(T.indexNames) {};
+                                indexNames(T.indexNames) {};*/
 
         std::string Name;
         int attrCnt, recordLength, recordCnt, size;
@@ -222,7 +222,6 @@ namespace MINISQL_BASE {
                << " attrNames: " << table.attrNames.size();
             return os;
         }
-        std::vector<std::string> indexNames;
     };
 
     struct Cond {

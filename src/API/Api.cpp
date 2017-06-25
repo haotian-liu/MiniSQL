@@ -31,7 +31,15 @@ namespace Api
 
     size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list)
     {
-        auto real_table_name = table_name;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (!cm->TableExist(table_name))
+        {
+            std::cout << "Table not found!" << std::endl;
+            return 0;
+        }
         return 0;
     }
 

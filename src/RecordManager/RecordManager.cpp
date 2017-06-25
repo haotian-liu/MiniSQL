@@ -219,9 +219,9 @@ bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
             if (condsTest(cond, tup, table.attrNames)) {
                 block[i * length] = UnUsed;
                 for (auto &col: tup.element) {
-                    for (auto &attr : table.indexNames) {
-                        if (col.type.attrName == attr) {
-                            im->removeKey(indexFile(table.Name, attr), col);
+                    for (auto &attr : table.index) {
+                        if (col.type.attrName == attr.first) {
+                            im->removeKey(indexFile(table.Name, attr.first), col);
                         }
                     }
                 }
