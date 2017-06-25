@@ -5,8 +5,13 @@
 
 using namespace std;
 
-void BufferManager::clearBlock(int i) {
-    blockBuffer[i].reset();
+BufferManager::BufferManager() {
+    blockBuffer.resize(MaxBlocks);
+    maxLRU = 0;
+    int id = 0;
+    for (auto &block : blockBuffer) {
+        block.id = id;
+    }
 }
 
 unsigned int BufferManager::getBlockTail(string filename) {
@@ -17,12 +22,35 @@ void BufferManager::setDirty(unsigned int offset) {
     //
 }
 
+void BufferManager::setBusy(int id) {
+    ++maxLRU;
+    Block &block = blockBuffer[id];
+    block.busy = true;
+    block.LRU_count = maxLRU;
+}
+
+Block &BufferManager::getLRU() {
+    int max = maxLRU;
+    Block *detect = nullptr;
+    for (auto &block : blockBuffer) {
+        if (block.busy) { continue; }
+        if (block.LRU_count <= max) {
+            max = block.LRU_count;
+            detect = &block;
+        }
+    }
+    if (detect == nullptr) {
+        cerr << "No LRU block found!";
+    }
+    return *detect;
+}
+
 // remove the buffer node with file instance
-void BufferManager::removeFile(string filename_in) {
-    const char *temp = filename_in.c_str();
+void BufferManager::removeFile(string filename) {
+    const char *temp = filename.c_str();
     for (int i = 0; i < MaxBlocks; i++) {
-        if (blockBuffer[i].filename == filename_in) {
-            int total_size = CatalogManager::get_total_size_of_attr(filename_in);
+        if (blockBuffer[i].filename == filename) {
+            int total_size = CatalogManager::get_total_size_of_attr(filename);
             blockBuffer[i].filename = nullptr;
             blockBuffer[i].dirty = false;
             blockBuffer[i].busy = false;
@@ -34,37 +62,26 @@ void BufferManager::removeFile(string filename_in) {
     }
 }
 
-void BufferManager::createTable(string in) {
+void BufferManager::createFile(string in) {
     ofstream f1(in);
 }
 
-
-void BufferManager::initialize_blocks() {
-    for (int i = 0; i < MaxBlocks; i++)
-        clearBlock(i);
-}
-
-
-//首先查找表中是否有空位写入
-//如果没有空位 用LRU找一块block清除后写入
-unsigned int BufferManager::get_blank_block_ind() {
-    int i, res;
-    char *p;
-    for (i = 0; i < MaxBlocks; i++) {
-        if (blockBuffer[i].filename != "")
-            break;
+// Find clean blocks, if failed use LRU replacement
+int BufferManager::getFreeBlockId() {
+    Block bb;
+    for (auto &block : blockBuffer) {
+        if (!block.dirty && !block.busy) {
+            block.reset();
+            setBusy(block.id);
+            return block.blockID;
+        }
     }
-    if (i < MaxBlocks) //如果找到空块
-    {
-        res = i;
-    } else if (i >= MaxBlocks) {
-        res = get_LRU();
-        flush_one_block(res);
-    }
-    using_block(res);
-    setBusy(i);
-    clearBlock(res);
-    return res;
+
+    bb = getLRU();
+    bb.flush().reset();
+    setBusy(bb.id);
+
+    return bb.id;
 }
 
 char *BufferManager::getBlock(string filename, unsigned int offset, bool allocate) {
@@ -72,12 +89,12 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     for (int i = 0; i < MaxBlocks; i++) {
         if (blockBuffer[i].filename == filename &&
             blockBuffer[i].blockID == offset) {
-            using_block(i);
+            setBusy(i);
             return (char *) (&blockBuffer[i]);
         }
     }
     //如果该块不在buffer中 则从文件中读取
-    i = get_blank_block_ind();
+    i = getFreeBlockId();
     mark_block(i, filename, offset);
 
     fstream fp;
@@ -87,8 +104,8 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     fp.seekg(ios::beg + offset * BlockSize);
     fp.read((char *) (blockBuffer[i].content), BlockSize);
     fp.close();
-    using_block(i);
-    return (char *) (&blockBuffer[i]);
+    setBusy(i);
+    return blockBuffer[i].content;
 }
 
 void BufferManager::mark_block(int ind, string filename_in, unsigned int offset) {
@@ -96,22 +113,8 @@ void BufferManager::mark_block(int ind, string filename_in, unsigned int offset)
     blockBuffer[ind].blockID = offset;
 }
 
-void BufferManager::setBusy(int ind) {
-    blockBuffer[ind].busy = true;
-}
-
 void BufferManager::setFree(int ind) {
     blockBuffer[ind].busy = false;
-}
-
-void BufferManager::using_block(int n) {
-    blockBuffer[n].busy = true;
-    for (int i = 0; i < MaxBlocks; i++) {
-        if (i != n && !(blockBuffer[i].busy))     //不在被使用的块 count++
-            blockBuffer[i].LRU_count++;
-        else if (i == n)
-            blockBuffer[i].LRU_count = 0;
-    }
 }
 
 int BufferManager::get_LRU() {
@@ -125,16 +128,11 @@ int BufferManager::get_LRU() {
     return num;
 }
 
-void BufferManager::flush_one_block(int ind) {
-    blockBuffer[ind].flush();
-}
-
 void BufferManager::flush_all_blocks() {
-    for (int i = 0; i < MaxBlocks; i++) {
-        flush_one_block(i);
-        if (blockBuffer[i].address != "\0")
-            blockBuffer[i].address = nullptr;
-        if (blockBuffer[i].filename != "\0")
-            blockBuffer[i].filename = nullptr;
+    for (auto &block : blockBuffer) {
+        if (block.dirty) {
+            block.flush();
+        }
+        block.reset();
     }
 }
