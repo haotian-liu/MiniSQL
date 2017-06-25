@@ -35,7 +35,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
 }
 
 CatalogManager::CatalogManager()
-        : tables(std::list<Table>())
+        : tables(std::vector<Table>())
 {
     LoadFromFile();
 }
@@ -48,6 +48,10 @@ CatalogManager::~CatalogManager()
 void CatalogManager::Flush() const
 {
     std::ofstream ofs(meta_file_name);
+
+    //debug
+    std::cout << tables.size() << endl;
+
     for (const auto &tb: tables)
     {
         ofs << tb.Name << std::endl;

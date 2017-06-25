@@ -36,7 +36,7 @@ private:
     }
 
 private:
-    std::list<Table> tables;
+    std::vector<Table> tables;
 
     static constexpr auto meta_file_name = "tables.meta";
 
