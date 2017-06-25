@@ -142,6 +142,11 @@ namespace Api
         auto im = ApiHelper::getApiHelper()->getIndexManager();
         auto cm = ApiHelper::getApiHelper()->getCatalogManager();
 
+        if (cm->CheckIndexNameExists(index_name))
+        {
+            std::cout << "Index name exists!" << std::endl;
+            return false;
+        }
 
         if (!cm->TableExist(table_name))
         {
@@ -149,6 +154,37 @@ namespace Api
             return false;
         }
         auto &tb = cm->GetTable(table_name);
+
+        for (auto &i: tb.index)
+        {
+            if (i.first == attribute_name)
+            {
+                std::cout << "Index on the attribute exists!" << std::endl;
+                return false;
+            }
+        }
+
+        SqlValueType type;
+        size_t i{0};
+        for (; i < tb.attrNames.size(); ++i)
+        {
+            if (tb.attrNames[i] == attribute_name)
+            {
+                type = tb.attrType[i];
+                break;
+            }
+        }
+
+        auto b1 = rm->createIndex(tb, type);
+        auto b2 = im->create(indexFile(table_name, attribute_name), type);
+        if (b1 && b2)
+        {
+            std::cout << "Create index success" << std::endl;
+            return true;
+        } else
+        {
+            return false;
+        }
     }
 
     bool drop_table(const std::string &table_name)
