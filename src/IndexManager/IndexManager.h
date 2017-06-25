@@ -9,6 +9,7 @@
 #include <map>
 #include "../../include/DataStructure.h"
 #include "../../lib/BPTree/BPTree.h"
+
 using namespace std;
 using namespace MINISQL_BASE;
 
@@ -18,18 +19,27 @@ public:
 
     // fixme!!! destructor needs to be implemented to release memory of B+Tree instances
     ~IndexManager();
+
     bool create(const string &filename, const SqlValueType &type);
+
     bool drop(const string &filename, const SqlValueType &type);
-    int search(const string &filename, const Element &e);
-    int searchHead(const string &filename, int attrType);
-    int searchNext(const string &filename, int attrType);
+
+    unsigned int search(const string &filename, const Element &e);
+
+    unsigned int searchHead(const string &filename, int attrType);
+
+    unsigned int searchNext(const string &filename, int attrType);
+
     bool finishSearch(const string &filename, int attrType);
+
     bool insert(const string &filename, const Element &e, int offset);
+
     bool removeKey(const string &filename, const Element &e);
+
 private:
-    typedef map<string, BPTree<int>*> intMap;
-    typedef map<string, BPTree<float>*> floatMap;
-    typedef map<string, BPTree<string>*> charMap;
+    typedef map<string, BPTree<int> *> intMap;
+    typedef map<string, BPTree<float> *> floatMap;
+    typedef map<string, BPTree<string> *> charMap;
     typedef map<string, NodeSearchParse<int>> intOMap;
     typedef map<string, NodeSearchParse<float>> floatOMap;
     typedef map<string, NodeSearchParse<string>> charOMap;

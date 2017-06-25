@@ -42,5 +42,4 @@ private:
 
     bool validFlag = true;
 };
-
 #endif

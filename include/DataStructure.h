@@ -32,6 +32,7 @@
 
 namespace MINISQL_BASE {
     const int BlockSize = 4096;
+    const int MaxBlocks = 128;
     const char UnUsed = 0;
     const char Used = 1;
 
@@ -46,11 +47,12 @@ namespace MINISQL_BASE {
     };
 
     struct SqlValueType {
+        std::string attrName;
         SqlValueTypeBase type;
-        int charSize; // charSize does not include the terminating zero of string!
 
         ///following fileds only for attribute type, not a single sql value type.
         bool primary = false;
+        size_t charSize; // charSize does not include the terminating zero of string!
         bool unique = false;
 
         inline int M() const {
@@ -64,7 +66,7 @@ namespace MINISQL_BASE {
             }
         }
 
-        inline int getSize() const {
+        inline size_t getSize() const {
             switch (M()) {
                 case MINISQL_TYPE_INT:
                     return sizeof(int);
@@ -76,7 +78,7 @@ namespace MINISQL_BASE {
         }
 
         inline int getDegree() const {
-            int keySize = getSize();
+            size_t keySize = getSize();
             int degree = BlockSize / (keySize + sizeof(int));
 
             return degree;
@@ -90,7 +92,7 @@ namespace MINISQL_BASE {
         int strLength;
         std::string str;
 
-        inline int M() const {
+        inline size_t M() const {
             switch (type.type) {
                 case SqlValueTypeBase::Integer:
                     return MINISQL_TYPE_INT;
@@ -210,6 +212,7 @@ namespace MINISQL_BASE {
                << " attrNames: " << table.attrNames.size();
             return os;
         }
+        std::vector<std::string> indexNames;
     };
 
     struct Cond {

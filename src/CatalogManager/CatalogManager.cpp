@@ -170,3 +170,4 @@ bool CatalogManager::TableExist(const std::string &table_name) const
         return (tb.Name == table_name);
     }) != tables.end();
 }
+

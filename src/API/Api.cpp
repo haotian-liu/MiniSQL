@@ -93,7 +93,8 @@ namespace Api
     bool create_index(const std::string &table_name, const std::string &attribute_name)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
-        return rm->createIndex(table_name, attribute_name);
+        //fixme!!! fix implementation
+        //return rm->createIndex(table_name, attribute_name);
     }
 
     bool drop_table(const std::string &table_name)

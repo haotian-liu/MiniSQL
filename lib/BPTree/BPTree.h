@@ -16,15 +16,21 @@ template<typename T>
 class BPTreeNode {
 public:
     BPTreeNode() = default;
+
     BPTreeNode(int degree, bool isLeaf);
 
     ~BPTreeNode() {}
 
     bool search(const T &key, int &index) const;
+
     BPTreeNode *split(T &key);
+
     int add(const T &key);
+
     int add(const T &key, int offset);
+
     void removeAt(int index);
+
     bool isRoot() const { return parent == nullptr; }
 
     bool isLeaf;
@@ -32,11 +38,11 @@ public:
     BPTreeNode *parent, *sibling;
     vector<T> keys;
     vector<int> keyOffset;
-    vector<BPTreeNode<T>*> children;
+    vector<BPTreeNode<T> *> children;
 
     void debug(int id) {
         cout << "Keys [" << id << "]: ";
-        for (int i=0; i<this->cnt; i++) {
+        for (int i = 0; i < this->cnt; i++) {
             cout << keys[i] << " ";
         }
         cout << endl;
@@ -48,7 +54,7 @@ private:
 
 template<typename T>
 BPTreeNode<T>::BPTreeNode(int degree, bool isLeaf) : degree(degree), isLeaf(isLeaf), cnt(0), parent(nullptr),
-                                                  sibling(nullptr) {
+                                                     sibling(nullptr) {
     children.resize(degree + 1);
     keys.resize(degree);
     keyOffset.resize(degree);
@@ -88,12 +94,12 @@ bool BPTreeNode<T>::binarySearch(const T &key, int &index) const {
 
 template<typename T>
 BPTreeNode<T> *BPTreeNode<T>::split(T &key) {
-    BPTreeNode<T>* newNode = new BPTreeNode<T>(degree, isLeaf);
+    BPTreeNode<T> *newNode = new BPTreeNode<T>(degree, isLeaf);
     int minimal = (degree - 1) / 2;
 
     if (isLeaf) {
         key = keys[minimal + 1];
-        for (int i=minimal + 1; i<degree; i++) {
+        for (int i = minimal + 1; i < degree; i++) {
             newNode->keys[i - minimal - 1] = keys[i];
             newNode->keyOffset[i - minimal - 1] = keyOffset[i];
         }
@@ -102,12 +108,12 @@ BPTreeNode<T> *BPTreeNode<T>::split(T &key) {
         this->cnt = minimal + 1;
     } else {
         key = keys[minimal];
-        for (int i=minimal + 1; i<=degree; i++) {
+        for (int i = minimal + 1; i <= degree; i++) {
             newNode->children[i - minimal - 1] = this->children[i];
             this->children[i]->parent = newNode;
             this->children[i] = nullptr;
         }
-        for (int i=minimal + 1; i<degree; i++) {
+        for (int i = minimal + 1; i < degree; i++) {
             newNode->keys[i - minimal - 1] = keys[i];
         }
         this->cnt = minimal;
@@ -125,9 +131,9 @@ int BPTreeNode<T>::add(const T &key) {
         cerr << "Key is not unique!" << endl;
         exit(10);
     }
-    for (int i=cnt; i>index; i--) {
-        keys[i] = keys[i-1];
-        children[i+1] = children[i];
+    for (int i = cnt; i > index; i--) {
+        keys[i] = keys[i - 1];
+        children[i + 1] = children[i];
     }
     keys[index] = key;
     children[index + 1] = nullptr;
@@ -143,9 +149,9 @@ int BPTreeNode<T>::add(const T &key, int offset) {
         cerr << "Key is not unique!" << endl;
         exit(10);
     }
-    for (int i=cnt; i>index; i--) {
-        keys[i] = keys[i-1];
-        keyOffset[i] = keyOffset[i-1];
+    for (int i = cnt; i > index; i--) {
+        keys[i] = keys[i - 1];
+        keyOffset[i] = keyOffset[i - 1];
     }
     keys[index] = key;
     keyOffset[index] = offset;
@@ -155,18 +161,18 @@ int BPTreeNode<T>::add(const T &key, int offset) {
 
 template<typename T>
 void BPTreeNode<T>::removeAt(int index) {
-    for (int i=index; i<cnt-1; i++) {
-        keys[i] = keys[i+1];
+    for (int i = index; i < cnt - 1; i++) {
+        keys[i] = keys[i + 1];
     }
     if (isLeaf) {
-        for (int i=index; i<cnt-1; i++) {
-            keyOffset[i] = keyOffset[i+1];
+        for (int i = index; i < cnt - 1; i++) {
+            keyOffset[i] = keyOffset[i + 1];
         }
         keyOffset[cnt - 1] = 0;
         keys[cnt - 1] = T();
     } else {
-        for (int i=index + 1; i<cnt; i++) {
-            children[i] = children[i+1];
+        for (int i = index + 1; i < cnt; i++) {
+            children[i] = children[i + 1];
         }
         keys[cnt - 1] = T();
         children[cnt] = nullptr;
@@ -177,21 +183,26 @@ void BPTreeNode<T>::removeAt(int index) {
 template<typename T>
 struct NodeSearchParse {
     int index;
-    BPTreeNode<T>* node;
+    BPTreeNode<T> *node;
 };
 
 template<typename T>
 class BPTree {
 public:
-    typedef BPTreeNode<T>* TreeNode;
+    typedef BPTreeNode<T> *TreeNode;
 
     BPTree(string fileName, int sizeofKey, int degree);
+
     ~BPTree();
 
     TreeNode getHeadNode() const { return head; }
+
     int find(const T &key);
+
     NodeSearchParse<T> findNode(const T &key);
+
     bool insert(const T &key, int offset);
+
     bool remove(const T &key);
 
 private:
@@ -200,24 +211,33 @@ private:
     int sizeofKey, level, keyCount, nodeCount, degree;
 
     void initBPTree();
+
     bool findKeyFromNode(TreeNode node, const T &key, NodeSearchParse<T> &res);
+
     void cascadeInsert(TreeNode node);
+
     bool cascadeDelete(TreeNode node);
 
     bool deleteBranchLL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
     bool deleteBranchLR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
     bool deleteBranchRL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
     bool deleteBranchRR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
 
     bool deleteLeafLL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
     bool deleteLeafLR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
     bool deleteLeafRL(TreeNode node, TreeNode parent, TreeNode sibling, int index);
+
     bool deleteLeafRR(TreeNode node, TreeNode parent, TreeNode sibling, int index);
 
     void debug(TreeNode node, int id) {
         node->debug(id);
         if (!node->isLeaf) {
-            for (int i=0; i<=node->cnt; i++) {
+            for (int i = 0; i <= node->cnt; i++) {
                 debug(node->children[i], i);
             }
         }
@@ -225,8 +245,10 @@ private:
 };
 
 template<typename T>
-BPTree<T>::BPTree(string fileName, int sizeofKey, int degree) : fileName(fileName), sizeofKey(sizeofKey), degree(degree), keyCount(0), nodeCount(0), level(0), root(
-        nullptr), head(nullptr) {
+BPTree<T>::BPTree(string fileName, int sizeofKey, int degree) : fileName(fileName), sizeofKey(sizeofKey),
+                                                                degree(degree), keyCount(0), nodeCount(0), level(0),
+                                                                root(
+                                                                        nullptr), head(nullptr) {
     initBPTree();
 }
 
@@ -253,7 +275,7 @@ bool BPTree<T>::findKeyFromNode(TreeNode node, const T &key, NodeSearchParse<T> 
         } else {
             node = node->children[index + 1];
             while (!node->isLeaf) { node = node->children[0]; }
-            res.index= 0;
+            res.index = 0;
         }
         res.node = node;
         return true;
@@ -461,9 +483,9 @@ bool BPTree<T>::cascadeDelete(BPTree::TreeNode node) {
 template<typename T>
 bool BPTree<T>::deleteBranchLL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
     node->children[node->cnt + 1] = node->children[node->cnt];
-    for (int i=node->cnt; i>0; i--) {
-        node->children[i] = node->children[i-1];
-        node->keys[i] = node->keys[i-1];
+    for (int i = node->cnt; i > 0; i--) {
+        node->children[i] = node->children[i - 1];
+        node->keys[i] = node->keys[i - 1];
     }
     node->children[0] = sibling->children[sibling->cnt];
     node->keys[0] = parent->keys[index];
@@ -481,7 +503,7 @@ bool BPTree<T>::deleteBranchLR(BPTree::TreeNode node, BPTree::TreeNode parent, B
     sibling->keys[sibling->cnt] = parent->keys[index]; // add one node
     parent->removeAt(index);
     sibling->cnt++;
-    for (int i=0; i<node->cnt; i++) {
+    for (int i = 0; i < node->cnt; i++) {
         node->children[i]->parent = sibling;
         sibling->children[sibling->cnt + i] = node->children[i];
         sibling->keys[sibling->cnt + i] = node->keys[i];
@@ -525,7 +547,7 @@ bool BPTree<T>::deleteBranchRR(BPTree::TreeNode node, BPTree::TreeNode parent, B
         parent->removeAt(index + 1);
     }
     node->cnt++;
-    for (int i=0; i<sibling->cnt; i++) {
+    for (int i = 0; i < sibling->cnt; i++) {
         sibling->children[i]->parent = node;
         node->children[node->cnt + i] = sibling->children[i];
         node->keys[node->cnt + i] = sibling->keys[i];
@@ -543,9 +565,9 @@ bool BPTree<T>::deleteBranchRR(BPTree::TreeNode node, BPTree::TreeNode parent, B
 
 template<typename T>
 bool BPTree<T>::deleteLeafLL(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
-    for (int i=node->cnt; i>0; i--) {
-        node->keys[i] = node->keys[i-1];
-        node->keyOffset[i] = node->keyOffset[i-1];
+    for (int i = node->cnt; i > 0; i--) {
+        node->keys[i] = node->keys[i - 1];
+        node->keyOffset[i] = node->keyOffset[i - 1];
     }
     node->keys[0] = sibling->keys[sibling->cnt - 1];
     node->keyOffset[0] = sibling->keyOffset[sibling->cnt - 1];
@@ -560,7 +582,7 @@ bool BPTree<T>::deleteLeafLL(BPTree::TreeNode node, BPTree::TreeNode parent, BPT
 template<typename T>
 bool BPTree<T>::deleteLeafLR(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
     parent->removeAt(index);
-    for (int i=0; i<node->cnt; i++) {
+    for (int i = 0; i < node->cnt; i++) {
         sibling->keys[i + sibling->cnt] = node->keys[i];
         sibling->keyOffset[i + sibling->cnt] = node->keyOffset[i];
     }
@@ -589,7 +611,7 @@ bool BPTree<T>::deleteLeafRL(BPTree::TreeNode node, BPTree::TreeNode parent, BPT
 
 template<typename T>
 bool BPTree<T>::deleteLeafRR(BPTree::TreeNode node, BPTree::TreeNode parent, BPTree::TreeNode sibling, int index) {
-    for (int i=0; i<sibling->cnt; i++) {
+    for (int i = 0; i < sibling->cnt; i++) {
         node->keys[node->cnt + i] = sibling->keys[i];
         node->keyOffset[node->cnt + i] = sibling->keyOffset[i];
     }
