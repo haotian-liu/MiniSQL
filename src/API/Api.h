@@ -21,11 +21,11 @@ namespace Api
 
     size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list);
 
-    size_t select(const std::string &table_name, const std::vector<Condition> &condition_list);
+    bool select(const std::string &table_name, const std::vector<Condition> &condition_list);
 
-    size_t select(const std::string &table_name,
-                  const std::vector<Condition> &condition_list,
-                  const std::vector<std::string> &attr_list
+    bool select(const std::string &table_name,
+                const std::vector<Condition> &condition_list,
+                const std::vector<std::string> &attr_list
     );
 
     size_t update(const std::string &table_name,

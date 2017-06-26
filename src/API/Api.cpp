@@ -202,7 +202,7 @@ namespace Api
         return rm->dropIndex(table_name, index_name);
     }
 
-    size_t select(const std::string &table_name, const std::vector<Condition> &condition_list)
+    bool select(const std::string &table_name, const std::vector<Condition> &condition_list)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
@@ -211,15 +211,15 @@ namespace Api
         if (!cm->TableExist(table_name))
         {
             std::cout << "Table not found!" << std::endl;
-            return 0;
+            return false;
         }
 
         auto &tb = cm->GetTable(table_name);
         return select(table_name, condition_list, tb.attrNames);
     }
 
-    size_t select(const std::string &table_name, const std::vector<Condition> &condition_list,
-                  const std::vector<std::string> &attr_list)
+    bool select(const std::string &table_name, const std::vector<Condition> &condition_list,
+                const std::vector<std::string> &attr_list)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
@@ -228,17 +228,32 @@ namespace Api
         if (!cm->TableExist(table_name))
         {
             std::cout << "Table not found!" << std::endl;
-            return 0;
+            return false;
         }
 
         auto &tb = cm->GetTable(table_name);
+        auto cond_list = std::vector<Cond>();
+        for (const auto &it: condition_list)
+        {
+            cond_list.push_back(it);
+        }
+
+        //check attr_list valid.
+        for (auto &at: attr_list)
+        {
+            if (std::find(tb.attrNames.begin(), tb.attrNames.end(), at) == tb.attrNames.end())
+            {
+                std::cout << "Attribute mismatch!!" << std::endl;
+                return false;
+            }
+        }
 
         if (tb.index.size() == 0)
         {
-
+            return rm->selectRecord(tb, attr_list, cond_list);
         } else
         {
-
+            return rm->selectRecord(tb, attr_list, cond_list);
         }
     }
 
