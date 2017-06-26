@@ -288,13 +288,47 @@ namespace Api
         }
     }
 
-    size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list)
+    bool delete_op(const std::string &table_name, const std::vector<Condition> &condition_list)
     {
-        return 0;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (!cm->TableExist(table_name))
+        {
+            std::cout << "Table not found!" << std::endl;
+            return false;
+        }
+
+        auto &tb = cm->GetTable(table_name);
+
+        for (const auto &cond: condition_list)
+        {
+            auto it = std::find(tb.attrNames.begin(), tb.attrNames.end(), cond.name);
+            if (it == tb.attrNames.end())
+            {
+                std::cout << "Attribute in conditions mismatch!" << std::endl;
+                return false;
+            }
+            auto type = tb.attrType[it - tb.attrNames.begin()];
+            if (type.type != cond.val.type.type)
+            {
+                std::cout << "Type in conditions mismatch!" << std::endl;
+                return false;
+            }
+        }
+
+        auto cond_list = std::vector<Cond>();
+        for (const auto &it: condition_list)
+        {
+            cond_list.push_back(it);
+        }
+
+        return rm->deleteRecord(tb, cond_list);
     }
 
-    size_t update(const std::string &table_name, const std::string &attr, const SqlValue &value,
-                  const std::vector<Condition> &condition_list)
+    bool update(const std::string &table_name, const std::string &attr, const SqlValue &value,
+                const std::vector<Condition> &condition_list)
     {
         return 0;
     }

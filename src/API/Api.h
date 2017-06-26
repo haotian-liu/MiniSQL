@@ -19,7 +19,7 @@ namespace Api
 
     size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list);
 
-    size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list);
+    bool delete_op(const std::string &table_name, const std::vector<Condition> &condition_list);
 
     bool select(const std::string &table_name, const std::vector<Condition> &condition_list);
 
@@ -28,10 +28,10 @@ namespace Api
                 const std::vector<std::string> &attr_list
     );
 
-    size_t update(const std::string &table_name,
-                  const std::string &attr,
-                  const SqlValue &value,
-                  const std::vector<Condition> &condition_list
+    bool update(const std::string &table_name,
+                const std::string &attr,
+                const SqlValue &value,
+                const std::vector<Condition> &condition_list
     );
 
     bool create_table(const std::string &table_name,
