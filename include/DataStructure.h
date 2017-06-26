@@ -242,16 +242,22 @@ namespace MINISQL_BASE {
             switch (condition.op) {
                 case Operator::GE_OP:
                     cond = MINISQL_COND_GEQUAL;
+                    break;
                 case Operator::LE_OP:
                     cond = MINISQL_COND_LEQUAL;
+                    break;
                 case Operator::GT_OP:
                     cond = MINISQL_COND_MORE;
+                    break;
                 case Operator::LT_OP:
                     cond = MINISQL_COND_LESS;
+                    break;
                 case Operator::EQ_OP:
                     cond = MINISQL_COND_EQUAL;
+                    break;
                 case Operator::NE_OP:
                     cond = MINISQL_COND_UEQUAL;
+                    break;
             }
         }
 
