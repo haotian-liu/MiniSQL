@@ -44,6 +44,10 @@ private:
     IndexManager *im;
 
     void dumpResult(const Result &res) const;
+
+    bool condsTest(const std::vector<Cond> &conds, const Tuple &tup, const std::vector<std::string> &attr);
+
+    void convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup);
 };
 
 

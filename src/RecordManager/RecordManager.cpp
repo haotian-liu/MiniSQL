@@ -256,3 +256,48 @@ void RecordManager::dumpResult(const Result &res) const {
         cout << endl;
     }
 }
+
+bool RecordManager::condsTest(const std::vector<Cond> &conds, const Tuple &tup, const std::vector<std::string> &attr) {
+    int condPos;
+    for (Cond cond : conds) {
+        condPos = -1;
+        for (int i = 0; i < attr.size(); i++) {
+            if (attr[i] == cond.attr) {
+                condPos = i;
+                break;
+            }
+        }
+        if (condPos == -1) {
+            std::cerr << "Attr not found in cond test!" << std::endl;
+        }
+        if (!cond.test(tup.element[condPos])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void RecordManager::convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup) {
+    const char *block = blockBuffer + offset + 1; // 1 for meta bit
+    Element e;
+    tup.element.clear();
+    for (int i = 0; i < attrType.size(); i++) {
+        e.reset();
+        e.type = attrType[i];
+        switch (attrType[i].M()) {
+            case MINISQL_TYPE_INT:
+                memcpy(&e.i, block, sizeof(int));
+                block += sizeof(int);
+                break;
+            case MINISQL_TYPE_FLOAT:
+                memcpy(&e.r, block, sizeof(float));
+                block += sizeof(float);
+                break;
+            case MINISQL_TYPE_CHAR:
+                e.str = block;
+                block += attrType[i].charSize + 1;
+                break;
+        }
+        tup.element.push_back(e);
+    }
+}
