@@ -106,7 +106,6 @@ namespace MINISQL_BASE
         SqlValueType type;
         int i;
         float r;
-        int strLength;
         std::string str;
 
         inline size_t M() const

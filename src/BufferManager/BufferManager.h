@@ -19,7 +19,6 @@ struct Block {
     bool dirty; // whether need to write to disk
     bool busy; // whether is free or not
     int LRUCount;
-    char *address; // ? what is the use
     char content[BlockSize];
 
     Block() { reset(); }
@@ -27,7 +26,6 @@ struct Block {
     void reset() {
         dirty = busy = false;
         memset(content, 0, BlockSize);
-        address = content;
     }
 
     void mark(string filename, unsigned int blockID) {
