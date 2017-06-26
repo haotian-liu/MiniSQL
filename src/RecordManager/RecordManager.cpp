@@ -60,6 +60,7 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
             }
             im->insert(indexFileStr, attr, blockID * recordsPerBlock + i);
         }
+        bm->setFree(tableFile(table.Name), blockID);
         blockID++;
         block = bm->getBlock(tableFile(table.Name), blockID);
     }
@@ -104,6 +105,7 @@ int RecordManager::insertRecord(const Table &table, const Tuple &record) {
 
     if (!validBlock) {
         recordOffset = 0;
+        bm->setFree(tableName, blockID);
         block = bm->getBlock(tableName, ++blockID, true); // get next block (should be empty) and get the first unit
     }
 
@@ -133,6 +135,7 @@ int RecordManager::insertRecord(const Table &table, const Tuple &record) {
     }
     block[0] = Used;
     bm->setDirty(tableName, blockID);
+    bm->setFree(tableName, blockID);
     return blockID * recordsPerBlock + recordOffset;
 }
 
@@ -154,6 +157,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
                 res.row.push_back(row);
             }
         }
+        bm->setFree(tableFile(table.Name), blockID);
         blockID++;
         block = bm->getBlock(tableFile(table.Name), blockID);
     }
@@ -174,7 +178,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     int length = table.recordLength + 1;
     int recordsPerBlock = BlockSize / length;
     char *block;
-    int blockOffset;
+    int blockID;
     Tuple tup;
     Row row;
     Result res;
@@ -184,8 +188,8 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     int cnt = 0;
 
     while (recordPos != -1) {
-        blockOffset = recordPos / recordsPerBlock;
-        block = bm->getBlock(tableFileName, blockOffset) + recordPos % recordsPerBlock;
+        blockID = recordPos / recordsPerBlock;
+        block = bm->getBlock(tableFileName, blockID) + recordPos % recordsPerBlock;
         convertToTuple(block, 0, table.attrType, tup);
         if (condsTest(cond, tup, table.attrNames)) {
             row = tup.fetchRow(table.attrNames, attr);
@@ -193,6 +197,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
         } else {
             e = tup.fetchElement(table.attrNames, indexHint.attrName);
             if (!indexHint.cond.test(e)) {
+                bm->setFree(tableFileName, blockID);
                 break;
             }
         }
@@ -200,8 +205,10 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
         cnt++;
         if (cnt > threshold) {
             degrade = true;
+            bm->setFree(tableFileName, blockID);
             break;
         }
+        bm->setFree(tableFileName, blockID);
     }
 
     if (!degrade) {
@@ -234,6 +241,7 @@ bool RecordManager::deleteRecord(const Table &table, const vector<Cond> &cond) {
             }
         }
         bm->setDirty(tableFile(table.Name), blockOffset);
+        bm->setFree(tableFile(table.Name), blockOffset);
         blockOffset++;
         block = bm->getBlock(tableFile(table.Name), blockOffset);
     }
