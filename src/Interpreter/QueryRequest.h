@@ -16,69 +16,6 @@
 
 using namespace MINISQL_BASE;
 
-/*
-enum class SqlValueType
-{
-    Integer,
-    String,
-    Float
-};
-
-inline int M(SqlValueType& tp)
-{
-    switch (tp)
-    {
-        case SqlValueType::Integer:
-            return MINISQL_TYPE_INT;
-        case SqlValueType::Float:
-            return MINISQL_TYPE_FLOAT;
-        case SqlValueType::String:
-            return MINISQL_TYPE_CHAR;
-        default:
-            throw std::runtime_error("");
-    }
-}
-
-inline std::ostream &operator<<(std::ostream &os, SqlValueType &tp)
-{
-    switch (tp)
-    {
-        case SqlValueType::Integer:
-            os << "Integer";
-            break;
-        case SqlValueType::String:
-            os << "String";
-            break;
-        case SqlValueType::Float:
-            os << "Float";
-            break;
-*/
-/*        default:
-            throw std::runtime_error("Invalid SqlValueType");*//*
-
-    }
-    return os;
-}
-
-struct SqlValue
-{
-    SqlValueType type;
-    int i;
-    float r;
-    std::string str;
-    //uint16_t char_length;
-};
-
-static_assert(!std::is_pod<SqlValue>::value);
-*/
-
-struct Condition
-{
-    std::string name;
-    Operator op;
-    SqlValue val;
-};
-
 enum class QueryType
 {
     INSERT,
