@@ -324,12 +324,21 @@ namespace Api
             cond_list.push_back(it);
         }
 
-        return rm->deleteRecord(tb, cond_list);
+        auto r = rm->deleteRecord(tb, cond_list);
+        if (r)
+        {
+            std::cout << "Delete success" << std::endl;
+        } else
+        {
+            std::cout << "Delete failed!" << std::endl;
+        }
+        return r;
     }
 
     bool update(const std::string &table_name, const std::string &attr, const SqlValue &value,
                 const std::vector<Condition> &condition_list)
     {
-        return 0;
+        std::cout << "Not supported." << std::endl;
+        return false;
     }
 }
