@@ -301,7 +301,6 @@ namespace MINISQL_BASE {
         Cond cond;
         std::string attrName;
         int attrType;
-        int capacity;
     };
 
 }

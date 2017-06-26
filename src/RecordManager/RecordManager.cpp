@@ -180,7 +180,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     Result res;
     Element e;
     bool degrade = false;
-    int threshold = indexHint.capacity / recordsPerBlock / 3;
+    int threshold = table.recordCnt / recordsPerBlock / 3;
     int cnt = 0;
 
     while (recordPos != -1) {
