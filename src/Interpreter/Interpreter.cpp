@@ -145,15 +145,15 @@ void dispatch()
     auto select_query = dynamic_cast<SelectQuery *>(query);
     if (select_query)
     {
-        size_t row_count{0};
+        bool r;
         if (select_query->isSelectAll)
         {
-            row_count = Api::select(Api::get_db_name_prefix() + select_query->table_name, select_query->condition_list);
+            r = Api::select(Api::get_db_name_prefix() + select_query->table_name, select_query->condition_list);
         } else
         {
-            row_count = Api::select(Api::get_db_name_prefix() + select_query->table_name,
-                                    select_query->condition_list,
-                                    select_query->attr_list);
+            r = Api::select(Api::get_db_name_prefix() + select_query->table_name,
+                            select_query->condition_list,
+                            select_query->attr_list);
         }
 
         delete select_query;
@@ -164,6 +164,7 @@ void dispatch()
     auto delete_query = dynamic_cast<DeleteQuery *>(query);
     if (delete_query)
     {
+        Api::delete_op(Api::get_db_name_prefix() + delete_query->table_name, delete_query->condition_list);
         delete delete_query;
         query = nullptr;
         return;
@@ -172,6 +173,8 @@ void dispatch()
     auto update_query = dynamic_cast<UpdateQuery *>(query);
     if (update_query)
     {
+        Api::update(Api::get_db_name_prefix() + update_query->table_name, update_query->attr, update_query->value,
+                    update_query->condition_list);
         delete update_query;
         query = nullptr;
         return;
