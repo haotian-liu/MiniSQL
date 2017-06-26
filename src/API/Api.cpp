@@ -215,6 +215,23 @@ namespace Api
         }
 
         auto &tb = cm->GetTable(table_name);
+
+        for (const auto &cond: condition_list)
+        {
+            auto it = std::find(tb.attrNames.begin(), tb.attrNames.end(), cond.name);
+            if (it == tb.attrNames.end())
+            {
+                std::cout << "Attribute in conditions mismatch!" << std::endl;
+                return false;
+            }
+            auto type = tb.attrType[it - tb.attrNames.begin()];
+            if (type.type != cond.val.type.type)
+            {
+                std::cout << "Type in conditions mismatch!" << std::endl;
+                return false;
+            }
+        }
+
         return select(table_name, condition_list, tb.attrNames);
     }
 
@@ -243,16 +260,30 @@ namespace Api
         {
             if (std::find(tb.attrNames.begin(), tb.attrNames.end(), at) == tb.attrNames.end())
             {
-                std::cout << "Attribute mismatch!!" << std::endl;
+                std::cout << "Attribute mismatch!" << std::endl;
                 return false;
             }
         }
 
-        if (tb.index.size() == 0)
+        if (tb.index.size() == 0 || cond_list.size() == 0)
         {
             return rm->selectRecord(tb, attr_list, cond_list);
         } else
         {
+            for (const auto &ind: tb.index)
+            {
+                for (const auto &cond: cond_list)
+                {
+                    if (ind.first == cond.attr)
+                    {
+                        IndexHint hint;
+                        hint.attrName = cond.attr;
+                        hint.cond = cond;
+                        hint.attrType = cond.value.type.M();
+                        return rm->selectRecord(tb, attr_list, cond_list, hint);
+                    }
+                }
+            }
             return rm->selectRecord(tb, attr_list, cond_list);
         }
     }
