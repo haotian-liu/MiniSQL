@@ -31,33 +31,27 @@
 #define INT_LENGTH 4
 #define FLOAT_LENGTH 4
 
-namespace MINISQL_BASE
-{
+namespace MINISQL_BASE {
     const int BlockSize = 4096;
     const int MaxBlocks = 128;
     const char UnUsed = 0;
     const char Used = 1;
 
-    inline std::string dbFile(const std::string &db)
-    { return db + ".db"; }
+    inline std::string dbFile(const std::string &db) { return db + ".db"; }
 
-    inline std::string tableFile(const std::string &table)
-    { return table + ".tb"; }
+    inline std::string tableFile(const std::string &table) { return table + ".tb"; }
 
-    inline std::string indexFile(const std::string &table, const std::string &index)
-    {
+    inline std::string indexFile(const std::string &table, const std::string &index) {
         return table + "_" + index + ".ind";
     }
 
-    enum class SqlValueTypeBase
-    {
+    enum class SqlValueTypeBase {
         Integer,
         String,
         Float
     };
 
-    struct SqlValueType
-    {
+    struct SqlValueType {
         std::string attrName;
         SqlValueTypeBase type;
 
@@ -66,10 +60,8 @@ namespace MINISQL_BASE
         size_t charSize; // charSize does not include the terminating zero of string!
         bool unique = false;
 
-        inline int M() const
-        {
-            switch (type)
-            {
+        inline int M() const {
+            switch (type) {
                 case SqlValueTypeBase::Integer:
                     return MINISQL_TYPE_INT;
                 case SqlValueTypeBase::Float:
@@ -79,10 +71,8 @@ namespace MINISQL_BASE
             }
         }
 
-        inline size_t getSize() const
-        {
-            switch (M())
-            {
+        inline size_t getSize() const {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return sizeof(int);
                 case MINISQL_TYPE_FLOAT:
@@ -92,8 +82,7 @@ namespace MINISQL_BASE
             }
         }
 
-        inline int getDegree() const
-        {
+        inline int getDegree() const {
             size_t keySize = getSize();
             int degree = BlockSize / (keySize + sizeof(int));
 
@@ -101,17 +90,14 @@ namespace MINISQL_BASE
         }
     };
 
-    struct SqlValue
-    {
+    struct SqlValue {
         SqlValueType type;
         int i;
         float r;
         std::string str;
 
-        inline size_t M() const
-        {
-            switch (type.type)
-            {
+        inline size_t M() const {
+            switch (type.type) {
                 case SqlValueTypeBase::Integer:
                     return MINISQL_TYPE_INT;
                 case SqlValueTypeBase::Float:
@@ -121,10 +107,8 @@ namespace MINISQL_BASE
             }
         }
 
-        bool operator<(const SqlValue &e) const
-        {
-            switch (M())
-            {
+        bool operator<(const SqlValue &e) const {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i < e.i;
                 case MINISQL_TYPE_FLOAT:
@@ -136,10 +120,8 @@ namespace MINISQL_BASE
             }
         }
 
-        bool operator==(const SqlValue &e) const
-        {
-            switch (M())
-            {
+        bool operator==(const SqlValue &e) const {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return i == e.i;
                 case MINISQL_TYPE_FLOAT:
@@ -151,26 +133,20 @@ namespace MINISQL_BASE
             }
         }
 
-        bool operator>(const SqlValue &e) const
-        { return !operator<(e); }
+        bool operator>(const SqlValue &e) const { return !operator<(e); }
 
-        bool operator<=(const SqlValue &e) const
-        { return operator<(e) && operator==(e); }
+        bool operator<=(const SqlValue &e) const { return operator<(e) && operator==(e); }
 
-        bool operator>=(const SqlValue &e) const
-        { return !operator<(e) && operator<(e); }
+        bool operator>=(const SqlValue &e) const { return !operator<(e) && operator<(e); }
 
-        void reset()
-        {
+        void reset() {
             str.clear();
             i = 0;
             r = 0;
         }
 
-        std::string toStr() const
-        {
-            switch (M())
-            {
+        std::string toStr() const {
+            switch (M()) {
                 case MINISQL_TYPE_INT:
                     return std::to_string(i);
                 case MINISQL_TYPE_FLOAT:
@@ -183,51 +159,40 @@ namespace MINISQL_BASE
 
     typedef struct SqlValue Element;
 
-    struct Row
-    {
+    struct Row {
         std::vector<std::string> col;
     };
 
-    struct Result
-    {
+    struct Result {
         std::vector<Row> row;
     };
 
-    struct Tuple
-    {
+    struct Tuple {
         std::vector<Element> element;
 
-        Row fetchRow(const std::vector<std::string> &attrTable, const std::vector<std::string> &attrFetch) const
-        {
+        Row fetchRow(const std::vector<std::string> &attrTable, const std::vector<std::string> &attrFetch) const {
             Row row;
             bool attrFound;
             row.col.reserve(attrFetch.size());
-            for (auto fetch : attrFetch)
-            {
+            for (auto fetch : attrFetch) {
                 attrFound = false;
-                for (int i = 0; i < attrTable.size(); i++)
-                {
-                    if (fetch == attrTable[i])
-                    {
+                for (int i = 0; i < attrTable.size(); i++) {
+                    if (fetch == attrTable[i]) {
                         row.col.push_back(element[i].toStr());
                         attrFound = true;
                         break;
                     }
                 }
-                if (!attrFound)
-                {
+                if (!attrFound) {
                     std::cerr << "Undefined attr in row fetching!!" << std::endl;
                 }
             }
             return row;
         }
 
-        const Element &fetchElement(const std::vector<std::string> &attrTable, const std::string &attrFetch) const
-        {
-            for (int i = 0; i < attrTable.size(); i++)
-            {
-                if (attrFetch == attrTable[i])
-                {
+        const Element &fetchElement(const std::vector<std::string> &attrTable, const std::string &attrFetch) const {
+            for (int i = 0; i < attrTable.size(); i++) {
+                if (attrFetch == attrTable[i]) {
                     return element[i];
                 }
             }
@@ -235,10 +200,8 @@ namespace MINISQL_BASE
         }
     };
 
-    struct Table
-    {
-        Table()
-        {};
+    struct Table {
+        Table() {};
 
 /*        Table(const Table &T) : Name(T.Name), attrCnt(T.attrCnt), recordLength(T.recordLength),
                                 recordCnt(T.recordCnt), size(T.size), attrType(T.attrType), attrNames(T.attrNames),
@@ -252,8 +215,7 @@ namespace MINISQL_BASE
         /// for index, first stands for attr name, second stands for index name.
         std::vector<std::pair<std::string, std::string>> index;
 
-        friend std::ostream &operator<<(std::ostream &os, const Table &table)
-        {
+        friend std::ostream &operator<<(std::ostream &os, const Table &table) {
             os << "Name: " << table.Name << " attrCnt: " << table.attrCnt << " recordLength: " << table.recordLength
                << " recordCnt: " << table.recordCnt << " size: " << table.size
                << " attrNames: " << table.attrNames.size();
@@ -261,26 +223,21 @@ namespace MINISQL_BASE
         }
     };
 
-    struct Condition
-    {
+    struct Condition {
         std::string name;
         Operator op;
         SqlValue val;
     };
 
-    struct Cond
-    {
+    struct Cond {
         Cond() = default;
 
-        Cond(const std::string &attr, const Element &value, int cond) : attr(attr), value(value), cond(cond)
-        {}
+        Cond(const std::string &attr, const Element &value, int cond) : attr(attr), value(value), cond(cond) {}
 
         Cond(const Condition &condition)
                 : attr(condition.name),
-                  value(condition.val)
-        {
-            switch (condition.op)
-            {
+                  value(condition.val) {
+            switch (condition.op) {
                 case Operator::GE_OP:
                     cond = MINISQL_COND_GEQUAL;
                 case Operator::LE_OP:
@@ -300,10 +257,8 @@ namespace MINISQL_BASE
         std::string attr;
         Element value;
 
-        bool test(const Element &e) const
-        {
-            switch (cond)
-            {
+        bool test(const Element &e) const {
+            switch (cond) {
                 case MINISQL_COND_EQUAL:
                     return e == value;
                 case MINISQL_COND_LEQUAL:
@@ -320,26 +275,20 @@ namespace MINISQL_BASE
         }
     };
 
-    inline bool condsTest(const std::vector<Cond> &conds, const Tuple &tup, const std::vector<std::string> &attr)
-    {
+    inline bool condsTest(const std::vector<Cond> &conds, const Tuple &tup, const std::vector<std::string> &attr) {
         int condPos;
-        for (Cond cond : conds)
-        {
+        for (Cond cond : conds) {
             condPos = -1;
-            for (int i = 0; i < attr.size(); i++)
-            {
-                if (attr[i] == cond.attr)
-                {
+            for (int i = 0; i < attr.size(); i++) {
+                if (attr[i] == cond.attr) {
                     condPos = i;
                     break;
                 }
             }
-            if (condPos == -1)
-            {
+            if (condPos == -1) {
                 std::cerr << "Attr not found in cond test!" << std::endl;
             }
-            if (!cond.test(tup.element[condPos]))
-            {
+            if (!cond.test(tup.element[condPos])) {
                 return false;
             }
         }
@@ -347,17 +296,14 @@ namespace MINISQL_BASE
     }
 
     inline void
-    convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup)
-    {
+    convertToTuple(const char *blockBuffer, int offset, const std::vector<SqlValueType> &attrType, Tuple &tup) {
         const char *block = blockBuffer + offset + 1; // 1 for meta bit
         Element e;
         tup.element.clear();
-        for (int i = 0; i < attrType.size(); i++)
-        {
+        for (int i = 0; i < attrType.size(); i++) {
             e.reset();
             e.type = attrType[i];
-            switch (attrType[i].M())
-            {
+            switch (attrType[i].M()) {
                 case MINISQL_TYPE_INT:
                     memcpy(&e.i, block, sizeof(int));
                     block += sizeof(int);
@@ -375,8 +321,7 @@ namespace MINISQL_BASE
         }
     }
 
-    struct IndexHint
-    {
+    struct IndexHint {
         Cond cond;
         std::string attrName;
         int attrType;
