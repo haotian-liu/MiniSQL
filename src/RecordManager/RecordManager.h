@@ -14,9 +14,11 @@
 using namespace std;
 using namespace MINISQL_BASE;
 
-class RecordManager {
+class RecordManager
+{
 public:
-    RecordManager(BufferManager *bm, IndexManager *im) : bm(bm), im(im) {}
+    RecordManager(BufferManager *bm, IndexManager *im) : bm(bm), im(im)
+    {}
 
     ~RecordManager() = default;
 
