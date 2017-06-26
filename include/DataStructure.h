@@ -135,11 +135,11 @@ namespace MINISQL_BASE {
 
         bool operator!=(const SqlValue &e) const { return !operator==(e); }
 
-        bool operator>(const SqlValue &e) const { return !operator<(e); }
+        bool operator>(const SqlValue &e) const { return !operator<(e) && operator!=(e); }
 
-        bool operator<=(const SqlValue &e) const { return operator<(e) && operator==(e); }
+        bool operator<=(const SqlValue &e) const { return operator<(e) || operator==(e); }
 
-        bool operator>=(const SqlValue &e) const { return !operator<(e) && operator<(e); }
+        bool operator>=(const SqlValue &e) const { return !operator<(e); }
 
         void reset() {
             str.clear();
