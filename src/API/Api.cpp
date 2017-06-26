@@ -189,12 +189,14 @@ namespace Api
 
     bool drop_table(const std::string &table_name)
     {
+        //FIXME
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         return rm->dropTable(table_name);
     }
 
     bool drop_index(const std::string &index_name)
     {
+        //FIXME
         std::string table_name;
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         return rm->dropIndex(table_name, index_name);
@@ -202,13 +204,42 @@ namespace Api
 
     size_t select(const std::string &table_name, const std::vector<Condition> &condition_list)
     {
-        return 0;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (!cm->TableExist(table_name))
+        {
+            std::cout << "Table not found!" << std::endl;
+            return 0;
+        }
+
+        auto &tb = cm->GetTable(table_name);
+        return select(table_name, condition_list, tb.attrNames);
     }
 
     size_t select(const std::string &table_name, const std::vector<Condition> &condition_list,
                   const std::vector<std::string> &attr_list)
     {
-        return 0;
+        auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (!cm->TableExist(table_name))
+        {
+            std::cout << "Table not found!" << std::endl;
+            return 0;
+        }
+
+        auto &tb = cm->GetTable(table_name);
+
+        if (tb.index.size() == 0)
+        {
+
+        } else
+        {
+
+        }
     }
 
     size_t delete_op(const std::string &table_name, const std::vector<Condition> &condition_list)
