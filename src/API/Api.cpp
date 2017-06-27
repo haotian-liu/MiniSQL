@@ -68,9 +68,11 @@ namespace Api
             }
         }
 
+        //assert unique
+        //TODO
+
         Tuple t;
         t.element = value_list;
-        //TODO: fail detect and stop.
         auto offset = rm->insertRecord(tb, t);
 
         for (const auto &id: tb.index)
