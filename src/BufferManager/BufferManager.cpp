@@ -1,4 +1,5 @@
 #include <cstring>
+#include <sys/stat.h>
 
 #include "BufferManager.h"
 
@@ -14,13 +15,11 @@ BufferManager::BufferManager() {
 }
 
 int BufferManager::getBlockTail(string filename) {
-    fstream fp;
-    fp.open(filename, ios::in | ios::binary);
-    if (!fp.good())
-        cerr << filename << " open failed." << endl;
-    fp.seekg(0, ios_base::end);
-    int k = fp.tellg();
-    return (k / BlockSize - 1);
+    struct stat st;
+    if (stat(filename.c_str(), &st) == 0) {
+        return (st.st_size / BlockSize - 1);
+    }
+    cerr << "Failed to get file tail" << endl;
 }
 
 void BufferManager::setDirty(const string &filename, unsigned int blockID) {
@@ -92,15 +91,17 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     }
 
     fstream fp;
-    fp.open(filename, ios::in | ios::out | ios::ate | ios::binary);
+    fp.open(filename, ios::in | ios::out | ios::binary);
     if (!fp.good())
         cerr << "Fail to open file: " << filename << "." << endl;
-    fp.seekg(0, ios_base::end);
-    int blockOffset = fp.tellg() / BlockSize;
+    fp.seekg(ios_base::end);
+    //int blockOffset = fp.tellg() / BlockSize;
+    int blockOffset = getBlockTail(filename) + 1;
     cout << "Detected blockOffset: " << blockOffset << endl;
     if (offset >= blockOffset) {
         if (!allocate) { return nullptr; }
         if (blockOffset != offset) {
+            cerr << fp.tellg() << " " << blockOffset << " " << offset << endl;
             cerr << "Requesting way beyond the tail!" << endl;
             return nullptr;
         }
@@ -111,7 +112,7 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     block.mark(filename, offset);
     blockMap.insert(TypeBlockMap::value_type(make_pair(filename, offset), block));
 
-    fp.seekg(ios::beg + offset * BlockSize);
+    fp.seekg(offset * BlockSize, ios::beg);
     fp.read(block.content, BlockSize);
     fp.close();
     setBusy(block.id);
