@@ -67,9 +67,23 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     return true;
 }
 
-bool RecordManager::dropIndex(const string &table, const string &index) {
-    string indexFileStr = indexFile(table, index);
+bool RecordManager::dropIndex(const Table &table, const string &index) {
+    string indexFileStr = indexFile(table.Name, index);
     bm->removeFile(indexFileStr);
+
+    bool foundAttr = false;
+
+    for (auto &attr : table.attrType) {
+        if (attr.attrName == index) {
+            foundAttr = true;
+            im->drop(indexFileStr, attr);
+            break;
+        }
+    }
+    if (!foundAttr) {
+        cerr << "Drop index on undefined attr!" << endl;
+    }
+
     return true;
 }
 
@@ -139,7 +153,7 @@ int RecordManager::insertRecord(const Table &table, const Tuple &record) {
     return blockID * recordsPerBlock + recordOffset;
 }
 
-bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
+int RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
     int blockID = 0;
     char *block = bm->getBlock(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
@@ -163,10 +177,11 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     }
 
     dumpResult(res);
+    return res.row.size();
 }
 
-bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
-                                 const IndexHint &indexHint) {
+int RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
+                                 const IndexHint &indexHint, bool printResult) {
     string tableFileName = tableFile(table.Name);
     string indexFileName = indexFile(table.Name, indexHint.attrName);
     int recordPos;
@@ -197,7 +212,14 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
             res.row.push_back(row);
         } else {
             e = tup.fetchElement(table.attrNames, indexHint.attrName);
-            if (!indexHint.cond.test(e)) {
+            if (indexHint.cond.cond == MINISQL_COND_MORE) {
+                IndexHint tmp = indexHint;
+                tmp.cond.cond = MINISQL_COND_GEQUAL;
+                if (!tmp.cond.test(e)) {
+                    bm->setFree(tableFileName, blockID);
+                    break;
+                }
+            } else if (!indexHint.cond.test(e)) {
                 bm->setFree(tableFileName, blockID);
                 break;
             }
@@ -213,9 +235,12 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     }
 
     if (!degrade) {
-        dumpResult(res);
+        if (printResult) {
+            dumpResult(res);
+        }
+        return cnt;
     } else {
-        selectRecord(table, attr, cond);
+        return selectRecord(table, attr, cond);
     }
 }
 

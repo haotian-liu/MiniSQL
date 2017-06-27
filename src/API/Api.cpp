@@ -241,7 +241,7 @@ namespace Api
         for (auto &it: tb.index)
         {
             auto ifn = it.second;
-            rm->dropIndex(tb.Name, ifn);
+            rm->dropIndex(tb, ifn);
         }
 
         std::cout << "Table " << table_name << " dropped." << std::endl;
@@ -268,7 +268,7 @@ namespace Api
         {
             if (ind.second == index_name)
             {
-                rm->dropIndex(tb.Name, ind.first);
+                rm->dropIndex(tb, ind.first);
                 tb.index.erase(std::find_if(tb.index.begin(), tb.index.end(),
                                             [&index_name](const std::pair<std::string, std::string> &it)
                                             { return it.second == index_name; }));

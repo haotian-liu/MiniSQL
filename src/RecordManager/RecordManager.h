@@ -28,14 +28,14 @@ public:
 
     bool createIndex(const Table &table, const SqlValueType &index);
 
-    bool dropIndex(const string &table, const string &index);
+    bool dropIndex(const Table &table, const string &index);
 
     int insertRecord(const Table &table, const Tuple &record);
 
-    bool selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond);
+    int selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond);
 
-    bool
-    selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint);
+    int
+    selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint, bool printResult = true);
 
     bool deleteRecord(const Table &table, const vector<Cond> &cond);
 
