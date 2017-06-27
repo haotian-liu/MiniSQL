@@ -193,10 +193,12 @@ bool CatalogManager::CheckIndexNameExists(const std::string &index_name) const
 
 bool CatalogManager::RemoveTable(const Table &table)
 {
-/*    if (std::find(tables.begin(), tables.end(), const_cast<const Table &>(table)) == std::end(tables))
-        return false;*/
-/*    tables.erase(std::find(tables.begin(), tables.end(), table));
-    return true;*/
+    if (std::find_if(tables.begin(), tables.end(), [&table](const Table &tb)
+    { return tb.Name == table.Name; }) == tables.end())
+        return false;
+    tables.erase(std::find_if(tables.begin(), tables.end(), [&table](const Table &tb)
+    { return tb.Name == table.Name; }));
+    return true;
 }
 
 Table &CatalogManager::GetTableWithIndex(const std::string &index_name)
