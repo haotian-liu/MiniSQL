@@ -27,6 +27,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
         if (sch.first == primary_key_name)
         {
             (tb.attrType.end() - 1)->primary = true;
+            (tb.attrType.end() - 1)->unique = true;
         }
     }
 
