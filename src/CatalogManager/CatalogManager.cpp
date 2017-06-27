@@ -53,6 +53,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
         }
     }
     tables.push_back(tb);
+    kv[tb.Name] = 0;
 }
 
 CatalogManager::CatalogManager()
@@ -75,6 +76,7 @@ void CatalogManager::Flush() const
     {
         ofs << tb.Name << std::endl;
         ofs << tb.recordCnt << std::endl;
+        ofs << kv[tb.Name] << std::endl;
         std::ofstream otbfs(tb.Name + ".catalog");
         uint16_t i{0};
 
@@ -147,6 +149,10 @@ void CatalogManager::LoadFromFile()
         std::vector<SqlValueType> ind_vec;
         //size_t len{0};
         ifs >> tb.recordCnt;
+
+        int v;
+        ifs >> v;
+        kv[tb_name] = v;
 
         tb.Name = tb_name;
 
