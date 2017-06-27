@@ -140,14 +140,18 @@ namespace Api
                 return false;
             }
         }
+        auto rval = rm->createTable(table_name);
         cm->CreateTable(table_name, schema_list, primary_key_name);
         auto &tb = cm->GetTable(table_name);
-        rm->createIndex(tb, primary_key_type);
-        tb.index.push_back(std::make_pair(primary_key_name, ind_name));
+        if (is_pri_index)
+        {
+            rm->createIndex(tb, primary_key_type);
+            tb.index.push_back(std::make_pair(primary_key_name, ind_name));
+        }
         std::cout << "Create table " << table_name << " success." << std::endl;
         cm->Flush();
 
-        return rm->createTable(table_name);
+        return rval;
     }
 
     bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name,
@@ -174,6 +178,12 @@ namespace Api
         {
             if (i.first == attribute_name)
             {
+                if (i.second.find("auto_ind") == 0)
+                {
+                    i.second = index_name;
+                    std::cout << "Create index success" << std::endl;
+                    return true;
+                }
                 std::cout << "Index on the attribute exists!" << std::endl;
                 return false;
             }

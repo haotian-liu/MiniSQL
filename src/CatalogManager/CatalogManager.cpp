@@ -19,22 +19,40 @@ void CatalogManager::CreateTable(const std::string &table_name,
     tb.Name = table_name;
     tb.attrCnt = (int) schema_list.size();
     uint32_t len{0};
+    char auto_ind{'A'};
+
+    auto rm = Api::ApiHelper::getApiHelper()->getRecordManager();
 
     for (const auto &sch: schema_list)
     {
         len += sch.second.getSize();
         tb.attrNames.push_back(sch.first);
-        tb.attrType.push_back(sch.second);
+        auto t = sch.second;
+        t.attrName = sch.first;
+        tb.attrType.push_back(t);
         if (sch.first == primary_key_name)
         {
             (tb.attrType.end() - 1)->primary = true;
             (tb.attrType.end() - 1)->unique = true;
         }
+/*        if (!(tb.attrType.end() - 1)->primary && (tb.attrType.end() - 1)->unique)
+        {
+            tb.index.push_back(std::make_pair(*(tb.attrNames.end() - 1), std::string("auto_ind_") + (auto_ind++)));
+            rm->createIndex(tb, )
+        }*/
     }
 
     tb.recordLength = len;
     tb.recordCnt = 0;
     tables.push_back(tb);
+    for (auto &t: tb.attrType)
+    {
+        if (t.unique && !t.primary)
+        {
+            tb.index.push_back(std::make_pair(t.attrName, std::string("auto_ind_") + (auto_ind++)));
+            rm->createIndex(tb, t);
+        }
+    }
 }
 
 CatalogManager::CatalogManager()
