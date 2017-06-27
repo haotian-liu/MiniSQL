@@ -54,8 +54,16 @@ namespace Api
         {
             if (value_list[i].type.type != tb.attrType[i].type)
             {
-                std::cout << "Type mismatch!" << std::endl;
-                return 0;
+                if (value_list[i].type.type == SqlValueTypeBase::Integer &&
+                    tb.attrType[i].type == SqlValueTypeBase::Float)
+                {
+                    value_list[i].type.type = SqlValueTypeBase::Float;
+                    value_list[i].r = value_list[i].i;
+                } else
+                {
+                    std::cout << "Type mismatch!" << std::endl;
+                    return 0;
+                }
             }
             if (value_list[i].type.type == SqlValueTypeBase::String)
             {
