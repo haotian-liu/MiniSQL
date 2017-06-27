@@ -79,6 +79,7 @@ namespace Api
                        value_list[it - tb.attrNames.begin()], offset);
         }
 
+        ++tb.recordCnt;
         std::cout << "Insert finished. 1 row affected." << std::endl;
         return 1;
     }

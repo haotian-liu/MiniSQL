@@ -31,6 +31,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
     }
 
     tb.recordLength = len;
+    tb.recordCnt = 0;
     tables.push_back(tb);
 }
 
