@@ -249,6 +249,7 @@ namespace Api
                 tb.index.erase(std::find_if(tb.index.begin(), tb.index.end(),
                                             [&index_name](const std::pair<std::string, std::string> &it)
                                             { return it.second == index_name; }));
+                std::cout << "Index " << table_name << " dropped." << std::endl;
                 cm->Flush();
                 return true;
             }

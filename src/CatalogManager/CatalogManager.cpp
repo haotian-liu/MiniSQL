@@ -51,6 +51,7 @@ CatalogManager::~CatalogManager()
 void CatalogManager::Flush() const
 {
     std::ofstream ofs(meta_file_name);
+    ofs << tables.size() << std::endl;
 
     for (const auto &tb: tables)
     {
@@ -112,11 +113,13 @@ void CatalogManager::LoadFromFile()
         std::ofstream touch(meta_file_name);
         return;
     }
+    size_t tables_count{0};
+    ifs >> tables_count;
 
     auto rm = Api::ApiHelper::getApiHelper()->getRecordManager();
 
     std::string tb_name;
-    while (ifs.peek() != EOF)
+    for (auto i = 0; i < tables_count; ++i)
     {
         ifs >> tb_name;
         auto file_name = tb_name + ".catalog";
