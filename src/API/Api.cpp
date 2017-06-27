@@ -16,7 +16,7 @@ namespace Api
     bool use_database(const std::string &db_name)
     {
         Api::is_database_assigned = true;
-        Api::database_name = db_name;
+/*        Api::database_name = db_name;*/
     }
 
     std::string get_db_name_prefix()
@@ -178,6 +178,7 @@ namespace Api
 
         auto b1 = rm->createIndex(tb, type);
         auto b2 = im->create(indexFile(table_name, attribute_name), type);
+        cm->Flush();
         if (b1 && b2)
         {
             std::cout << "Create index success" << std::endl;
@@ -210,6 +211,7 @@ namespace Api
 
         std::cout << "Table " << table_name << " dropped." << std::endl;
         cm->RemoveTable(tb);
+        cm->Flush();
         return rm->dropTable(table_name);
     }
 
@@ -235,6 +237,7 @@ namespace Api
                 tb.index.erase(std::find_if(tb.index.begin(), tb.index.end(),
                                             [&index_name](const std::pair<std::string, std::string> &it)
                                             { return it.second == index_name; }));
+                cm->Flush();
                 return true;
             }
         }
