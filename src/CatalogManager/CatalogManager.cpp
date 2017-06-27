@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "CatalogManager.h"
+#include "../API/ApiHelper.h"
 
 using namespace std;
 
@@ -112,6 +113,8 @@ void CatalogManager::LoadFromFile()
         return;
     }
 
+    auto rm = Api::ApiHelper::getApiHelper()->getRecordManager();
+
     std::string tb_name;
     while (ifs.peek() != EOF)
     {
@@ -157,11 +160,13 @@ void CatalogManager::LoadFromFile()
             record_length += type.getSize();
             type.primary = isPri != 0;
             type.unique = isUni != 0;
+            type.attrName = attr_name;
             tb.attrType.push_back(type);
             if (isInd)
             {
                 auto ind = std::make_pair(attr_name, index_name);
                 tb.index.push_back(ind);
+                rm->createIndex(tb, type);
             }
         }
         tb.attrCnt = attr_cnts;
