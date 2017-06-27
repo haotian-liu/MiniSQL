@@ -209,12 +209,12 @@ namespace Api
         }
 
         std::cout << "Table " << table_name << " dropped." << std::endl;
+        cm->RemoveTable(tb);
         return rm->dropTable(table_name);
     }
 
     bool drop_index(const std::string &index_name)
     {
-        //FIXME
         std::string table_name;
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
@@ -226,6 +226,19 @@ namespace Api
             std::cout << "Index not found!" << std::endl;
             return false;
         }
+        auto &tb = cm->GetTableWithIndex(index_name);
+        for (auto &ind: tb.index)
+        {
+            if (ind.second == index_name)
+            {
+                rm->dropIndex(tb.Name, ind.first);
+                tb.index.erase(std::find_if(tb.index.begin(), tb.index.end(),
+                                            [&index_name](const std::pair<std::string, std::string> &it)
+                                            { return it.second == index_name; }));
+                return true;
+            }
+        }
+        return false;
     }
 
     bool select(const std::string &table_name, const std::vector<Condition> &condition_list)
