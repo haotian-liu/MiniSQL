@@ -22,6 +22,10 @@ public:
 
     bool CheckIndexNameExists(const std::string &index_name) const;
 
+    Table &GetTableWithIndex(const std::string &index_name);
+
+    bool RemoveTable(const Table &table);
+
     CatalogManager();
 
     ~CatalogManager();

@@ -190,10 +190,25 @@ namespace Api
 
     bool drop_table(const std::string &table_name)
     {
-        //FIXME
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
         auto cm = ApiHelper::getApiHelper()->getCatalogManager();
+
+        if (!cm->TableExist(table_name))
+        {
+            std::cout << "Table not found!" << std::endl;
+            return false;
+        }
+
+        auto &tb = cm->GetTable(table_name);
+
+        for (auto &it: tb.index)
+        {
+            auto ifn = it.second;
+            rm->dropIndex(tb.Name, ifn);
+        }
+
+        std::cout << "Table " << table_name << " dropped." << std::endl;
         return rm->dropTable(table_name);
     }
 
@@ -204,7 +219,13 @@ namespace Api
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
         auto cm = ApiHelper::getApiHelper()->getCatalogManager();
-        return rm->dropIndex(table_name, index_name);
+
+        bool e = cm->CheckIndexNameExists(index_name);
+        if (!e)
+        {
+            std::cout << "Index not found!" << std::endl;
+            return false;
+        }
     }
 
     bool select(const std::string &table_name, const std::vector<Condition> &condition_list)
