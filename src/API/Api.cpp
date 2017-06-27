@@ -70,6 +70,7 @@ namespace Api
 
         Tuple t;
         t.element = value_list;
+        //TODO: fail detect and stop.
         auto offset = rm->insertRecord(tb, t);
 
         for (const auto &id: tb.index)
@@ -138,7 +139,8 @@ namespace Api
         return rm->createTable(table_name);
     }
 
-    bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name, bool usercall)
+    bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name,
+                      bool usercall)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
@@ -172,9 +174,16 @@ namespace Api
         {
             if (tb.attrNames[i] == attribute_name)
             {
-                type = tb.attrType[i];
-                type.attrName = tb.attrNames[i];
-                break;
+                if (tb.attrType[i].unique)
+                {
+                    type = tb.attrType[i];
+                    type.attrName = tb.attrNames[i];
+                    break;
+                } else
+                {
+                    std::cout << "Not a unique attribute!!" << std::endl;
+                    return false;
+                }
             }
         }
 
@@ -187,6 +196,7 @@ namespace Api
             return true;
         } else
         {
+            std::cout << "Unknown failure!" << std::endl;
             return false;
         }
     }
