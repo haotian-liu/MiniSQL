@@ -168,7 +168,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
 bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
                                  const IndexHint &indexHint) {
     string tableFileName = tableFile(table.Name);
-    string indexFileName = indexFile(table.Name, "");
+    string indexFileName = indexFile(table.Name, indexHint.attrName);
     int recordPos;
     if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
         recordPos = im->searchHead(indexFileName, indexHint.attrType);
