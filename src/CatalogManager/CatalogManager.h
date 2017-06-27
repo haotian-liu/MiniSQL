@@ -2,6 +2,7 @@
 #define _catalog_H_
 
 #include <list>
+#include <map>
 
 #include "../../include/DataStructure.h"
 
@@ -34,6 +35,8 @@ public:
 
     bool isValid() const
     { return validFlag; }
+
+    mutable std::map<std::string, int> kv;
 
 private:
     void LoadFromFile();
