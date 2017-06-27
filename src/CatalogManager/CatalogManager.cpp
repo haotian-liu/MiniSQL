@@ -44,7 +44,6 @@ void CatalogManager::CreateTable(const std::string &table_name,
 
     tb.recordLength = len;
     tb.recordCnt = 0;
-    tables.push_back(tb);
     for (auto &t: tb.attrType)
     {
         if (t.unique && !t.primary)
@@ -53,6 +52,7 @@ void CatalogManager::CreateTable(const std::string &table_name,
             rm->createIndex(tb, t);
         }
     }
+    tables.push_back(tb);
 }
 
 CatalogManager::CatalogManager()
@@ -144,6 +144,7 @@ void CatalogManager::LoadFromFile()
         std::ifstream itbfs(file_name);
 
         Table tb;
+        std::vector<SqlValueType> ind_vec;
         //size_t len{0};
         ifs >> tb.recordCnt;
 
@@ -187,12 +188,16 @@ void CatalogManager::LoadFromFile()
             {
                 auto ind = std::make_pair(attr_name, index_name);
                 tb.index.push_back(ind);
-                rm->createIndex(tb, type);
+                ind_vec.push_back(type);
             }
         }
         tb.attrCnt = attr_cnts;
         tb.recordLength = record_length;
         tables.push_back(tb);
+        for(auto &it: ind_vec)
+        {
+            rm->createIndex(tb, it);
+        }
     }
 }
 
