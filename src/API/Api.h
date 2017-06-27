@@ -17,7 +17,7 @@ namespace Api
 {
     bool use_database(const std::string &db_name);
 
-    size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list);
+    size_t insert(const std::string &table_name, std::vector<SqlValue> &value_list);
 
     bool delete_op(const std::string &table_name, const std::vector<Condition> &condition_list);
 

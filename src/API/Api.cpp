@@ -30,7 +30,7 @@ namespace Api
         return std::string("db_") + database_name + "_";
     }
 
-    size_t insert(const std::string &table_name, const std::vector<SqlValue> &value_list)
+    size_t insert(const std::string &table_name, std::vector<SqlValue> &value_list)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
@@ -64,6 +64,7 @@ namespace Api
                     std::cout << "String too long!" << std::endl;
                     return 0;
                 }
+                value_list[i].type.charSize = tb.attrType[i].charSize;
             }
         }
 
