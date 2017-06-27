@@ -116,6 +116,7 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     fp.read(block.content, BlockSize);
     fp.close();
     setBusy(block.id);
+    block.flush();
     return block.content;
 }
 
