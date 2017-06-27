@@ -55,6 +55,7 @@ void CatalogManager::Flush() const
         std::ofstream otbfs(tb.Name + ".catalog");
         uint16_t i{0};
 
+        otbfs << tb.attrNames.size() << std::endl;
         for (const auto &attr_name: tb.attrNames)
         {
             otbfs << attr_name << std::endl;
@@ -120,7 +121,10 @@ void CatalogManager::LoadFromFile()
 
         uint16_t attr_cnts{0};
         uint16_t record_length{0};
-        do
+
+        size_t attr_counts{0};
+        itbfs >> attr_counts;
+        for (auto ci = 0; ci < attr_counts; ++ci)
         {
             std::string attr_name, type_name, index_name;
             uint16_t isPri, isUni, isInd, size;
@@ -153,7 +157,7 @@ void CatalogManager::LoadFromFile()
                 auto ind = std::make_pair(attr_name, index_name);
                 tb.index.push_back(ind);
             }
-        } while (itbfs.peek() != EOF);
+        }
         tb.attrCnt = attr_cnts;
         tables.push_back(tb);
     }

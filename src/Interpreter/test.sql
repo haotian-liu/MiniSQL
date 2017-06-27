@@ -24,7 +24,11 @@ execfile "~/n.sql";
 
 create table t1(a int, b char(20), primary key(a));
 create table t2(a float, b char(20), primary key(a));
-create table q(k int);
 
+create table q(k int);
 insert into q values(42);
+insert into q values(43);
+
+select * from q;
+
 insert into tq(24, "asd");
