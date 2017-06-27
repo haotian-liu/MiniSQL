@@ -197,7 +197,14 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
             res.row.push_back(row);
         } else {
             e = tup.fetchElement(table.attrNames, indexHint.attrName);
-            if (!indexHint.cond.test(e)) {
+            if (indexHint.cond.cond == MINISQL_COND_MORE) {
+                IndexHint tmp = indexHint;
+                tmp.cond.cond = MINISQL_COND_GEQUAL;
+                if (!tmp.cond.test(e)) {
+                    bm->setFree(tableFileName, blockID);
+                    break;
+                }
+            } else if (!indexHint.cond.test(e)) {
                 bm->setFree(tableFileName, blockID);
                 break;
             }
