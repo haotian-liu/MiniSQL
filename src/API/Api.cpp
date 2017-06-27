@@ -191,6 +191,8 @@ namespace Api
     {
         //FIXME
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
         return rm->dropTable(table_name);
     }
 
@@ -199,6 +201,8 @@ namespace Api
         //FIXME
         std::string table_name;
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
+        auto im = ApiHelper::getApiHelper()->getIndexManager();
+        auto cm = ApiHelper::getApiHelper()->getCatalogManager();
         return rm->dropIndex(table_name, index_name);
     }
 
