@@ -67,9 +67,23 @@ bool RecordManager::createIndex(const Table &table, const SqlValueType &index) {
     return true;
 }
 
-bool RecordManager::dropIndex(const string &table, const string &index) {
-    string indexFileStr = indexFile(table, index);
+bool RecordManager::dropIndex(const Table &table, const string &index) {
+    string indexFileStr = indexFile(table.Name, index);
     bm->removeFile(indexFileStr);
+
+    bool foundAttr = false;
+
+    for (auto &attr : table.attrType) {
+        if (attr.attrName == index) {
+            foundAttr = true;
+            im->drop(indexFileStr, attr);
+            break;
+        }
+    }
+    if (!foundAttr) {
+        cerr << "Drop index on undefined attr!" << endl;
+    }
+
     return true;
 }
 
