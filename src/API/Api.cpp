@@ -114,16 +114,24 @@ namespace Api
             }
         }
 
+        bool is_pri_index{false};
+        SqlValueType primary_key_type;
+        std::string ind_name;
         if (!primary_key_name.empty())
         {
             bool pri_schema_found = false;
-            SqlValueType primary_key_type;
             for (auto &it: schema_list)
             {
                 if (it.first == primary_key_name)
                 {
                     pri_schema_found = true;
                     primary_key_type = it.second;
+
+                    primary_key_type.unique = true;
+                    primary_key_type.charSize = it.second.getSize();
+                    primary_key_type.attrName = it.first;
+                    ind_name = "pri_" + table_name + "_" + it.first;
+                    is_pri_index = true;
                 }
             }
             if (!pri_schema_found)
@@ -133,6 +141,9 @@ namespace Api
             }
         }
         cm->CreateTable(table_name, schema_list, primary_key_name);
+        auto &tb = cm->GetTable(table_name);
+        rm->createIndex(tb, primary_key_type);
+        tb.index.push_back(std::make_pair(primary_key_name, ind_name));
         std::cout << "Create table " << table_name << " success." << std::endl;
         cm->Flush();
 
