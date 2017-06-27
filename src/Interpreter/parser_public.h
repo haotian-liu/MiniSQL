@@ -15,7 +15,7 @@
 #include "operator.h"
 #include "QueryRequest.h"
 
-#define INPUT_LENGTH 2000
+#define INPUT_LENGTH 409600
 
 // generated functions
 int yylex();
