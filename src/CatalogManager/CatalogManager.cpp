@@ -117,6 +117,8 @@ void CatalogManager::LoadFromFile()
         std::ifstream itbfs(file_name);
 
         Table tb;
+        //size_t len{0};
+
         tb.Name = tb_name;
 
         uint16_t attr_cnts{0};
@@ -159,6 +161,7 @@ void CatalogManager::LoadFromFile()
             }
         }
         tb.attrCnt = attr_cnts;
+        tb.recordLength = record_length;
         tables.push_back(tb);
     }
 }
