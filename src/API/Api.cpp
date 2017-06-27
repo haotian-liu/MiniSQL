@@ -138,7 +138,7 @@ namespace Api
         return rm->createTable(table_name);
     }
 
-    bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name)
+    bool create_index(const std::string &table_name, const std::string &attribute_name, const std::string &index_name, bool usercall)
     {
         auto rm = ApiHelper::getApiHelper()->getRecordManager();
         auto im = ApiHelper::getApiHelper()->getIndexManager();
@@ -173,16 +173,15 @@ namespace Api
             if (tb.attrNames[i] == attribute_name)
             {
                 type = tb.attrType[i];
+                type.attrName = tb.attrNames[i];
                 break;
             }
         }
 
         auto b1 = rm->createIndex(tb, type);
-        //FIXME! should the im be called from API directly???
-        auto b2 = im->create(indexFile(table_name, attribute_name), type);
         tb.index.push_back(std::make_pair(attribute_name, index_name));
         cm->Flush();
-        if (b1 && b2)
+        if (b1)
         {
             std::cout << "Create index success" << std::endl;
             return true;
