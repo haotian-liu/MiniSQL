@@ -65,6 +65,7 @@ namespace Api
                     return 0;
                 }
             }
+            value_list[i].type.attrName = tb.attrNames[i];
             if (value_list[i].type.type == SqlValueTypeBase::String)
             {
                 if (value_list[i].str.length() > tb.attrType[i].charSize)
@@ -76,8 +77,27 @@ namespace Api
             }
         }
 
-        //assert unique
-        //TODO
+        // Assert unique
+        IndexHint uniqueTest;
+        std::vector<Cond> conds;
+        conds.emplace_back();
+        Cond &cond = conds[0];
+        cond.cond = MINISQL_COND_EQUAL;
+
+        for (auto &index : tb.index) {
+            for (auto &val : value_list) {
+                if (val.type.attrName != index.second) { continue; }
+                cond.value = val;
+                cond.attr = val.type.attrName;
+                uniqueTest.attrName = cond.attr;
+                uniqueTest.cond = cond;
+                uniqueTest.attrType = cond.value.type.M();
+                if (rm->selectRecord(tb, tb.attrNames, conds, uniqueTest, false)) {
+                    std::cerr << "Insert failed. Duplicate key!" << std::endl;
+                    return 0;
+                }
+            }
+        }
 
         Tuple t;
         t.element = value_list;
