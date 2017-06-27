@@ -97,7 +97,7 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
     fp.seekg(ios_base::end);
     //int blockOffset = fp.tellg() / BlockSize;
     int blockOffset = getBlockTail(filename) + 1;
-    cout << "Detected blockOffset: " << blockOffset << endl;
+//    cout << "Detected blockOffset: " << blockOffset << endl;
     if (offset >= blockOffset) {
         if (!allocate) { return nullptr; }
         if (blockOffset != offset) {
@@ -105,7 +105,7 @@ char *BufferManager::getBlock(string filename, unsigned int offset, bool allocat
             cerr << "Requesting way beyond the tail!" << endl;
             return nullptr;
         }
-        cout << "Requesting new block..." << endl;
+//        cout << "Requesting new block..." << endl;
     }
 
     Block &block = getFreeBlock();
