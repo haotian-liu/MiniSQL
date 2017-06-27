@@ -228,8 +228,14 @@ void dispatch()
 
 void exec_file(const std::string &file_name)
 {
-    std::cout << "Executing SQL file: " << file_name << std::endl;
     std::ifstream file(file_name);
+
+    if (!file.is_open())
+    {
+        std::cout << "File not found!" << std::endl;
+        return;
+    }
+    std::cout << "Executing SQL file: " << file_name << std::endl;
 
     while (!file.eof())
     {
