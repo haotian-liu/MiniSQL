@@ -84,36 +84,36 @@ int IndexManager::searchNext(const string &filename, int attrType) {
     switch (attrType) {
         case MINISQL_TYPE_INT:
             intNode = intOffsetMap.find(filename)->second;
-            intOffsetMap[filename] = intNode;
             intNode.index++;
             if (intNode.index == intNode.node->cnt) {
                 intNode.node = intNode.node->sibling;
                 intNode.index = 0;
             }
+            intOffsetMap[filename] = intNode;
             if (intNode.node != nullptr) {
                 return intNode.node->keyOffset[intNode.index];
             }
             break;
         case MINISQL_TYPE_FLOAT:
             floatNode = floatOffsetMap.find(filename)->second;
-            floatOffsetMap[filename] = floatNode;
             floatNode.index++;
             if (floatNode.index == floatNode.node->cnt) {
                 floatNode.node = floatNode.node->sibling;
                 floatNode.index = 0;
             }
+            floatOffsetMap[filename] = floatNode;
             if (floatNode.node != nullptr) {
                 return floatNode.node->keyOffset[floatNode.index];
             }
             break;
         case MINISQL_TYPE_CHAR:
             charNode = charOffsetMap.find(filename)->second;
-            charOffsetMap[filename] = charNode;
             charNode.index++;
             if (charNode.index == charNode.node->cnt) {
                 charNode.node = charNode.node->sibling;
                 charNode.index = 0;
             }
+            charOffsetMap[filename] = charNode;
             if (charNode.node != nullptr) {
                 return charNode.node->keyOffset[charNode.index];
             }

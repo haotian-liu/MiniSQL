@@ -168,11 +168,12 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
 bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
                                  const IndexHint &indexHint) {
     string tableFileName = tableFile(table.Name);
+    string indexFileName = indexFile(table.Name, "");
     int recordPos;
     if (indexHint.cond.cond == MINISQL_COND_LESS || indexHint.cond.cond == MINISQL_COND_LEQUAL) {
-        recordPos = im->searchHead(tableFileName, indexHint.attrType);
+        recordPos = im->searchHead(indexFileName, indexHint.attrType);
     } else {
-        recordPos = im->search(tableFileName, indexHint.cond.value);
+        recordPos = im->search(indexFileName, indexHint.cond.value);
     }
 
     int length = table.recordLength + 1;
@@ -189,7 +190,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
 
     while (recordPos != -1) {
         blockID = recordPos / recordsPerBlock;
-        block = bm->getBlock(tableFileName, blockID) + recordPos % recordsPerBlock;
+        block = bm->getBlock(tableFileName, blockID) + recordPos % recordsPerBlock * length;
         convertToTuple(block, 0, table.attrType, tup);
         if (condsTest(cond, tup, table.attrNames)) {
             row = tup.fetchRow(table.attrNames, attr);
@@ -201,7 +202,7 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
                 break;
             }
         }
-        recordPos = im->searchNext(tableFileName, indexHint.attrType);
+        recordPos = im->searchNext(indexFileName, indexHint.attrType);
         cnt++;
         if (cnt > threshold) {
             degrade = true;
