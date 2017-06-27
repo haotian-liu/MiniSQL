@@ -153,7 +153,7 @@ int RecordManager::insertRecord(const Table &table, const Tuple &record) {
     return blockID * recordsPerBlock + recordOffset;
 }
 
-bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
+int RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond) {
     int blockID = 0;
     char *block = bm->getBlock(tableFile(table.Name), blockID);
     int length = table.recordLength + 1;
@@ -177,10 +177,11 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     }
 
     dumpResult(res);
+    return res.row.size();
 }
 
-bool RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
-                                 const IndexHint &indexHint) {
+int RecordManager::selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond,
+                                 const IndexHint &indexHint, bool printResult) {
     string tableFileName = tableFile(table.Name);
     string indexFileName = indexFile(table.Name, indexHint.attrName);
     int recordPos;
@@ -234,9 +235,12 @@ bool RecordManager::selectRecord(const Table &table, const vector<string> &attr,
     }
 
     if (!degrade) {
-        dumpResult(res);
+        if (printResult) {
+            dumpResult(res);
+        }
+        return cnt;
     } else {
-        selectRecord(table, attr, cond);
+        return selectRecord(table, attr, cond);
     }
 }
 
