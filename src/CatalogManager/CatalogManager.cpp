@@ -52,6 +52,7 @@ void CatalogManager::Flush() const
     for (const auto &tb: tables)
     {
         ofs << tb.Name << std::endl;
+        ofs << tb.recordCnt << std::endl;
         std::ofstream otbfs(tb.Name + ".catalog");
         uint16_t i{0};
 
@@ -118,6 +119,7 @@ void CatalogManager::LoadFromFile()
 
         Table tb;
         //size_t len{0};
+        ifs >> tb.recordCnt;
 
         tb.Name = tb_name;
 
