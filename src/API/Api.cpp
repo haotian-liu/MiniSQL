@@ -178,7 +178,9 @@ namespace Api
         }
 
         auto b1 = rm->createIndex(tb, type);
+        //FIXME! should the im be called from API directly???
         auto b2 = im->create(indexFile(table_name, attribute_name), type);
+        tb.index.push_back(std::make_pair(attribute_name, index_name));
         cm->Flush();
         if (b1 && b2)
         {
