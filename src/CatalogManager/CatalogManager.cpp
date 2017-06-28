@@ -35,11 +35,6 @@ void CatalogManager::CreateTable(const std::string &table_name,
             (tb.attrType.end() - 1)->primary = true;
             (tb.attrType.end() - 1)->unique = true;
         }
-/*        if (!(tb.attrType.end() - 1)->primary && (tb.attrType.end() - 1)->unique)
-        {
-            tb.index.push_back(std::make_pair(*(tb.attrNames.end() - 1), std::string("auto_ind_") + (auto_ind++)));
-            rm->createIndex(tb, )
-        }*/
     }
 
     tb.recordLength = len;

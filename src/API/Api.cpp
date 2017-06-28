@@ -268,7 +268,7 @@ namespace Api
 
         for (auto &it: tb.index)
         {
-            auto ifn = it.second;
+            auto ifn = it.first;
             rm->dropIndex(tb, ifn);
         }
 
