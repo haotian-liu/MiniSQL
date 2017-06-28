@@ -126,7 +126,7 @@ namespace Api
 
         if (cm->TableExist(table_name))
         {
-            std::cout << "Table already exists!" << std::endl;
+            std::cerr << "Table already exists!" << std::endl;
             return false;
         }
 
@@ -138,7 +138,7 @@ namespace Api
             {
                 if (it.second.charSize < 1 || it.second.charSize > 255)
                 {
-                    std::cout << "Char count out of range" << std::endl;
+                    std::cerr << "Char count out of range" << std::endl;
                     return false;
                 }
             }
@@ -166,7 +166,7 @@ namespace Api
             }
             if (!pri_schema_found)
             {
-                std::cout << "Primary key not found!" << std::endl;
+                std::cerr << "Primary key not found!" << std::endl;
                 return false;
             }
         }
@@ -193,13 +193,13 @@ namespace Api
 
         if (cm->CheckIndexNameExists(index_name))
         {
-            std::cout << "Index name exists!" << std::endl;
+            std::cerr << "Index name exists!" << std::endl;
             return false;
         }
 
         if (!cm->TableExist(table_name))
         {
-            std::cout << "Table not found!" << std::endl;
+            std::cerr << "Table not found!" << std::endl;
             return false;
         }
         auto &tb = cm->GetTable(table_name);
@@ -214,7 +214,7 @@ namespace Api
                     std::cout << "Create index success" << std::endl;
                     return true;
                 }
-                std::cout << "Index on the attribute exists!" << std::endl;
+                std::cerr << "Index on the attribute exists!" << std::endl;
                 return false;
             }
         }
@@ -247,7 +247,7 @@ namespace Api
             return true;
         } else
         {
-            std::cout << "Unknown failure!" << std::endl;
+            std::cerr << "Unknown failure!" << std::endl;
             return false;
         }
     }
@@ -260,7 +260,7 @@ namespace Api
 
         if (!cm->TableExist(table_name))
         {
-            std::cout << "Table not found!" << std::endl;
+            std::cerr << "Table not found!" << std::endl;
             return false;
         }
 
@@ -288,7 +288,7 @@ namespace Api
         bool e = cm->CheckIndexNameExists(index_name);
         if (!e)
         {
-            std::cout << "Index not found!" << std::endl;
+            std::cerr << "Index not found!" << std::endl;
             return false;
         }
         auto &tb = cm->GetTableWithIndex(index_name);
@@ -316,7 +316,7 @@ namespace Api
 
         if (!cm->TableExist(table_name))
         {
-            std::cout << "Table not found!" << std::endl;
+            std::cerr << "Table not found!" << std::endl;
             return false;
         }
 
@@ -327,13 +327,13 @@ namespace Api
             auto it = std::find(tb.attrNames.begin(), tb.attrNames.end(), cond.name);
             if (it == tb.attrNames.end())
             {
-                std::cout << "Attribute in conditions mismatch!" << std::endl;
+                std::cerr << "Attribute in conditions mismatch!" << std::endl;
                 return false;
             }
             auto type = tb.attrType[it - tb.attrNames.begin()];
             if (type.type != cond.val.type.type)
             {
-                std::cout << "Type in conditions mismatch!" << std::endl;
+                std::cerr << "Type in conditions mismatch!" << std::endl;
                 return false;
             }
         }
@@ -350,7 +350,7 @@ namespace Api
 
         if (!cm->TableExist(table_name))
         {
-            std::cout << "Table not found!" << std::endl;
+            std::cerr << "Table not found!" << std::endl;
             return false;
         }
 
@@ -366,7 +366,7 @@ namespace Api
         {
             if (std::find(tb.attrNames.begin(), tb.attrNames.end(), at) == tb.attrNames.end())
             {
-                std::cout << "Attribute mismatch!" << std::endl;
+                std::cerr << "Attribute mismatch!" << std::endl;
                 return false;
             }
         }
@@ -402,7 +402,7 @@ namespace Api
 
         if (!cm->TableExist(table_name))
         {
-            std::cout << "Table not found!" << std::endl;
+            std::cerr << "Table not found!" << std::endl;
             return false;
         }
 
@@ -413,13 +413,13 @@ namespace Api
             auto it = std::find(tb.attrNames.begin(), tb.attrNames.end(), cond.name);
             if (it == tb.attrNames.end())
             {
-                std::cout << "Attribute in conditions mismatch!" << std::endl;
+                std::cerr << "Attribute in conditions mismatch!" << std::endl;
                 return false;
             }
             auto type = tb.attrType[it - tb.attrNames.begin()];
             if (type.type != cond.val.type.type)
             {
-                std::cout << "Type in conditions mismatch!" << std::endl;
+                std::cerr << "Type in conditions mismatch!" << std::endl;
                 return false;
             }
         }
@@ -436,7 +436,7 @@ namespace Api
             std::cout << "Delete success" << std::endl;
         } else
         {
-            std::cout << "Delete failed!" << std::endl;
+            std::cerr << "Delete failed!" << std::endl;
         }
         return r;
     }
@@ -444,7 +444,7 @@ namespace Api
     bool update(const std::string &table_name, const std::string &attr, const SqlValue &value,
                 const std::vector<Condition> &condition_list)
     {
-        std::cout << "Not supported." << std::endl;
+        std::cerr << "Not supported." << std::endl;
         return false;
     }
 }

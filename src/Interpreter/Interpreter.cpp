@@ -232,7 +232,7 @@ void exec_file(const std::string &file_name)
 
     if (!file.is_open())
     {
-        std::cout << "File not found!" << std::endl;
+        std::cerr << "File not found!" << std::endl;
         return;
     }
     std::cout << "Executing SQL file: " << file_name << std::endl;
@@ -242,7 +242,7 @@ void exec_file(const std::string &file_name)
         memset(input_tmp, 0, INPUT_LENGTH);
         file.getline(input_tmp, INPUT_LENGTH);
 
-        std::cout << input_tmp << std::endl;
+//        std::cout << input_tmp << std::endl;
 
         //code below copied from main loop:
         //copy temp input to buffer to form a multi-line completed statement.
