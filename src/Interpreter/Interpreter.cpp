@@ -49,8 +49,8 @@ void main_repl_loop [[noreturn]]()
     while (true)
     {
         memset(input_tmp, 0, INPUT_LENGTH);
-#ifdef NO_GNU_READLINE
-        std::cout << "\n>>> ";
+#if defined(__APPLE__) || defined(NO_GNU_READLINE)
+        std::cout << "\nMiniSQL> ";
         std::cin.getline(input_tmp, INPUT_LENGTH);
 #else
         char *rl = readline("MiniSQL>");
