@@ -37,7 +37,7 @@ struct Block {
         fstream fp;
         fp.open(filename, ios::in | ios::out | ios::ate | ios::binary);
         fp.seekg(blockID * BlockSize, ios::beg);
-        cout << "Flushing: " << content << endl;
+//        cout << "Flushing: " << content << endl;
         fp.write(content, BlockSize);
         fp.close();
         return *this;
