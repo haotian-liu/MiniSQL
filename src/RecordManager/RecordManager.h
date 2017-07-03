@@ -14,11 +14,9 @@
 using namespace std;
 using namespace MINISQL_BASE;
 
-class RecordManager
-{
+class RecordManager {
 public:
-    RecordManager(BufferManager *bm, IndexManager *im) : bm(bm), im(im)
-    {}
+    RecordManager(BufferManager *bm, IndexManager *im) : bm(bm), im(im) {}
 
     ~RecordManager() = default;
 
@@ -35,7 +33,8 @@ public:
     int selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond);
 
     int
-    selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint, bool printResult = true);
+    selectRecord(const Table &table, const vector<string> &attr, const vector<Cond> &cond, const IndexHint &indexHint,
+                 bool printResult = true);
 
     bool deleteRecord(const Table &table, const vector<Cond> &cond);
 

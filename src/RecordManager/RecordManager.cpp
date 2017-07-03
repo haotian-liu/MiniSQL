@@ -226,11 +226,11 @@ int RecordManager::selectRecord(const Table &table, const vector<string> &attr, 
         }
         recordPos = im->searchNext(indexFileName, indexHint.attrType);
         cnt++;
-//        if (cnt > threshold) {
-//            degrade = true;
-//            bm->setFree(tableFileName, blockID);
-//            break;
-//        }
+        if (cnt > threshold) {
+            degrade = true;
+            bm->setFree(tableFileName, blockID);
+            break;
+        }
         bm->setFree(tableFileName, blockID);
     }
 

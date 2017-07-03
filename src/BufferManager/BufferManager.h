@@ -53,7 +53,7 @@ public:
 
     int getBlockTail(string filename);
 
-    void setDirty(const string &filename, unsigned int blockID); // fixme parameter is wrong!!
+    void setDirty(const string &filename, unsigned int blockID);
 
     char *getBlock(string filename, unsigned int blockID, bool allocate = false);
 
